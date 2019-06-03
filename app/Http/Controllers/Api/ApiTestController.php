@@ -11,6 +11,7 @@ class ApiTestController extends Controller
     public function getJsonSample(Request $request)
     {
         $response = [
+            'date' => date('Y/m/d h:i:s'),
             'name' => 'sample',
             'parameters' => [
                 'param1' => '1',
