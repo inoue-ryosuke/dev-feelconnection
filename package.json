@@ -24,5 +24,9 @@
         "vue": "^2.5.17",
         "vue-router": "^3.0.0",
         "vue-template-compiler": "^2.6.10"
+    },
+    "dependencies": {
+        "json2yaml": "^1.1.0",
+        "redoc-cli": "^0.8.4"
     }
 }

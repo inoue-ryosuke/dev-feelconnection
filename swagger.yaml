@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: 'FeelConnection API仕様書'
+  version: '1.0'
+paths:
+  /api/get_json_sample:
+    post:
+      tags:
+        - Sample
+      summary: 'API-xx: テストAPI'
+      description: JSONサンプルを表示するためのAPI
+      operationId: 'App\Http\Controllers\Api\ApiTestController::getJsonSample'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              properties:
+                paramater1:
+                  description: リクエストパラメータ1
+                  type: integer
+                paramater2:
+                  description: リクエストパラメータ2
+                  type: integer
+              type: object
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-FeelConnection-Required-Ver:
+              description: 対応バージョン
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                properties:
+                  date: { description: 日付（サンプル）, type: date }
+                  name: { description: 名前（サンプル）, type: string }
+                  parameters: { description: パラメータ（サンプル）, properties: { param1: { description: オブジェクト内パラメータ1（サンプル）, type: string }, param2: { description: オブジェクト内オブジェクト2（サンプル）, properties: { key: { description: オブジェクト2パラメータキー, type: string }, value: { description: オブジェクト2パラメータ値, type: string } }, type: object }, param3: { description: 配列内オブジェクトパラメータ群3（サンプル）, type: array, items: { properties: { param3_key: { description: オブジェクト3パラメータキー, type: string }, param3_value: { description: オブジェクト3パラメータ値, type: string } }, type: object } } }, type: object }
+                type: object
