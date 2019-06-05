@@ -165,7 +165,8 @@ return [
         /*
          * Package Service Providers...
          */
-
+        //App\Providers\AnnotationsServiceProvider::class,      // ルーティング情報をアノテーション指定
+        Barryvdh\Debugbar\ServiceProvider::class,             // Debugbar
         /*
          * Application Service Providers...
          */
@@ -174,6 +175,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\HelperServiceProvider::class,           // ヘルパー関数
 
     ],
 

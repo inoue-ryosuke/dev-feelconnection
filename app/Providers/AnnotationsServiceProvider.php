@@ -36,6 +36,7 @@ class AnnotationsServiceProvider extends ServiceProvider
         // API
         $scanRoutes = array_merge($scanRoutes, [
             'App\Http\Controllers\Api\ApiTestController',
+            'App\Http\Controllers\Api\AuthController',
         ]);
 
         // WEB

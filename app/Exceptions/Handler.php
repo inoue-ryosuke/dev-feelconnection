@@ -100,10 +100,10 @@ class Handler extends ExceptionHandler
         // API向けの出力
         if(isApiRequest()){
             $response =  [
-                'error'     => 1,
-                'errorId'   => $errorId,
-                'code'      => $code,
-                'message'   => $message
+                'result_code' => 1,
+                'error_id'    => $errorId,
+                'error_code'  => $code,
+                'message'     => $message
             ];
 
             $return_code = $this->getReturnCode($exception);
