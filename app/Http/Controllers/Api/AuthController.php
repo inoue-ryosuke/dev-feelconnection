@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 
 /**
  * 認証コントローラー
- * @Middleware({"logger", "ua", "append", "maintenance", "api"})
+ //* @Middleware({"logger", "ua", "append", "maintenance", "api"})
  */
 class AuthController extends ApiController
 {
