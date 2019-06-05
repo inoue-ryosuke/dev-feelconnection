@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Exceptions\MalformedPayloadException;
 use App\Exceptions\IllegalParameterException;
 use App\Libraries\Logger;
-use Debugbar;
+//use Debugbar;
 
 /**
  */
@@ -26,7 +26,7 @@ class ApiController extends Controller
 
     public function __destruct()
     {
-        \Debugbar::disable();
+//        \Debugbar::disable();
 //        logger('debugbar off');
     }
 
