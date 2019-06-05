@@ -27,7 +27,6 @@ class HelperServiceProvider extends ServiceProvider
     public function register()
     {
         foreach (glob(app_path() . '/Helpers/*.php') as $filename) {
-            var_dump("Helpers set[".$filename."]");
             require_once($filename);
         }
     }

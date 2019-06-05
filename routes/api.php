@@ -19,4 +19,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 */
 Route::group(['middleware' => 'api'], function () {
     Route::post('/get_json_sample', 'Api\ApiTestController@getJsonSample')->name('get_json_sample');
+    Route::post('/auth', 'Api\AuthController@getUserInfo')->name('api.auth.get');
 });

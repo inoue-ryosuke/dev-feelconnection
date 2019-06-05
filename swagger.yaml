@@ -40,3 +40,59 @@ paths:
                   name: { description: 名前（サンプル）, type: string }
                   parameters: { description: パラメータ（サンプル）, properties: { param1: { description: オブジェクト内パラメータ1（サンプル）, type: string }, param2: { description: オブジェクト内オブジェクト2（サンプル）, properties: { key: { description: オブジェクト2パラメータキー, type: string }, value: { description: オブジェクト2パラメータ値, type: string } }, type: object }, param3: { description: 配列内オブジェクトパラメータ群3（サンプル）, type: array, items: { properties: { param3_key: { description: オブジェクト3パラメータキー, type: string }, param3_value: { description: オブジェクト3パラメータ値, type: string } }, type: object } } }, type: object }
                 type: object
+  /api/auth:
+    post:
+      tags:
+        - Auth
+      summary: 'API-01: 認証情報の取得'
+      description: 認証されている会員情報を取得
+      operationId: 'App\Http\Controllers\Admin\AuthController::getUserInfo'
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-FeelConnection-Required-Ver:
+              description: 対応バージョン
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                properties:
+                  result_code: { description: '0:正常 1:エラー(フロント側のダイアログ制御仕分け用)', type: integer }
+                  name: { description: 認証ユーザー名称, type: string }
+                  kana: { description: 認証ユーザー名フリガナ, type: string }
+                  mail: { description: PCメールアドレス, type: string }
+                  b_birthday: { description: 生年月日（和暦）, type: string }
+                  b_year: { description: 生年月日（西暦：年）, type: integer }
+                  b_month: { description: 生年月日（西暦：月）, type: integer }
+                  b_day: { description: 生年月日（西暦：日）, type: integer }
+                  sex: { description: '性別（1:男性 2:女性 3:未設定）', type: integer }
+                  h_zip: { description: 郵便番号（ハイフンを含む）, type: string }
+                  h_pref: { description: 都道府県, type: string }
+                  h_addr: { description: 番地、建物名, type: string }
+                  h_tel: { description: 電話番号（ハイフンなし）, type: string }
+                  memtype_name: { description: 会員種別名（変更がある場合は（変更登録あり）の文言が末尾に追加）, type: string }
+                  store_name: { description: 所属店名（複数想定：「、」区切り）, type: string }
+                  dm_list: { description: '案内メール(現行では1:PCメールのみ想定)  チェックON= 1:PCメールのみON  チェックOFF=5:拒否のみON', type: string }
+                  pc_conf: { description: '予約確認メール（0：予約確認メールしない　1:予約確認メールする）', type: integer }
+                  gmo_credit: { description: GMO関連の手続き処理（外部URL）に指定するパラメータ, type: string }
+                type: object
+        '403':
+          description: 'NG（403:認証失敗時）'
+          headers:
+            X-FeelConnection-Required-Ver:
+              description: 対応バージョン
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                properties:
+                  result_code: { description: '1:エラー(フロント側のダイアログ制御仕分け用)', type: integer }
+                  error_id: { description: サーバ返却エラーID（通常はHTTPレスポンスコード）, type: string }
+                  error_code: { description: サーバ返却エラーコード, type: string }
+                  message: { description: サーバ返却エラーメッセージ, type: string }
+                type: object
