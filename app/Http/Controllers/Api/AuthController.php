@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Api;
 
 //use App\Libraries\Logic\Loader;  実開発の場合はロジック層にて実装
 use Illuminate\Http\Request;
