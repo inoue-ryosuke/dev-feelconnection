@@ -26,7 +26,7 @@ class ApiController extends Controller
 
     public function __destruct()
     {
-        \Debugbar::disable();
+//        \Debugbar::disable();
 //        logger('debugbar off');
     }
 
