@@ -42,7 +42,9 @@ class InviteController extends Controller
      */
     public function validateInviteCode($inviteCode, Request $request)
     {
+        logger('validateInviteCode start');
         if (empty($inviteCode)) {
+            logger($inviteCode);
             $inviteCode = 'asdf1321asfa3s21asf';
         }
         $response = [
@@ -51,8 +53,9 @@ class InviteController extends Controller
             'lesson_flag' => 1,
             'friend_flag' => 0,
         ];
-        
+        logger('validateInviteCode end');
         return response()->json($response)->Cookie('_ic', $inviteCode);
+
     }
     
 }
