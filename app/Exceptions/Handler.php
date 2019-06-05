@@ -95,7 +95,7 @@ class Handler extends ExceptionHandler
 
         // 404 NotFound の場合
         if (!isApiRequest() && $exception instanceof NotFoundHttpException) {
-            return redirect()->route("admin.top.get");
+            return redirect()->url("app");
         }
         // API向けの出力
         if(isApiRequest()){
@@ -110,7 +110,7 @@ class Handler extends ExceptionHandler
             return new JSONResponse($response,$return_code);
         }
         // その他例外の場合
-        return redirect()->route("admin.top.get");
+        return redirect()->route("app");
         // 描画
         //return parent::render($request, $exception);
     }

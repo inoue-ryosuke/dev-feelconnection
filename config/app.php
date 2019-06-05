@@ -166,7 +166,7 @@ return [
          * Package Service Providers...
          */
         App\Providers\AnnotationsServiceProvider::class,      // ルーティング情報をアノテーション指定
-        Barryvdh\Debugbar\ServiceProvider::class,             // Debugbar
+//        Barryvdh\Debugbar\ServiceProvider::class,             // Debugbar
         /*
          * Application Service Providers...
          */
