@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
  * TestＡＰＩコントローラー
  * @Middleware({"logger", "ua",  "web.nocsrf", "api.logger", "append", "auth:api", "maintenance","token"})
  */
-class ApiTestController extends Controller
+class ApiTestController extends ApiController
 {
     /**
      * API-xx: テストAPI
@@ -76,11 +76,16 @@ class ApiTestController extends Controller
             'name' => 'sample',
             'parameters' => [
                 'param1' => '1',
-                'param2' => ['p' => '2']
+                'param2' => ['p' => '2'],
+                'param3' => [
+                        ['param3_key' => 'param3_value'],
+                        ['param3_key' => 'param3_value'],
+                        ['param3_key' => 'param3_value'],
+                ],
             ]
         ];
-        
+
         return response()->json($response);
     }
-    
+
 }

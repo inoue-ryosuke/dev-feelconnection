@@ -18,7 +18,9 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (Auth::guard($guard)->check()) {
-            return redirect('/home');
+            // 認証状態にあるときは各TOPへ飛ばす
+            $url = route('admin.top.get');
+            return redirect($url);
         }
 
         return $next($request);
