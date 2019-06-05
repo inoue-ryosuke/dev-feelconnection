@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-// /**
-// * TestＡＰＩコントローラー
-//// * @Middleware({"logger", "ua",  "web.nocsrf", "api.logger", "append", "auth:api", "maintenance"})
-// */
+ /**
+ * TestＡＰＩコントローラー
+// * @Middleware({"logger", "ua",  "api.logger", "append", "maintenance"})
+ */
 class InviteController extends Controller
 {
     /**
@@ -36,7 +36,7 @@ class InviteController extends Controller
      *     )
      * )
      *
-     * @GET("/api/invite/{invite_code}", as="api.invite.get")
+     * @GET("api/invite/{invite_code}", as="api.invite.get")
      * @param Request $request
      * @return
      */
