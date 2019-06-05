@@ -32,11 +32,15 @@ class AnnotationsServiceProvider extends ServiceProvider
      */
     public function __construct(Application $app)
     {
-
+        $scanRoutes = [
+//            'App\Http\Controllers\Api\ApiTestController',
+//            'App\Examples\Http\Controllers\HtmlController',
+        ];
         // API
         $scanRoutes = array_merge($scanRoutes, [
             'App\Http\Controllers\Api\ApiTestController',
             'App\Http\Controllers\Api\AuthController',
+            'App\Http\Controllers\Api\InviteController',
         ]);
 
         // WEB

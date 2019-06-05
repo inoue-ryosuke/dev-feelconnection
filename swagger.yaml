@@ -46,7 +46,7 @@ paths:
         - Auth
       summary: 'API-01: 認証情報の取得'
       description: 認証されている会員情報を取得
-      operationId: 'App\Http\Controllers\Admin\AuthController::getUserInfo'
+      operationId: 'App\Http\Controllers\Api\AuthController::getUserInfo'
       responses:
         '200':
           description: OK
@@ -95,4 +95,29 @@ paths:
                   error_id: { description: サーバ返却エラーID（通常はHTTPレスポンスコード）, type: string }
                   error_code: { description: サーバ返却エラーコード, type: string }
                   message: { description: サーバ返却エラーメッセージ, type: string }
+                type: object
+  '/api/invite/{invite_code}':
+    get:
+      tags:
+        - Invite
+      summary: 'API-xx: 紹介URL有効性確認API'
+      description: '対象の紹介URLに埋め込まれた{invite_code}の有効性を確認する。'
+      operationId: 'App\Http\Controllers\Api\InviteController::validateInviteCode'
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-FeelConnection-Required-Ver:
+              description: 対応バージョン
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                properties:
+                  result_code: { description: '結果コード(0:正常 1:エラー)', type: integer }
+                  lid: { description: レッスンID, type: integer }
+                  lesson_flag: { description: 'レッスン受講可能判定(0:不可　1:可(申し込んだレッスンが受講可能か判定。受講可能の場合は1:可))', type: integer }
+                  friend_flag: { description: '友人紹介判定(0:偽　1:真(アカウント登録か体験レッスン申込か判定。アカウント登録の場合は1:真))', type: integer }
                 type: object
