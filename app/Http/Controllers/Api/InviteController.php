@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class InviteController extends Controller
 {
     /**
-     * API-xx: テストAPI
+     * API-xx: 紹介URL有効性確認API
      * @OA\GET(
      *     path="/api/invite/{invite_code}",
      *     description="対象の紹介URLに埋め込まれた{invite_code}の有効性を確認する。",
@@ -42,7 +42,9 @@ class InviteController extends Controller
      */
     public function validateInviteCode($inviteCode, Request $request)
     {
-        $inviteCode = 'asdf1321asfa3s21asf';
+        if (empty($inviteCode)) {
+            $inviteCode = 'asdf1321asfa3s21asf';
+        }
         $response = [
             'result_code' => 0,
             'lid' => 51,

@@ -8,8 +8,8 @@ use Illuminate\Http\Response;
 
 
 /**
- * 管理画面ユーザー情報コントローラー
- * @Middleware({"logger", "ua", "append", "maintenance", "api", "auth:web"})
+ * 認証コントローラー
+ * @Middleware({"logger", "ua", "append", "maintenance", "api"})
  */
 class AuthController extends ApiController
 {
