@@ -36,7 +36,7 @@ class InviteController extends Controller
      *     )
      * )
      *
-     * @GET("/api/invite/{invite_code}", as="api.invite.get")
+     * @GET("api/invite/{invite_code}", as="api.invite.get")
      * @param Request $request
      * @return
      */

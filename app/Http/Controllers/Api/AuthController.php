@@ -72,7 +72,7 @@ class AuthController extends ApiController
      *     )
      * )
      *
-     * @POST("/api/auth", as="api.auth.get")
+     * @POST("api/auth", as="api.auth.get")
      * @param $request
      * @return Response
      */

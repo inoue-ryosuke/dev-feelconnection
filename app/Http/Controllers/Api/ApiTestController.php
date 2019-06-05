@@ -64,8 +64,7 @@ class ApiTestController extends ApiController
      *          ),
      *     )
      * )
-     *
-     * @POST("/api/get_json_sample", as="api.get_json_sample.get")
+     * @POST("api/get_json_sample", as="api.get_json_sample.get")
      * @param Request $request
      * @return void
      */
