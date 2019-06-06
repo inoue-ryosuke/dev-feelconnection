@@ -110,7 +110,7 @@ class Handler extends ExceptionHandler
             return new JSONResponse($response,$return_code);
         }
         // その他例外の場合
-        return redirect()->route("app");
+        return redirect()->route("/");
         // 描画
         //return parent::render($request, $exception);
     }
