@@ -167,8 +167,8 @@ return [
          */
         App\Providers\AnnotationsServiceProvider::class,      // ルーティング情報をアノテーション指定
 //        Barryvdh\Debugbar\ServiceProvider::class,             // Debugbar
-        Way\Generators\GeneratorsServiceProvider::class,
-        Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
+//        Way\Generators\GeneratorsServiceProvider::class,
+//        Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
         /*
          * Application Service Providers...
          */
