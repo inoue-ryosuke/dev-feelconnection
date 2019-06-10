@@ -71,8 +71,10 @@ class Handler extends ExceptionHandler
         $version = $request->headers->get('X-FeelConnection-Version');
 //        $method = array_selector('REQUEST_METHOD', $_SERVER, '-');
 //        $uri = array_selector('REQUEST_URI', $_SERVER, '-');
-        $method = array_get($_SERVER, 'REQUEST_METHOD', '-');
-        $uri = array_get($_SERVER,'REQUEST_URI', '-');
+//        $method = array_get($_SERVER, 'REQUEST_METHOD', '-');
+//        $uri = array_get($_SERVER,'REQUEST_URI', '-');
+        $method = data_get($_SERVER, 'REQUEST_METHOD', '-');
+        $uri = data_get($_SERVER,'REQUEST_URI', '-');
         $ua = $request->headers->get('USER_AGENT');
         $code = $this->isHttpException($exception)?$exception->getStatusCode():$exception->getCode();
         $message = $exception->getMessage();
@@ -95,7 +97,7 @@ class Handler extends ExceptionHandler
 
         // 404 NotFound の場合
         if (!isApiRequest() && $exception instanceof NotFoundHttpException) {
-            return redirect()->url("app");
+            return redirect()->route('top');
         }
         // API向けの出力
         if(isApiRequest()){
@@ -110,7 +112,7 @@ class Handler extends ExceptionHandler
             return new JSONResponse($response,$return_code);
         }
         // その他例外の場合
-        return redirect()->route("/");
+        return redirect()->route('top');
         // 描画
         //return parent::render($request, $exception);
     }
