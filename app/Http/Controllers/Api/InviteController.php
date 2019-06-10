@@ -5,11 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
- /**
- * TestＡＰＩコントローラー
-// * @Middleware({"logger", "ua",  "api.logger", "append", "maintenance"})
- */
-class InviteController extends Controller
+class InviteController extends ApiController
 {
     /**
      * API-xx: 紹介URL有効性確認API

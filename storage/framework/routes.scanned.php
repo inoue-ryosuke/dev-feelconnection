@@ -16,6 +16,14 @@ $router->get('api/invite/{invite_code}', [
 	'domain' => NULL,
 ]);
 
+$router->post('api/instructors', [
+	'uses' => 'App\Http\Controllers\Api\UserMasterController@getInstructors',
+	'as' => 'api.instructors.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->post('api/reservation_modal', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@reservationModalApi',
 	'as' => 'api.reservation_modal.post',
