@@ -12,5 +12,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // $this->call(UsersTableSeeder::class);
+        //DB::statement('TRUNCATE sessions CASCADE');
+        //$this->call(UserMasterSeeder::class);
+        $this->call(CustSeeder::class);
     }
 }
