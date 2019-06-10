@@ -81,9 +81,9 @@ class ApiController extends Controller
                 }
                 return $record->{$v};
             }, $mapper);
-            $value = array_get($rules, $key);
+            $value = data_get($rules, $key);
             $value = vsprintf($value, $recordMapper);
-            array_set($rules, $key, $value);
+            data_set($rules, $key, $value);
         }
 
         $validator = validator(
