@@ -41,6 +41,8 @@ class AnnotationsServiceProvider extends ServiceProvider
             'App\Http\Controllers\Api\ApiTestController',
             'App\Http\Controllers\Api\AuthController',
             'App\Http\Controllers\Api\InviteController',
+            'App\Http\Controllers\Api\UserMasterController',
+            'App\Http\Controllers\Api\MusicController',
             'App\Http\Controllers\Api\ReservationModalController'
         ]);
 

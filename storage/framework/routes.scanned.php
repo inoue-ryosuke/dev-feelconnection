@@ -11,7 +11,23 @@ $router->post('api/auth', [
 $router->get('api/invite/{invite_code}', [
 	'uses' => 'App\Http\Controllers\Api\InviteController@validateInviteCode',
 	'as' => 'api.invite.get',
-	'middleware' => ['logger', 'ua', 'api.logger', 'append', 'maintenance'],
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/instructors', [
+	'uses' => 'App\Http\Controllers\Api\UserMasterController@getInstructors',
+	'as' => 'api.instructors.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->get('api/apple_music', [
+	'uses' => 'App\Http\Controllers\Api\MusicController@getMusicPlaylist',
+	'as' => 'api.apple_music.get',
+	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
 ]);
