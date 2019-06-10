@@ -1,17 +1,9 @@
 <?php 
 
-$router->post('api/get_json_sample', [
-	'uses' => 'App\Http\Controllers\Api\ApiTestController@getJsonSample',
-	'as' => 'api.get_json_sample.get',
-	'middleware' => ['logger', 'ua', 'web.nocsrf', 'api.logger', 'append', 'auth:api', 'maintenance', 'token'],
-	'where' => [],
-	'domain' => NULL,
-]);
-
 $router->post('api/auth', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
 	'as' => 'api.auth.get',
-	'middleware' => ['logger', 'ua', 'append', 'maintenance', 'api'],
+	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -19,6 +11,14 @@ $router->post('api/auth', [
 $router->get('api/invite/{invite_code}', [
 	'uses' => 'App\Http\Controllers\Api\InviteController@validateInviteCode',
 	'as' => 'api.invite.get',
+	'middleware' => ['logger', 'ua', 'api.logger', 'append', 'maintenance'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/reservation_modal', [
+	'uses' => 'App\Http\Controllers\Api\ReservationModalController@reservationModalApi',
+	'as' => 'api.reservation_modal.post',
 	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
