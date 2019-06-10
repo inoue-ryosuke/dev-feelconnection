@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Redis;
 use App\Libraries\Logic\ReservationModal\VaidationLogic;
+use App\Libraries\Logic\ReservationModal\ReservationModalMasterResource;
 
 /**
  * 予約モーダルコントローラー
@@ -14,20 +14,19 @@ use App\Libraries\Logic\ReservationModal\VaidationLogic;
  */
 class ReservationModalController extends Controller
 {
-
     /**
      * 予約モーダルAPI
      *
-     * @POST("api/reservation_modal", as="api.reservation_modal.post")
+     * @GET("api/reservation_modal/{sid}", as="api.reservation_modal.get")
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function reservationModalApi(Request $request)
+    public function reservationModalApi(Request $request, $sid)
     {
-        $parameters = $request->all();
+        $params = array('sid' => $sid);
 
         // レッスンスケジュールIDハッシュのバリデーション
-        if (!VaidationLogic::validateShiftIdHash($parameters)) {
+        if (!VaidationLogic::validateShiftIdHash($params)) {
             // エラー
             return response()
                     ->json([ 'エラー' ])
@@ -41,9 +40,14 @@ class ReservationModalController extends Controller
          * 「lesson_master:ID」のようにキーを指定・Hashで登録して、O(1)で取得できるようにする
          *
          */
-        Redis::set('shiftid_hash:' . $parameters['sid'], 'テスト');
-        $value = Redis::get('shiftid_hash:' . $parameters['sid']);
 
-        return response()->json([ 'redis' => $value ]);
+        // 予約モーダルで必要なマスターデータ取得
+        $resource = new ReservationModalMasterResource($sid);
+        if(!$resource->createRedisResource()) {
+            // Redisキャッシュの取得に失敗
+            $resource->createDBResource();
+        }
+
+        return response()->json([ 'shift_master' => $resource->getShitMasterResource() ]);
     }
 }
