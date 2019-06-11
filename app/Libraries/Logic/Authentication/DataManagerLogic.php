@@ -34,7 +34,7 @@ class DataManagerLogic
             "b_year" => $custinfo->b_year,
             "b_month" => $custinfo->b_month,
             "b_day" => $custinfo->b_day,
-             "sex" => $custinfo->sex,
+            "sex" => $custinfo->sex,
             "h_zip" => $custinfo->h_zip,
             "h_pref" => $custinfo->h_addr1,
             "h_addr" => $custinfo->h_addr2,
@@ -42,7 +42,7 @@ class DataManagerLogic
             "memtype_name" => $custinfo->getMemType(),  //"マンスリーメンバー",
             "store_name" => $custinfo->getStoreNames(), //"銀座（GNZ）、自由が丘（JYO）",
             "dm_list" => $custinfo->getDmLists(),       //"1,,,,",
-               "pc_conf" => $custinfo->getPcConf(),        // 1,
+            "pc_conf" => $custinfo->getPcConf(),        // 1,
             "gmo_credit" => $custinfo->getGmoId()       // "XXXXXXXXXXX",
         ];
         return true;

@@ -5,6 +5,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use App\Exceptions\IllegalParameterException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
+use Carbon\Carbon;
 
 class Cust extends BaseFormModel implements Authenticatable
 {
@@ -22,133 +23,133 @@ class Cust extends BaseFormModel implements Authenticatable
      * @var array
      */
     protected $fillable = [
-	"flg",
-	"webmem",
-	"login_pass",
-	"res_permit_cnt",
-	"gmo_credit",
-	"memberid",
-	"memberid2",
-	"reason_admit",
-	"admit_date",
-	"admit_onday",
-	"reason_rest",
-	"rest_date",
-	"quit",
-	"quit_date",
-	"readmit_date",
-	"resumption",
-	"recess",
-	"idm",
-	"rank",
-	"memtype",
-	"experience_flg",
-	"store_id",
-	"last_tenpo",
-	"sex",
-	"kana",
-	"name",
-	"nickname",
-	"caution",
-	"b_code",
-	"b_name",
-	"br_code",
-	"br_name",
-	"c_code",
-	"c_name",
-	"a_name",
-	"a_number",
-	"y_code",
-	"y_number",
-	"ya_name",
-	"bank_type",
-	"transfer_date",
-	"b_year",
-	"b_month",
-	"b_day",
-	"kubun1_id",
-	"kubun2_id",
-	"kubun3_id",
-	"kubun4_id",
-	"kubun5",
-	"kubun6",
-	"kubun7",
-	"kubun8",
-	"hw",
-	"h_zip",
-	"h_addr1",
-	"h_addr2",
-	"h_buil",
-	"ng_h_hagaki",
-	"h_tel1",
-	"h_tel2",
-	"h_tel3",
-	"cellph1",
-	"cellph2",
-	"cellph3",
-	"fax1",
-	"fax2",
-	"fax3",
-	"c_mail",
-	"c_conf",
-	"ng_c_mail",
-	"pc_mail",
-	"pc_conf",
-	"ng_pc_mail",
-	"job_id",
-	"jobkind_id",
-	"syoujo_sub1",
-	"syoujo_sub2",
-	"t_change",
-	"t_comment",
-	"kana_g",
-	"name_g",
-	"fam_relation",
-	"h_zip_g",
-	"h_addr1_g",
-	"h_addr2_g",
-	"h_buil_g",
-	"ng_h_hagaki_g",
-	"h_tel1_g",
-	"h_tel2_g",
-	"h_tel3_g",
-	"cellph1_g",
-	"cellph2_g",
-	"cellph3_g",
-	"fax1_g",
-	"fax2_g",
-	"fax3_g",
-	"c_mail_g",
-	"pc_mail_g",
-	"memberflg",
-	"type_edit_date",
-	"dm_list",
-	"w_report",
-	"m_pub",
-	"wpatern",
-	"week_id",
-	"first_buy",
-	"first_lesson",
-	"last_lesson",
-	"eraser_name",
-	"reg_user",
-	"edit_tenpoid",
-	"edit_date",
-	"edit_time",
-	"del_date",
-	"del_time",
-	"raiten",
-	"reedit_date",
-	"unpay_total",
-	"mov_id",
-	"mov_id_all",
-	"info_boad",
-	"mail_delivery",
-	"no_mess",
-	"reserve_lock",
-	"salt",
-	"password_change_datetime",
-	"login_trial_count"
+		"flg",
+		"webmem",
+		"login_pass",
+		"res_permit_cnt",
+		"gmo_credit",
+		"memberid",
+		"memberid2",
+		"reason_admit",
+		"admit_date",
+		"admit_onday",
+		"reason_rest",
+		"rest_date",
+		"quit",
+		"quit_date",
+		"readmit_date",
+		"resumption",
+		"recess",
+		"idm",
+		"rank",
+		"memtype",
+		"experience_flg",
+		"store_id",
+		"last_tenpo",
+		"sex",
+		"kana",
+		"name",
+		"nickname",
+		"caution",
+		"b_code",
+		"b_name",
+		"br_code",
+		"br_name",
+		"c_code",
+		"c_name",
+		"a_name",
+		"a_number",
+		"y_code",
+		"y_number",
+		"ya_name",
+		"bank_type",
+		"transfer_date",
+		"b_year",
+		"b_month",
+		"b_day",
+		"kubun1_id",
+		"kubun2_id",
+		"kubun3_id",
+		"kubun4_id",
+		"kubun5",
+		"kubun6",
+		"kubun7",
+		"kubun8",
+		"hw",
+		"h_zip",
+		"h_addr1",
+		"h_addr2",
+		"h_buil",
+		"ng_h_hagaki",
+		"h_tel1",
+		"h_tel2",
+		"h_tel3",
+		"cellph1",
+		"cellph2",
+		"cellph3",
+		"fax1",
+		"fax2",
+		"fax3",
+		"c_mail",
+		"c_conf",
+		"ng_c_mail",
+		"pc_mail",
+		"pc_conf",
+		"ng_pc_mail",
+		"job_id",
+		"jobkind_id",
+		"syoujo_sub1",
+		"syoujo_sub2",
+		"t_change",
+		"t_comment",
+		"kana_g",
+		"name_g",
+		"fam_relation",
+		"h_zip_g",
+		"h_addr1_g",
+		"h_addr2_g",
+		"h_buil_g",
+		"ng_h_hagaki_g",
+		"h_tel1_g",
+		"h_tel2_g",
+		"h_tel3_g",
+		"cellph1_g",
+		"cellph2_g",
+		"cellph3_g",
+		"fax1_g",
+		"fax2_g",
+		"fax3_g",
+		"c_mail_g",
+		"pc_mail_g",
+		"memberflg",
+		"type_edit_date",
+		"dm_list",
+		"w_report",
+		"m_pub",
+		"wpatern",
+		"week_id",
+		"first_buy",
+		"first_lesson",
+		"last_lesson",
+		"eraser_name",
+		"reg_user",
+		"edit_tenpoid",
+		"edit_date",
+		"edit_time",
+		"del_date",
+		"del_time",
+		"raiten",
+		"reedit_date",
+		"unpay_total",
+		"mov_id",
+		"mov_id_all",
+		"info_boad",
+		"mail_delivery",
+		"no_mess",
+		"reserve_lock",
+		"salt",
+		"password_change_datetime",
+		"login_trial_count"
     ];
 
     const CREATED_AT = 'edit_date';
@@ -162,6 +163,11 @@ class Cust extends BaseFormModel implements Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+	// モデル結合アクセサ
+    public function hasMemType() {
+		$this->hasOne(self::Class,"mid","memtype");
+	}
 
     /**
 	 * IDでcust情報を取得する
@@ -177,46 +183,73 @@ class Cust extends BaseFormModel implements Authenticatable
 		return $authcust;
 	}
 
-	public function getBirthDayWord($mode="") {
+	/**
+	 * 年,月,日から誕生日文字列を出力する。
+	 */
+	public function getBirthDayWord($mode="jp") {
 		$y  = $this->b_year;
 		$m  = $this->b_month;
 		$d  = $this->b_day;
 		if (!$y || !$m || !$d ) {
 			return "";
 		}
+		// 和暦変換返却
     	if ($mode="jp") {
-			// TBD:和暦変換：元号取得
-			//"昭和55年1月1日"
-			$jp = $this->getJpCalenderWord($y);
-			return sprintf("%s%d年%d月%d日",$jp,$y,$m,$d);
+			$c = Carbon::createFromDate($y,$m,$d,'Asia/Tokyo');
+			setlocale(LC_TIME, 'ja_JP.utf8');
+			$format = '%EC%Ey年%-m月%-d日';
+			return $c->formatLocalized($format);
 		}
+		// 西暦返却
 		return sprintf("%04d",$y).sprintf("%02d",$m).sprintf("%02d",$d);
 	}
-
+    /**
+	 * 電話番号文字列を返却する
+	 */
 	public function getTelNo($separater="") {
 		if (!$this->h_tel1 || !$this->h_tel2 || !$this->h_tel3) {
 			return "";
 		}
 		return $this->h_tel1.$separater.$this->h_tel2.$separater.$this->h_tel3;
 	}
-	
-	public function getMemType() {
-		//"マンスリーメンバー"	
+	/**
+	 * 会員種別を返却する
+	 */
+	public function getMemTypeName() {
+		/*
+		$memtype = $this->hasMemType->get();
+		if (is_null($memtype)) {
+			return "";
+		}
+		return $memtype->return;
+		*/
 		return "マンスリーメンバー";
 	}
+	/**
+	 * 所属店舗を返却する（TBD:他箇所で取得する処理があればそれを用いる）
+	 */
 	public function getStoreNames() {
 		//"銀座（GNZ）、自由が丘（JYO）",	
 		return "銀座（GNZ）、自由が丘（JYO）";
 	}
+	/**
+	 * 案内メール設定を返却する
+	 */
 	public function getDmLists() {
 		//"1,,,,",
-		return $this->dm_list;
+		return $this->dm_list ?? ",,,,5";
 	}
+	/**
+	 * PCメールアドレス予約確認メール設定を返却する
+	 */
 	public function getPcConf() {
-		return $this->pc_conf;
+		return $this->pc_conf ?? 0;
 	}
+	/**
+	 * GMO会員IDを返却する
+	 */
 	public function getGmoId() {
-		return $this->gmo_credit;
+		return $this->gmo_credit ?? null;
 	}
 
 }
