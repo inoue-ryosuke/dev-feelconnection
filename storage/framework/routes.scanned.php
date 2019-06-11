@@ -32,9 +32,9 @@ $router->get('api/apple_music', [
 	'domain' => NULL,
 ]);
 
-$router->post('api/reservation_modal', [
+$router->get('api/reservation_modal/{sid}', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@reservationModalApi',
-	'as' => 'api.reservation_modal.post',
+	'as' => 'api.reservation_modal.get',
 	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
