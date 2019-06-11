@@ -67,7 +67,7 @@ class UserMasterController extends ApiController
         $payload = $this->getPayload();
         logger('payload');
         logger($payload);
-        $this->validateApiPayload('customer.instructors.search', $payload);
+        $this->validateApiPayload('instructors.search', $payload);
 
         $response = [
             'result_code' => 0,
