@@ -8,6 +8,14 @@ $router->post('api/get_json_sample', [
 	'domain' => NULL,
 ]);
 
+$router->get('api', [
+	'uses' => 'App\Http\Controllers\Api\AuthController@index',
+	'as' => 'api.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->post('api/auth', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
 	'as' => 'api.auth.get',
