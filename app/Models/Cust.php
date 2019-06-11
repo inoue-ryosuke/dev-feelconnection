@@ -184,6 +184,22 @@ class Cust extends BaseFormModel implements Authenticatable
 	}
 
 	/**
+	 * 変更登録情報を不可する判定結果により文言を加えた名前を返却する
+	 */
+    pubic function getNameInfo() {
+		if (is_null($this->type_edit_date)) {
+			return "";
+		}
+		$append = "";
+		$c = Carbon::parse($this->type_edit_date);
+		// 変更日が当日かそれ以下（過去）の場合
+		if ($c->lte(Carbon::today())) {
+			$append = "（変更登録あり）";
+		}
+		return $this->name.$append;
+	}
+
+	/**
 	 * 年,月,日から誕生日文字列を出力する。
 	 */
 	public function getBirthDayWord($mode="jp") {
@@ -221,7 +237,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		if (is_null($memtype)) {
 			return "";
 		}
-		return $memtype->return;
+		return $memtype->type_name ?? "";
 		*/
 		return "マンスリーメンバー";
 	}

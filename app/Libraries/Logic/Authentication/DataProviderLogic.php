@@ -8,7 +8,7 @@ use app\Models\Cust;
  * 認証で使用するバリデーション
  *
  */
-class DataManagerLogic
+class DataProviderLogic
 {
     /**
      * 
@@ -18,16 +18,12 @@ class DataManagerLogic
         $request->get("cid");
         $custinfo = Cust::getAuthInfo($cid);
         if (is_null($custinfo)) {
-            //throw new NotFoundException(); // Hander経由レスポンスの場合
-            // 手動レスポンス形成
-            return response()
-                    ->json([ 'エラー' ])
-                    ->setStatusCode(Response::HTTP_BAD_REQUEST);
+            throw new BadRequestException(); // Hander経由レスポンスの場合
         }
 
         $response = [
             "result_code" => 0,
-            "name" => $custinfo->name,
+            "name" => $custinfo->getNameInfo(),
             "kana" => $custinfo->kana,
             "pc_mail" => $custinfo->pc_mail,
             "b_birthday" => $custinfo->getBirthDayWord("jp"), //"昭和55年1月1日",
@@ -45,6 +41,6 @@ class DataManagerLogic
             "pc_conf" => $custinfo->getPcConf(),        // 1,
             "gmo_credit" => $custinfo->getGmoId()       // "XXXXXXXXXXX",
         ];
-        return true;
+        return $response;
     }
 }

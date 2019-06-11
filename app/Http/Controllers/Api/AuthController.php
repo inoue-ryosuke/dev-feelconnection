@@ -5,8 +5,7 @@ namespace App\Http\Controllers\Api;
 //use App\Libraries\Logic\Loader;  実開発の場合はロジック層にて実装
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Libraries\Logic\Authentication\ValidationLogic;   // バリデーション
-use App\Libraries\Logic\Authentication\DataManagerLogic;  // 情報取得･更新系
+use App\Libraries\Logic\Authentication\DataProviderLogic;  // 情報取得系
 
 ///**
 // * 認証コントローラー
@@ -91,16 +90,12 @@ class AuthController extends ApiController
         logger("getUserInfo() Start");
 
         // ▼実実装用
-        $payload = $request->getContent();
-        $payload = json_decode($payload, true);
-        if (!VaidationLogic::validateAuthInfo($parameters)) {
-            // エラー
-            //throw new AuthenticationErrorException(); Handler経由レスポンスの場合
-            // 手動レスポンス形成
-            return response()
-                    ->json([ 'エラー' ])
-                    ->setStatusCode(Response::HTTP_BAD_REQUEST);
-        }
+        $payload = $this->getPayload();
+        logger('payload');
+        logger($payload);
+        // ペイロードバリデーション
+        $this->validateApiPayload('cust.auth', $payload);
+
         // TBD:認証情報からIDを特定する
         $id = 1;
         $custinfo = DataManagerLogic::getAuthInfo($id);
