@@ -18,9 +18,22 @@ class VaidationLogic
      */
     public static function validateShiftIdHash(array $params) {
         $validator = Validator::make($params, [
-            'sid' => 'required|string'//|exists:shift_master,shiftid_hash'
+            'sid' => 'required|string|exists:shift_master,shiftid_hash'
         ]);
 
         return !$validator->fails();
+    }
+
+    /**
+     * ネット予約公開日時が過去の日付かどうか
+     *
+     * @param string $openDateTime ネット予約公開日時
+     * @return boolean
+     */
+    public static function isOpenDateTimePassed(string $openDateTime) {
+        $currentDate = new \DateTime();
+        $openDateTimeDate = new \DateTime($openDateTime);
+
+        return $currentDate >= $openDateTimeDate;
     }
 }
