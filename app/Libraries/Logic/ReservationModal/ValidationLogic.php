@@ -13,11 +13,11 @@ class VaidationLogic
     /**
      * レッスンスケジュールIDハッシュ(shift_master.shiftid_hash)のバリデーション
      *
-     * @param array $parameters リクエストパラメータ
+     * @param array $params リクエストパラメータ
      * @return boolean
      */
-    public static function validateShiftIdHash(array $parameters) {
-        $validator = Validator::make($parameters, [
+    public static function validateShiftIdHash(array $params) {
+        $validator = Validator::make($params, [
             'sid' => 'required|string'//|exists:shift_master,shiftid_hash'
         ]);
 
