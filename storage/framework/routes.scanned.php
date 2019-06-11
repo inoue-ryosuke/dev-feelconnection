@@ -1,5 +1,13 @@
 <?php 
 
+$router->post('api/get_json_sample', [
+	'uses' => 'App\Http\Controllers\Api\ApiTestController@getJsonSample',
+	'as' => 'api.get_json_sample.get',
+	'middleware' => ['logger', 'ua', 'web.nocsrf', 'api.logger', 'append', 'auth:api', 'maintenance', 'token'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->post('api/auth', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
 	'as' => 'api.auth.get',
