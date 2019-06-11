@@ -4,7 +4,8 @@ use App\Exceptions\ApiHeaderException;
 use App\Exceptions\IllegalParameterException;
 use App\Exceptions\LogicNotFoundException;
 use App\Libraries\Logic\Loader;
-use App\Libraries\Logic\UserMaster\SelectLogic;
+use App\Libraries\Logic\UserMaster\SelectLogic as UserMasterSelectLogic;
+use App\Libraries\Logic\Invite\SelectLogic as InviteSelectLogic;
 
 /**
  * API用ロジックに関するトレイト
@@ -29,10 +30,18 @@ trait ApiLogicTrait {
 
     /**
      * UserMasterのSelectロジックを取得する
-     * @return SelectLogic
+     * @return UserMasterSelectLogic
      */
     public function getUserMasterSelectLogic() {
         return $this->getApiLogic(Loader::USER_MASTER, Loader::SELECT);
+    }
+
+    /**
+     * InviteのSelectロジックを取得する
+     * @return InviteSelectLogic
+     */
+    public function getInviteSelectLogic() {
+        return $this->getApiLogic(Loader::Invite, Loader::SELECT);
     }
 
 }

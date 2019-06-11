@@ -43,12 +43,10 @@ class InviteController extends ApiController
             logger($inviteCode);
             $inviteCode = 'asdf1321asfa3s21asf';
         }
-        $response = [
-            'result_code' => 0,
-            'lid' => 51,
-            'lesson_flag' => 1,
-            'friend_flag' => 0,
-        ];
+        // レスポンスを取得
+        $response = $this->getInviteSelectLogic()->validateInviteCode($inviteCode);
+        logger('response');
+        logger($response);
         logger('validateInviteCode end');
         return response()->json($response)->Cookie('_ic', $inviteCode);
 

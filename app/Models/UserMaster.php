@@ -25,16 +25,27 @@ class UserMaster extends BaseModel
      * インストラクター一覧取得
      * @param $limit
      * @param $offset
+     * @param $freeword
      * @return
      */
-    public static function getInstructors ($limit, $offset) {
+    public static function findInstructors ($limit, $offset, $freeword=null) {
         // 退職済みでないかつ先生フラグが1
         $query = self::where('user_master.alive_flg', self::ALIVE_VALID)
             ->where('user_master.teacher', self::TEACHER_VALID);
+
+        if ($freeword) {
+            $query->where(function($obj) use($freeword) {
+                // 商品名またはJANコード
+                $obj->where("user_master.name","LIKE","%".$freeword."%");
+//                $obj->orWhere("tenpo_master.tenpo_name","LIKE","%".$freeword."%");
+            });
+        }
         // レッスンスケジュールテーブルと結合
         $query->leftjoin('shift_master', 'user_master.uid', 'shift_master.teacher');
         //user_master_histテーブルと結合
 //        $query->leftjoin('user_master_hist', 'user_master.uid', 'user_master_hist.uid');
+        //店舗テーブルと結合
+//        $query->leftjoin('tenpo_master', 'user_master_hist.tid', 'tenpo_master.tid');
 
         $query->groupBy('shift_master.teacher')
             ->select(

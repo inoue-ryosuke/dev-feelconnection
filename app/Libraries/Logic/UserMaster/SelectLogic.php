@@ -34,8 +34,9 @@ class SelectLogic extends BaseLogic
         $offset = data_get($payload, 'offset', 0);
         $type = data_get($payload, 'type', UserMaster::SORT_TYPE_NAME);
         // インストラクター一覧を取得
-//        $instructorList = UserMaster::getInstructors($limit, $offset);
-//        $sortResults =
+//        $instructorList = UserMaster::findInstructors($limit, $offset);
+//        $instructorIds = $instructorList->pluck('uid')->unique();
+//        $sortResults = TenpoMaster::findInstructorsShops($instructorIds);
         $response = [
             'result_code' => 0,
             "list" => [
@@ -75,7 +76,7 @@ class SelectLogic extends BaseLogic
             "offset" => 0,
             "type" => 1
         ];
-        logger('UserMaster SelectLogic getInstructors start');
+        logger('UserMaster SelectLogic getInstructors end');
         return $response;
 
     }
