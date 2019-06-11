@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Api;
 //use App\Libraries\Logic\Loader;  実開発の場合はロジック層にて実装
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
+use App\Libraries\Logic\Authentication\ValidationLogic;   // バリデーション
+use App\Libraries\Logic\Authentication\DataManagerLogic;  // 情報取得･更新系
 
 ///**
 // * 認証コントローラー
@@ -81,11 +82,31 @@ class AuthController extends ApiController
         logger("getUserInfo() Start");
 
         // ▼実実装用
-        //$payload = $request->getContent();
-        //$payload = json_decode($payload, true);
-        //$this->validateApiPayload('admin.accountManagement.userInfo', $payload);
-        //$response = $this->getUserLogic()->getAdminUser($payload);
+        $payload = $request->getContent();
+        $payload = json_decode($payload, true);
+        if (!VaidationLogic::validateAuthInfo($parameters)) {
+            // エラー
+            //throw new AuthenticationErrorException(); Handler経由レスポンスの場合
+            // 手動レスポンス形成
+            return response()
+                    ->json([ 'エラー' ])
+                    ->setStatusCode(Response::HTTP_BAD_REQUEST);
+        }
+        // TBD:認証情報からIDを特定する
+        $id = 1;
+        $custinfo = DataManagerLogic::getAuthInfo($id);
+        if (!$custinfo) {
+            // エラー
+            //throw new AuthenticationErrorException(); Handler経由レスポンスの場合
+            // 手動レスポンス形成
+            return response()
+                    ->json([ 'エラー' ])
+                    ->setStatusCode(Response::HTTP_BAD_REQUEST);
+        }
+        $response = DataManagerLogic::getUserInfo($cid);
+
         // ▼stub用
+        /*
         $response = [
 	        "result_code" => 0,
 	        "name" => "鈴木太郎",
@@ -105,7 +126,7 @@ class AuthController extends ApiController
             "dm_list" => "1,,,,",
    	        "pc_conf" => 1,
 	        "gmo_credit" => "XXXXXXXXXXX",
-        ];
+        ];*/
         logger("getUserInfo() End");
         return response()->json($response);
 

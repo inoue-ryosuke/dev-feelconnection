@@ -163,4 +163,60 @@ class Cust extends BaseFormModel implements Authenticatable
         'password', 'remember_token',
     ];
 
+    /**
+	 * IDでcust情報を取得する
+	 */
+	public static function getAuthInfo($cid) {
+		if (empty($cid)) {
+			return false;
+		}
+		$authcust = Cust::find($cid);
+        if (is_null($authcust)) {
+			return false;
+		}
+		return $authcust;
+	}
+
+	public function getBirthDayWord($mode="") {
+		$y  = $this->b_year;
+		$m  = $this->b_month;
+		$d  = $this->b_day;
+		if (!$y || !$m || !$d ) {
+			return "";
+		}
+    	if ($mode="jp") {
+			// TBD:和暦変換：元号取得
+			//"昭和55年1月1日"
+			$jp = $this->getJpCalenderWord($y);
+			return sprintf("%s%d年%d月%d日",$jp,$y,$m,$d);
+		}
+		return sprintf("%04d",$y).sprintf("%02d",$m).sprintf("%02d",$d);
+	}
+
+	public function getTelNo($separater="") {
+		if (!$this->h_tel1 || !$this->h_tel2 || !$this->h_tel3) {
+			return "";
+		}
+		return $this->h_tel1.$separater.$this->h_tel2.$separater.$this->h_tel3;
+	}
+	
+	public function getMemType() {
+		//"マンスリーメンバー"	
+		return "マンスリーメンバー";
+	}
+	public function getStoreNames() {
+		//"銀座（GNZ）、自由が丘（JYO）",	
+		return "銀座（GNZ）、自由が丘（JYO）";
+	}
+	public function getDmLists() {
+		//"1,,,,",
+		return $this->dm_list;
+	}
+	public function getPcConf() {
+		return $this->pc_conf;
+	}
+	public function getGmoId() {
+		return $this->gmo_credit;
+	}
+
 }
