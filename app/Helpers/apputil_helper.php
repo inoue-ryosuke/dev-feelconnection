@@ -52,23 +52,22 @@ if ( ! function_exists('isApiRequest'))
      * @return boolean True or False
      */
     function isApiRequest() {
+        logger('isApiRequest start');
         $currentUrl = url()->current();
+        logger('current url');
+        logger($currentUrl);
         $urlKey = "api.get";
-        $urlAdminKey = "api.admin.get";
         $headers = apache_request_headers();
         try {
-            if (strpos($currentUrl, route($urlAdminKey)) !== FALSE) {
-                // アプリはauth:apiで認証をかけているのでauth:webの認証をしない。
-                // 管理画面APIはすべてセッション認証の為、API判定はfalseで返す。
+            if (strpos($currentUrl, route($urlKey)) !== FALSE) {
                 return true;
-            } else if (strpos($currentUrl, route($urlKey)) !== FALSE) {
-                return true;
-            } else if(!is_null($headers) && isset($headers['X-Everegi-Version'])){
+            } else if(!is_null($headers) && isset($headers['X-FeelConnection-Version'])){
                 return true;
             }
         } catch (\InvalidArgumentException $e) {
             return false;
         }
+        logger('isApiRequest end');
         return false;
     }
 }

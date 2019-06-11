@@ -16,6 +16,15 @@ class AuthController extends ApiController
 {
 
     use ApiLogicTrait;
+    /**
+     * API インデックス (APIパスか判定するためのダミーAPI)
+     * @Get("api", as="api.get")
+     * @param $request
+     * @return Response
+     */
+    public function index(Request $request) {
+        return $this->getUrl($request);
+    }
 
     /**
      * API-01: 認証情報の取得

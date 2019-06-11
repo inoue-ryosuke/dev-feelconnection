@@ -121,3 +121,62 @@ paths:
                   lesson_flag: { description: 'レッスン受講可能判定(0:不可　1:可(申し込んだレッスンが受講可能か判定。受講可能の場合は1:可))', type: integer }
                   friend_flag: { description: '友人紹介判定(0:偽　1:真(アカウント登録か体験レッスン申込か判定。アカウント登録の場合は1:真))', type: integer }
                 type: object
+  /api/apple_music:
+    get:
+      tags:
+        - Music
+      summary: 'API-xx: AppleMusic情報取得API'
+      description: AppleMusicの情報を取得する
+      operationId: 'App\Http\Controllers\Api\MusicController::getMusicPlaylist'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  result_code: { description: '結果コード(0:正常 1:エラー)', type: integer }
+                  list: { description: 音楽プログラムリスト, type: array, items: { properties: { '{category_name}': { description: 'BBC HIT,BB1 COMP等カテゴリー毎にグルーピングされたリスト', type: array, items: { properties: { name: { description: "プレイリスト名(表示プレイリスト名　＝　プログラム名 ＋ 音楽ジャンル名 ＋ バージョン\r\n    ex) BB2 HIT 16  = BB2 + HIT + 16)", type: string }, path: { description: 'プレイリストパス(URL)(AppleMusicのプレイリスト詳細へのURL )', type: string }, image_path: { description: プレイリスト画像パス(URL)(AppleMusicのプレイリスト画像パス(URL), type: string } }, type: object } } }, type: object } }
+                type: object
+  /api/instructors:
+    post:
+      tags:
+        - UserMaster
+      summary: 'API-xx: インストラクター紹介一覧取得API'
+      description: インストラクター紹介画面に表示するインストラクターの一覧を取得する
+      operationId: 'App\Http\Controllers\Api\UserMasterController::getInstructors'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              properties:
+                freeword:
+                  description: 検索ワード(インストラクター名、店舗名を入力して検索)
+                  type: string
+                limit:
+                  description: 取得上限数(データ取得数を指定)
+                  type: integer
+                offset:
+                  description: オフセット数(取得オフセット数を指定)
+                  type: integer
+                type:
+                  description: 'ソート対象項目(ソート対象項目を指定(1：所属店舗順(北から) / 2：デビュー年順(古い在籍順) / 3：名前順(ABC順)))'
+                  type: integer
+              type: object
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  result_code: { description: '結果コード(0:正常 1:エラー)', type: integer }
+                  instructors: { description: インストラクター一覧リスト, type: array, items: { properties: { uid: { description: スタッフID(インストラクターID。インストラクター詳細情報取得用。), type: integer }, name: { description: スタッフ名(インストラクター名), type: string }, assigned_at: { description: インストラクターのデビュー年月日, type: date }, comment: { description: インストラクターの自己紹介文, type: string }, image_path: { description: インストラクターの表示画像パス(画像URL), type: string } }, type: object } }
+                  sort_results: { description: ソート店舗リスト, type: array, items: { properties: { name: { description: 店舗名, type: string }, instructors: { description: 店舗所属インストラクターリスト, type: array, items: { properties: { uid: { description: スタッフID(インストラクターID), type: integer } }, type: object } } }, type: object } }
+                  total_count: { description: データ全件数, type: integer }
+                  list_count: { description: 取得したリストのデータ件数, type: integer }
+                  limit: { description: 取得上限数(リクエストで指定された取得数), type: integer }
+                  offset: { description: オフセット数(リクエストで指定された取得オフセット数), type: integer }
+                  type: { description: ソート対象項目(リクエストで指定されたソート対象), type: integer }
+                type: object

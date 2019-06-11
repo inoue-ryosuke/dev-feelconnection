@@ -19,13 +19,16 @@ class MusicController extends ApiController
      *          @OA\JsonContent(
      *              type="object",
      *              @OA\Property(property="result_code", type="integer",description="結果コード(0:正常 1:エラー)"),
-     *               @OA\Property(property="list", type="array",description="インストラクター一覧リスト",
+     *               @OA\Property(property="list", type="array",description="音楽プログラムリスト",
      *                  @OA\Items(type="object",
-     *                      @OA\Property(property="{category_name}", type="integer",description="BBC HIT,BB1 COMP等カテゴリー毎にグルーピングされたリスト"),
-     *                      @OA\Property(property="name", type="integer",description="プレイリスト名(表示プレイリスト名　＝　プログラム名 ＋ 音楽ジャンル名 ＋ バージョン
+     *                      @OA\Property(property="{category_name}", type="array",description="BBC HIT,BB1 COMP等カテゴリー毎にグルーピングされたリスト",
+     *                         @OA\Items(type="object",
+     *                             @OA\Property(property="name", type="string",description="プレイリスト名(表示プレイリスト名　＝　プログラム名 ＋ 音楽ジャンル名 ＋ バージョン
     ex) BB2 HIT 16  = BB2 + HIT + 16)"),
-     *                      @OA\Property(property="path", type="date",description="プレイリストパス(URL)(AppleMusicのプレイリスト詳細へのURL )"),
-     *                      @OA\Property(property="image_path", type="date",description="プレイリスト画像パス(URL)(AppleMusicのプレイリスト画像パス(URL)"),
+     *                             @OA\Property(property="path", type="string",description="プレイリストパス(URL)(AppleMusicのプレイリスト詳細へのURL )"),
+     *                             @OA\Property(property="image_path", type="string",description="プレイリスト画像パス(URL)(AppleMusicのプレイリスト画像パス(URL)"),
+     *                         )
+     *                      ),
      *                  ),
      *              ),
      *          ),
