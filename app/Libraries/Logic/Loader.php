@@ -14,8 +14,9 @@ class Loader
     // 種別
     const API           = "Api";
     const URL           = 'Url';
-    const USER_MASTER   = 'UserMaster';
+    const Instructor   = 'Instructor';
     const Invite        = 'Invite';
+    const Music        = 'Music';
 
     // 機能
     const SELECT = 'Select';

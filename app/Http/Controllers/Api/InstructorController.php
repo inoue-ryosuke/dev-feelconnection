@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class UserMasterController extends ApiController
+class InstructorController extends ApiController
 {
     /**
      * API-xx: インストラクター紹介一覧取得API
@@ -70,7 +70,7 @@ class UserMasterController extends ApiController
         // バリデーションチェック
         $this->validateApiPayload('instructors.search', $payload);
         // レスポンスを取得
-        $response = $this->getUserMasterSelectLogic()->getInstructors($payload);
+        $response = $this->getInstructorSelectLogic()->getInstructors($payload);
         logger('response');
         logger($response);
         logger('getInstructors end');
