@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\Cust as Cust;
 use App\Models\CustMemType as CustMemType;
+use App\Models\TenpoMaster as TenpoMaster;
 
 class CustSeeder extends BaseSeeder
 {
@@ -28,7 +29,7 @@ class CustSeeder extends BaseSeeder
         echo "\n" . "CustSeeder Start" . "\n";
         DB::transaction(function() {
             // 登録単位ループ
-            foreach ($this->getConfig() as $records) {
+            foreach ($this->getConfig("cust_master") as $records) {
                 $this->insertRecord($records);
             }
         });
@@ -37,28 +38,42 @@ class CustSeeder extends BaseSeeder
     /**
      * 登録単位でCUSTに関係する指定キーのみ登録
      */
-    protected function insertRecord($recordset = []) {
+    protected function insertRecord($record = []) {
 
-        // 
-        if (isset($recordset["cust_master"]) && isset($recordset["cust_memtype"])) {
-
-            //echo "\n   ---> " . "Cust Insert Start" . "\n";
+            $memdao = $tenpo = null;
+            // メインModel用の関連情報を取り除く
+            if (isset($record["assign"])) {
+                $assign = $record["assign"];
+                unset($record["assign"]);
+            }
+            // 関連情報に店舗名がある場合、店舗を特定し紐づけ
+            if (isset($assign["tenpo_name"])) {
+                $tenpo = TenpoMaster::where("tenpo_name",$assign["tenpo_name"])->first();
+            }
+            // 関連情報に会員種別がある場合、登録
+            if (isset($assign["cust_memtype"])) {
+                $memdao = new CustMemType();
+                $memdao->mergeRequest($assign["cust_memtype"]);
+                $memdao->save();
+                echo "\n   ---> " . "CustMemType Insert End [".$memdao->type_name."]" . "\n";
+            }
+            // 
             $dao = new Cust();
-            $dao->mergeRequest($recordset["cust_master"]);
+            $dao->mergeRequest($record);
             $dao->save();
             echo "\n   ---> " . "Cust Insert End [".$dao->name."]" . "\n";
-
-            //echo "\n   ---> " . "CustMemType Insert Start" . "\n";
-            $memdao = new CustMemType();
-            $memdao->mergeRequest($recordset["cust_memtype"]);
-            $memdao->save();
-            echo "\n   ---> " . "CustMemType Insert End [".$memdao->type_name."]" . "\n";
-
-            // Cust と CustMemTypeを紐づけ
-            $dao->memtype = $memdao->mid;
-            $dao->save();
-            echo "\n" . "Lincked CustMemId [".$memdao->mid."] == [".$dao->memtype."]" . "\n";
-        }
+            if ($memdao) {
+                // Cust と CustMemTypeを紐づけ
+                $dao->memtype = $memdao->mid;
+                $dao->save();
+                echo "\n" . "Linked CustMemId [".$dao->memtype."]" . "\n";
+            }
+            // 所属店舗情報の紐づけ
+            if ($tenpo) {
+                $dao->store_id = $tenpo->tid;
+                $dao->save();
+                echo "\n" . "Linked StoreId [".$dao->store_id."]" . "\n";
+            }
 
     }
 
