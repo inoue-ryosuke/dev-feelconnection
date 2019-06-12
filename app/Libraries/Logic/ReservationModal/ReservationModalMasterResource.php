@@ -4,7 +4,7 @@ namespace App\Libraries\Logic\ReservationModal;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\ShiftMaster;
-use App\Models\Constant\ReservationModalTablePrefix;
+use App\Models\Constant\ReservationTablePrefix;
 
 /**
  * 予約モーダルで必要なRedis・DBのマスター情報
@@ -20,7 +20,7 @@ class ReservationModalMasterResource extends ReservationMasterResource {
      * 各マスターのRedisキャッシュを取得
      * すべて成功=true、失敗=false
      *
-     * @return boolean Redisからキャッシュ取得成功したかどうか
+     * @return bool Redisからキャッシュ取得成功したかどうか
      */
     public function createRedisResource() {
         if (!$this->createRedisResourceByKey(
@@ -95,50 +95,60 @@ class ReservationModalMasterResource extends ReservationMasterResource {
         $this->tenpoMaster = [];
         $this->userMaster = [];
 
+        $smLength = strlen(ReservationTablePrefix::SM);
+        $lmLength = strlen(ReservationTablePrefix::LM);
+        $lc1Length = strlen(ReservationTablePrefix::LC1);
+        $lc2Length = strlen(ReservationTablePrefix::LC1);
+        $lc3Length = strlen(ReservationTablePrefix::LC3);
+        $tmLength = strlen(ReservationTablePrefix::TM);
+        $umLength = strlen(ReservationTablePrefix::UM);
+
         foreach ($attributes as $key => $value) {
-            if (strpos($key, ReservationModalTablePrefix::SM) !== FALSE) {
+            if (strpos($key, ReservationTablePrefix::SM) !== FALSE) {
                 // shift_masterのカラム
-                $this->shiftMaster[substr($key, strlen(ReservationModalTablePrefix::SM))] = $value;
+                $this->shiftMaster[substr($key, $smLength)] = $value;
                 continue;
             }
 
-            if (strpos($key, ReservationModalTablePrefix::LM) !== FALSE) {
+            if (strpos($key, ReservationTablePrefix::LM) !== FALSE) {
                 // lesson_masterのカラム
-                $this->lessonMaster[substr($key, strlen(ReservationModalTablePrefix::LM))] = $value;
+                $this->lessonMaster[substr($key, $lmLength)] = $value;
                 continue;
             }
 
-            if (strpos($key, ReservationModalTablePrefix::LC1) !== FALSE) {
+            if (strpos($key, ReservationTablePrefix::LC1) !== FALSE) {
                 // lesson_class1のカラム
-                $this->lessonClass1[substr($key, strlen(ReservationModalTablePrefix::LC1))] = $value;
+                $this->lessonClass1[substr($key, $lc1Length)] = $value;
                 continue;
             }
 
-            if (strpos($key, ReservationModalTablePrefix::LC2) !== FALSE) {
+            if (strpos($key, ReservationTablePrefix::LC2) !== FALSE) {
                 // lesson_class2のカラム
-                $this->lessonClass2[substr($key, strlen(ReservationModalTablePrefix::LC2))] = $value;
+                $this->lessonClass2[substr($key, $lc2Length)] = $value;
                 continue;
             }
 
-            if (strpos($key, ReservationModalTablePrefix::LC3) !== FALSE) {
+            if (strpos($key, ReservationTablePrefix::LC3) !== FALSE) {
                 // lesson_class3のカラム
-                $this->lessonClass3[substr($key, strlen(ReservationModalTablePrefix::LC3))] = $value;
+                $this->lessonClass3[substr($key, $lc3Length)] = $value;
                 continue;
             }
 
-            if (strpos($key, ReservationModalTablePrefix::TM) !== FALSE) {
+            if (strpos($key, ReservationTablePrefix::TM) !== FALSE) {
                 // tenpo_masterのカラム
-                $this->tenpoMaster[substr($key, strlen(ReservationModalTablePrefix::TM))] = $value;
+                $this->tenpoMaster[substr($key, $tmLength)] = $value;
                 continue;
             }
 
-            if (strpos($key, ReservationModalTablePrefix::UM) !== FALSE) {
+            if (strpos($key, ReservationTablePrefix::UM) !== FALSE) {
                 // user_masterのカラム
-                $this->userMaster[substr($key, strlen(ReservationModalTablePrefix::UM))] = $value;
+                $this->userMaster[substr($key, $umLength)] = $value;
             }
         }
 
-        // cust_masterの必要カラムを取得
+        // TODO cust_masterの必要カラムをDBから取得
+        $this->custMaster['cid'] = 1;
+        $this->custMaster['memtype'] = 2; // マンスリー会員
     }
 
 }
