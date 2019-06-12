@@ -16,6 +16,7 @@ class Loader
     const URL           = 'Url';
     const USER_MASTER   = 'UserMaster';
     const Invite        = 'Invite';
+    const Auth          = "Authentication";
 
     // 機能
     const SELECT = 'Select';

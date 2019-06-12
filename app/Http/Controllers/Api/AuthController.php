@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Api;
 //use App\Libraries\Logic\Loader;  実開発の場合はロジック層にて実装
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Libraries\Logic\Authentication\SelectLogic as AuthSelectLogic;  // 情報取得系
 use App\Exceptions\ForbiddenException;
-use App\Models\Cust;
 
 ///**
 // * 認証コントローラー
@@ -99,7 +97,7 @@ class AuthController extends ApiController
         //$this->validateApiPayload('cust.auth', $payload);
 
         // TBD:認証情報からIDを特定する
-        $response = AuthSelectLogic::getAuthInfo();
+        $response = $this->getAuthSelectLogic()->getAuthInfo();
         logger("getUserInfo() End");
         return response()->json($response);
 

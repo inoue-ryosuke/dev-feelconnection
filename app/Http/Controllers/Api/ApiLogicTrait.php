@@ -6,6 +6,7 @@ use App\Exceptions\LogicNotFoundException;
 use App\Libraries\Logic\Loader;
 use App\Libraries\Logic\UserMaster\SelectLogic as UserMasterSelectLogic;
 use App\Libraries\Logic\Invite\SelectLogic as InviteSelectLogic;
+use App\Libraries\Logic\Authentication\SelectLogic as AuthSelectLogic;
 
 /**
  * API用ロジックに関するトレイト
@@ -42,6 +43,14 @@ trait ApiLogicTrait {
      */
     public function getInviteSelectLogic() {
         return $this->getApiLogic(Loader::Invite, Loader::SELECT);
+    }
+
+    /**
+     * AuthのSelectロジックを取得する
+     * @return AuthSelectLogic
+     */
+    public function getAuthSelectLogic() {
+        return $this->getApiLogic(Loader::Auth, Loader::SELECT);
     }
 
 }
