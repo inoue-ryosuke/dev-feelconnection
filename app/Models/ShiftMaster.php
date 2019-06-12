@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Exceptions\IllegalParameterException;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Constant\ReservationTablePrefix;
 
@@ -10,8 +12,17 @@ class ShiftMaster extends Model
     /** LessonFeelのテーブルサフィックス */
     const LF = '';
 
+    /** 有効/無効フラグ */
+    const VALID = 1; //有効
+    const INVALID = 0; //無効
+    const FLAG_VALID = 'Y';
+    const FLAG_INVALID = 'N';
+    const FLAG_CANCELLED = 'C';
+
     /** テーブル名 */
     protected $table = 'shift_master' . self::LF;
+    const TABLE = 'shift_master' . self::LF;
+
     /** 主キー */
     protected $primaryKey = 'shiftid';
 
@@ -112,5 +123,31 @@ class ShiftMaster extends Model
         ->where('SM.shiftid_hash', '=', $shiftIdHash);
 
         return $query->get()->first();
+    }
+
+    /**
+     * レッスンの予約が可能か判定
+     * @param $lid
+     * @param $trial
+     * @return
+     */
+    public static function isReservableLesson($lid, $trial=null) {
+        // 空もしくはnullの場合
+        if(empty($lid) || is_null($lid)) {
+            return false;
+        }
+
+        $now = Carbon::now()->format('Y-m-d H:i:s');
+        $query = self::where(self::TABLE.'.ls_menu', $lid)
+            ->where(self::TABLE.'.flg', self::FLAG_VALID)
+            ->where(self::TABLE.'.ls_st',  '>=', $now)
+            ->where(self::TABLE.'.tlimit',  '>=', $now);
+
+        // 体験レッスンの条件を付加
+        if ($trial === LessonMaster::TRIAL) {
+            $query->where(self::TABLE.'.taiken_les_flg', self::VALID);
+        }
+
+        return $query->exists();
     }
 }

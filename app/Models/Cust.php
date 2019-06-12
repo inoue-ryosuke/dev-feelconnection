@@ -8,6 +8,8 @@ use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 use Carbon\Carbon;
 use App\Libraries\Common\JpDateTime as JpDateTime;
 
+use App\Models\TenpoMaster as TenpoMaster;
+
 class Cust extends BaseFormModel implements Authenticatable
 {
 //    use AuthenticatableTrait, ListingTrait, SoftDeletes, TokenizerTrait,UserTrait, UserStatusTrait;
@@ -165,16 +167,73 @@ class Cust extends BaseFormModel implements Authenticatable
         'password', 'remember_token',
     ];
 
-	// モデル結合アクセサ
+	// モデル結合アクセサ（会員区分）
     public function joinAllMemType() {
 		return $this->hasOne(CustMemType::Class,"mid","memtype");
 	}
     public function hasOneMemType() {
+		if (!$this->joinAllMemType) {
+			return null;
+		}
 		return $this->joinAllMemType->first();
 	}
     public function hasManyMemType() {
+		if (!$this->joinAllMemType) {
+			return null;
+		}
 		return $this->joinAllMemType->get();
 	}
+	// モデル結合アクセサ（所属店舗）
+    public function joinAllStoreTenpo() {
+		return $this->hasOne(TenpoMaster::Class,"tid","store_id");
+	}
+    public function hasOneStoreTenpo() {
+		if (!$this->joinAllStoreTenpo) {
+			return null;
+		}
+		return $this->joinAllStoreTenpo->first();
+	}
+    public function hasManyStoreTenpo() {
+		if (!$this->joinAllStoreTenpo) {
+			return null;
+		}
+		return $this->joinAllStoreTenpo->get();
+	}
+	// モデル結合アクセサ（登録店舗）
+    public function joinAllLastTenpo() {
+		return $this->hasOne(TenpoMaster::Class,"tid","last_tenpo");
+	}
+    public function hasOneLastTenpo() {
+		if (!$this->joinAllLastTenpo) {
+			return null;
+		}
+		return $this->joinAllLastTenpo->first();
+	}
+    public function hasManyLastTenpo() {
+		if (!$this->joinAllLastTenpo) {
+			return null;
+		}
+		return $this->joinAllLastTenpo->get();
+	}
+	// 全店舗情報（所属店舗＋登録店舗）
+    public function hasManyAllTenpo() {
+
+		$all = collect([]);
+		if (!$this->store_id && !$this->last_tenpo) {
+			return null;
+		}
+		$store  = $this->hasOneStoreTenpo();
+		if ($store) {
+             $all->add($store);
+		} 
+		//print "<pre>"; print_r($store); print "</pre>";
+		$last   = $this->hasOneLastTenpo();
+		if ($last) {
+             $all->add($last);
+		} 
+		return $all;
+	}
+
     /**
 	 * IDでcust情報を取得する
 	 */
@@ -247,7 +306,15 @@ class Cust extends BaseFormModel implements Authenticatable
 	 */
 	public function getStoreNames() {
 		//"銀座（GNZ）、自由が丘（JYO）",	
-		return "銀座（GNZ）、自由が丘（JYO）";
+		$all = $this->hasManyAllTenpo();
+		if ($all->isEmpty()) {
+			return "";
+		}
+		// 銀座（GNZ）という文字列を作る
+		$tenpostr = $all->map(function($tenpo) {
+			return ["tenpo_str" => $tenpo->tenpo_name."(".$tenpo->tenpo_code.")"];
+		});
+		return $tenpostr->implode("tenpo_str","、");
 	}
 	/**
 	 * 案内メール設定を返却する
@@ -267,6 +334,25 @@ class Cust extends BaseFormModel implements Authenticatable
 	 */
 	public function getGmoId() {
 		return $this->gmo_credit ?? null;
+	}
+	/**
+	 * キャンペーン一覧を取得返却する
+	 */
+	public function getCampaignList() {
+		//TBD:テーブル構造次第。今はスタブ返却
+		$campaign = [
+			[
+				"code" => "XXXXXXXXXX",
+				"name" => "NEW YEARキャンペーン",
+				"flag" => 1,
+			],
+			[
+				"code" => "XXXXXXXXXX",
+				"name" => "お友達紹介キャンペーン",
+				"flag" => 1,
+			]
+		];
+        return $campaign;
 	}
 
 }

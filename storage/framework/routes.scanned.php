@@ -24,6 +24,14 @@ $router->post('api/auth', [
 	'domain' => NULL,
 ]);
 
+$router->post('api/auth/user', [
+	'uses' => 'App\Http\Controllers\Api\AuthController@getUserMoreInfo',
+	'as' => 'api.auth.user.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->get('api/invite/{invite_code}', [
 	'uses' => 'App\Http\Controllers\Api\InviteController@validateInviteCode',
 	'as' => 'api.invite.get',

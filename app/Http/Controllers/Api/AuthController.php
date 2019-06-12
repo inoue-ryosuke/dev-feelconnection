@@ -102,5 +102,27 @@ class AuthController extends ApiController
         return response()->json($response);
 
     }
+    /**
+     * API-02: 個人情報表示
+     * 
+     * @POST("api/auth/user", as="api.auth.user.get")
+     * @param $request
+     * @return Response
+     */
+    public function getUserMoreInfo(Request $request) {
+        logger("getUserInfo() Start");
 
+        // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
+        $payload = $this->getPayload();
+        logger('payload');
+        logger($payload);
+        // ペイロードバリデーション
+        $this->validateApiPayload('cust.auth_user', $payload);
+        $cid = array_get($payload,"cid",null);
+
+        // TBD:認証情報からIDを特定する
+        $response = $this->getAuthSelectLogic()->getUserMoreInfo($cid);
+        logger("getUserInfo() End");
+        return response()->json($response);
+    }
 }

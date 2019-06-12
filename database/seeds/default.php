@@ -4,10 +4,45 @@ $now = date('Y-m-d H:i:s');
 
 
 return [
+	    // 事前登録(店舗エリア・店舗・店舗区分)
+		"tenpo_master" => [
+			[
+					"tenpo_name" => "銀座", // 銀座（GNZ）、自由が丘（JYO）
+					"tenpo_code" => "GNZ",
+//					"tenpo_area_id" => ,    // 紐付する
+					"monthly_avail_all" => 0,
+					"monthly_avail_tenpo" => "-1",
+					"monthly_free_exp" => "2020-01-01",
+					"monthly_fname" => "",
+					"mtenpo_explain" => "",
+					"tenpo_memtype" => "",
+					// シーダーで登録する
+					"assign" => [
+			            "tenpo_area_name" => "銀座エリア",
+					    "tenpo_kubun_name" => "区分１",
+					]
+			],
+			[
+					"tenpo_name" => "自由が丘", // 銀座（GNZ）、自由が丘（JYO）
+					"tenpo_code" => "JYO",
+//					"tenpo_area_id" => ,    // 紐付する
+					"monthly_avail_all" => 0,
+					"monthly_avail_tenpo" => "-1",
+					"monthly_free_exp" => "2020-01-01",
+					"monthly_fname" => "",
+					"mtenpo_explain" => "",
+					"tenpo_memtype" => "",
+//					"tenpo_memtype"         // 紐づけする
+                    // シーダーで登録する
+					"assign" => [
+			            "tenpo_area_name"  => "自由が丘エリア",
+						"tenpo_kubun_name" => "区分２",
+					]
+			],
+		],
 	    // 登録単位にデータ配列を["table_name"=>[],"table_name"=>[]]と用意する。登録単位でループしてシーダーは登録する
-		[
-	        "cust_master"=>[
-	//			"cid"=>1,
+        "cust_master"=>[
+			[
 				"flg"=>"Y",
 				"webmem"=>"Y",
 				"login_pass"=>"",
@@ -134,21 +169,21 @@ return [
 				"reserve_lock"=>"N",
 				"salt"=>"abcdefg1234567890",
 				"password_change_datetime"=>"2019-06-10 16:02:43.563",
-				"login_trial_count"=>0
-			],
-			"cust_memtype" => [
-	//          "mid" => 1,
-				"type_name" => "マンスリーメンバー",
-				"status" => "ステータス名",
-				"flg" => "Y",
-//				"iname" => "アイコン名",
-//				"itxtcol" => "00FFFF", // 0x999999
-//				"ibgcol" => "FF00FF", // 0x999999
-				"rescnt_mem" => 0,
-				"resspan" => 0,
-				"attend_count" => 0,
-				"seq" => 0,
-				"mem_prod" => 0
+				"login_trial_count"=>0,
+				"assign" => [
+					"tenpo_name" => "銀座",
+			        "cust_memtype" => [
+	//                  "mid" => 1,
+				        "type_name" => "マンスリーメンバー",
+				        "status" => "ステータス名",
+				        "flg" => "Y",
+				        "rescnt_mem" => 0,
+				        "resspan" => 0,
+				        "attend_count" => 0,
+				        "seq" => 0,
+					    "mem_prod" => 0
+				    ],
+				],
 			],
 		]
 ];

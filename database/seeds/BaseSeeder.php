@@ -13,12 +13,10 @@ abstract class BaseSeeder extends Seeder
     {
         if (config('app.env') === 'production') {
             $config = require(base_path('database/seeds/default_production.php'));
-            //return array_get($config, $target);
-            return $config;
+            return array_get($config, $target);
         }
         $config = require(base_path('database/seeds/default.php'));
-        //return array_get($config, $target);
-        return $config;
+        return array_get($config, $target);
     }
 
     /**
