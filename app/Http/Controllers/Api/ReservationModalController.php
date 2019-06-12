@@ -41,11 +41,33 @@ class ReservationModalController extends Controller
         }
 
         // ネット予約公開日時が過去の日付かどうか
-        if (!VaidationLogic::isOpenDateTimePassed($resource->getShitMasterColumn('open_datetime'))) {
+        $openDateTime = $resource->getShitMasterColumn('open_datetime');
+        if (!VaidationLogic::isOpenDateTimePassed($openDateTime)) {
             // エラー
             return response()
                 ->json([ 'open_datetimeエラー' ])
                 ->setStatusCode(Response::HTTP_BAD_REQUEST);
+        }
+
+        // ネット・トライアル会員が体験予約不可のレッスンを指定した場合エラー
+        $memberType = $resource->getCustMasterColumn('memtype');
+        $taikenLessonFlag = $resource->getShitMasterColumn('taiken_les_flg');
+        if (!VaidationLogic::canReserveByNetTrialMember($memberType, $taikenLessonFlag)) {
+            // エラー
+            return response()
+            ->json([ 'ネット・トライアル会員予約不可エラー' ])
+            ->setStatusCode(Response::HTTP_BAD_REQUEST);
+        }
+
+        // 予約受付時間内かどうか
+        $shiftDate = $resource->getShitMasterColumn('shift_date');
+        $startTime = $resource->getShitMasterColumn('ls_st');
+        $timeLimit = $resource->getShitMasterColumn('tlimit');
+        if (!VaidationLogic::validateTimeLimit($shiftDate, $startTime, $timeLimit)) {
+            // エラー
+            return response()
+            ->json([ '予約受付時間外エラー' ])
+            ->setStatusCode(Response::HTTP_CONFLICT);
         }
 
         return response()->json([ 'resources' => $resource->getAllResource() ]);
