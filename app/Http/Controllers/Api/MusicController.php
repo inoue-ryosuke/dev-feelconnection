@@ -43,25 +43,10 @@ class MusicController extends ApiController
     {
         logger('getMusicPlaylist start');
 
-        $response = [
-            'result_code' => 0,
-            "list" => [
-                [
-                    "BBC HIT" => [
-                        [
-                            "name"=> "BBC HIT 1",
-                            "path"=> "https://music.apple.com/jp/playlist/bb1-dvgt/pl.d1f9e9638c9a41c5ad72e5885e94e6bc",
-                            "image_path"=> "https://www.feelcycle.com/feelcycle_hp/img/contents/apple_music/fcam_bb1_hit_03.png"
-                        ],
-                        [
-                            "name"=> "BBC HIT 2",
-                            "path"=> "https://music.apple.com/jp/playlist/bb1-hit2/pl.b472b0df577047bb85254a78089ae549",
-                            "image_path"=> "https://www.feelcycle.com/feelcycle_hp/img/contents/apple_music/fcam_bb1_hit_02.png"
-                        ],
-                    ]
-                ]
-            ]
-        ];
+        // レスポンスを取得
+        $response = $this->getMusicSelectLogic()->getPlayLists();
+        logger('response');
+        logger($response);
         logger('getMusicPlaylist end');
         return response()->json($response);
 

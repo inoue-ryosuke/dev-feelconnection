@@ -24,8 +24,9 @@ class Invite extends BaseModel
         if(empty($inviteCode) || is_null($inviteCode)) {
             return false;
         }
-        $count = self::where('invite.invite_code', $inviteCode)->first();
-        return $count > 0;
+//        $count = self::where('invite.invite_code', $inviteCode)->first();
+//        return $count > 0;
+        return self::where('invite.invite_code', $inviteCode)->exists();
     }
 
     /**

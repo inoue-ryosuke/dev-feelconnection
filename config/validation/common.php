@@ -9,7 +9,12 @@ return [
     'errors' => [
         'required' => ':attributeは必須です。',
         'integer' => ':attributeは整数で入力してください。',
-        'between' => ':attributeは:min～:maxの範囲で指定してください。',
+        'between' => [
+            'numeric' => ':attributeは:min〜:maxまでにしてください。',
+            'file'    => ':attributeは:min〜:max KBまでのファイルにしてください。',
+            'string'  => ':attributeは:min〜:max文字にしてください。',
+            'array'   => ':attributeは:min〜:max個までにしてください。',
+        ],
         'file_required' => ':attributeは必須です。',
         'unique_filename' => '重複したファイル名が存在します。別名をアップロードしてください。',
         'same' => ':attributeと:otherが合致しません。',
