@@ -186,7 +186,7 @@ class Cust extends BaseFormModel implements Authenticatable
 	/**
 	 * 変更登録情報を不可する判定結果により文言を加えた名前を返却する
 	 */
-    pubic function getNameInfo() {
+    public function getNameInfo() {
 		if (is_null($this->type_edit_date)) {
 			return "";
 		}
