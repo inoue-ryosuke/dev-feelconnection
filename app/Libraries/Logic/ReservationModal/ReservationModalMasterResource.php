@@ -4,6 +4,7 @@ namespace App\Libraries\Logic\ReservationModal;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\ShiftMaster;
+use App\Models\Constant\ReservationModalTablePrefix;
 
 /**
  * 予約モーダルで必要なRedis・DBのマスター情報
@@ -78,5 +79,66 @@ class ReservationModalMasterResource extends ReservationMasterResource {
     /** DBのマスタデータ取得 */
     public function createDBResource() {
         $model = ShiftMaster::getReservationModalResource($this->shiftIdHash);
+
+        if (is_null($model)) {
+            // エラー、不正なIDハッシュ値
+        }
+
+        $attributes = $model->attributesToArray();
+
+        $this->shiftMaster = [];
+        $this->lessonMaster = [];
+        $this->lessonClass1 = [];
+        $this->lessonClass2 = [];
+        $this->lessonClass3 = [];
+        $this->custMaster = [];
+        $this->tenpoMaster = [];
+        $this->userMaster = [];
+
+        foreach ($attributes as $key => $value) {
+            if (strpos($key, ReservationModalTablePrefix::SM) !== FALSE) {
+                // shift_masterのカラム
+                $this->shiftMaster[substr($key, strlen(ReservationModalTablePrefix::SM))] = $value;
+                continue;
+            }
+
+            if (strpos($key, ReservationModalTablePrefix::LM) !== FALSE) {
+                // lesson_masterのカラム
+                $this->lessonMaster[substr($key, strlen(ReservationModalTablePrefix::LM))] = $value;
+                continue;
+            }
+
+            if (strpos($key, ReservationModalTablePrefix::LC1) !== FALSE) {
+                // lesson_class1のカラム
+                $this->lessonClass1[substr($key, strlen(ReservationModalTablePrefix::LC1))] = $value;
+                continue;
+            }
+
+            if (strpos($key, ReservationModalTablePrefix::LC2) !== FALSE) {
+                // lesson_class2のカラム
+                $this->lessonClass2[substr($key, strlen(ReservationModalTablePrefix::LC2))] = $value;
+                continue;
+            }
+
+            if (strpos($key, ReservationModalTablePrefix::LC3) !== FALSE) {
+                // lesson_class3のカラム
+                $this->lessonClass3[substr($key, strlen(ReservationModalTablePrefix::LC3))] = $value;
+                continue;
+            }
+
+            if (strpos($key, ReservationModalTablePrefix::TM) !== FALSE) {
+                // tenpo_masterのカラム
+                $this->tenpoMaster[substr($key, strlen(ReservationModalTablePrefix::TM))] = $value;
+                continue;
+            }
+
+            if (strpos($key, ReservationModalTablePrefix::UM) !== FALSE) {
+                // user_masterのカラム
+                $this->userMaster[substr($key, strlen(ReservationModalTablePrefix::UM))] = $value;
+            }
+        }
+
+        // cust_masterの必要カラムを取得
     }
+
 }
