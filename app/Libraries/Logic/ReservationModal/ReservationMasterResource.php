@@ -105,7 +105,7 @@ abstract class ReservationMasterResource {
      *
      * @param string $keyName Redisキー名
      * @param array $resource リソース連想配列
-     * @return boolean 成功=true, 失敗=false
+     * @return bool 成功=true, 失敗=false
      */
     protected function createRedisResourceByKey(string $keyName, &$resource) {
         $resource = Redis::hgetall($keyName);
@@ -195,5 +195,12 @@ abstract class ReservationMasterResource {
      */
     public function getShitMasterColumn($key) {
         return $this->shiftMaster[$key];
+    }
+
+    /**
+     * @return string cust_masterリソースのカラム名に対応する値
+     */
+    public function getCustMasterColumn($key) {
+        return $this->custMaster[$key];
     }
 }

@@ -1,4 +1,4 @@
-<?php namespace App\Libraries\Logic\UserMaster;
+<?php namespace App\Libraries\Logic\Instructor;
 
 use App\Libraries\Logger;
 use App\Libraries\Logic\BaseLogic;
@@ -25,7 +25,7 @@ class SelectLogic extends BaseLogic
     */
     public function getInstructors($payload)
     {
-        logger('UserMaster SelectLogic getInstructors start');
+        logger('Instructor SelectLogic getInstructors start');
         logger('payload');
         logger($payload);
         // パラメーターを取得
@@ -76,7 +76,7 @@ class SelectLogic extends BaseLogic
             "offset" => 0,
             "type" => 1
         ];
-        logger('UserMaster SelectLogic getInstructors end');
+        logger('Instructor SelectLogic getInstructors end');
         return $response;
 
     }

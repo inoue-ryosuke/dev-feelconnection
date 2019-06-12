@@ -12,10 +12,10 @@ use Illuminate\Http\Request;
  * ),
  */
 
- /**
- * TestＡＰＩコントローラー
- * @Middleware({"logger", "ua",  "web.nocsrf", "api.logger", "append", "auth:api", "maintenance","token"})
- */
+// /**
+// * TestＡＰＩコントローラー
+//// * @Middleware({"logger", "ua",  "web.nocsrf", "api.logger", "append", "auth:api", "maintenance","token"})
+// */
 class ApiTestController extends ApiController
 {
     /**
@@ -70,6 +70,7 @@ class ApiTestController extends ApiController
      */
     public function getJsonSample(Request $request)
     {
+        logger('getJsonSample start');
         $response = [
             'date' => date('Y/m/d h:i:s'),
             'name' => 'sample',
@@ -83,7 +84,8 @@ class ApiTestController extends ApiController
                 ],
             ]
         ];
-
+        logger($response);
+        logger('getJsonSample end');
         return response()->json($response);
     }
 

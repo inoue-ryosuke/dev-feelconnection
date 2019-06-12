@@ -24,8 +24,9 @@ class Invite extends BaseModel
         if(empty($inviteCode) || is_null($inviteCode)) {
             return false;
         }
-        $count = self::where('invite.invite_code', $inviteCode)->first();
-        return $count > 0;
+//        $count = self::where('invite.invite_code', $inviteCode)->first();
+//        return $count > 0;
+        return self::where('invite.invite_code', $inviteCode)->exists();
     }
 
     /**
@@ -43,16 +44,25 @@ class Invite extends BaseModel
     }
 
     /**
-     * 体験レッスンの予約が可能か判定
-     * @param $lid
+     * 紹介コードからレコードを取得。存在しない場合は例外。
+     * @param $inviteCode
      * @return
      */
-    public static function isReserveLesson($lid) {
+    public static function findByCodeOrFail($inviteCode) {
         // 空もしくはnullの場合
-        if(empty($lid) || is_null($lid)) {
+        if(empty($inviteCode) || is_null($inviteCode)) {
             throw new IllegalParameterException();
         }
-//        $record = self::where('invite.invite_code', $inviteCode)->first();
-//        return $record;
+        $query = self::where('invite.invite_code', $inviteCode);
+
+        if ($query->exists()) {
+            // レコードが存在する場合
+            return $query->first();
+        } else {
+            // レコードが存在しない場合は例外
+            throw new IllegalParameterException();
+        }
+
     }
+
 }

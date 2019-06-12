@@ -4,8 +4,10 @@ use App\Exceptions\ApiHeaderException;
 use App\Exceptions\IllegalParameterException;
 use App\Exceptions\LogicNotFoundException;
 use App\Libraries\Logic\Loader;
-use App\Libraries\Logic\UserMaster\SelectLogic as UserMasterSelectLogic;
+use App\Libraries\Logic\Instructor\SelectLogic as InstructorSelectLogic;
 use App\Libraries\Logic\Invite\SelectLogic as InviteSelectLogic;
+use App\Libraries\Logic\Music\SelectLogic as MusicSelectLogic;
+use App\Libraries\Logic\Authentication\SelectLogic as AuthSelectLogic;
 
 /**
  * API用ロジックに関するトレイト
@@ -29,11 +31,11 @@ trait ApiLogicTrait {
     }
 
     /**
-     * UserMasterのSelectロジックを取得する
-     * @return UserMasterSelectLogic
+     * InstructorのSelectロジックを取得する
+     * @return InstructorSelectLogic
      */
-    public function getUserMasterSelectLogic() {
-        return $this->getApiLogic(Loader::USER_MASTER, Loader::SELECT);
+    public function getInstructorSelectLogic() {
+        return $this->getApiLogic(Loader::Instructor, Loader::SELECT);
     }
 
     /**
@@ -42,6 +44,22 @@ trait ApiLogicTrait {
      */
     public function getInviteSelectLogic() {
         return $this->getApiLogic(Loader::Invite, Loader::SELECT);
+    }
+
+    /**
+     * MusicのSelectロジックを取得する
+     * @return MusicSelectLogic
+     */
+    public function getMusicSelectLogic() {
+        return $this->getApiLogic(Loader::Music, Loader::SELECT);
+    }
+
+    /**
+     * AuthのSelectロジックを取得する
+     * @return AuthSelectLogic
+     */
+    public function getAuthSelectLogic() {
+        return $this->getApiLogic(Loader::Auth, Loader::SELECT);
     }
 
 }
