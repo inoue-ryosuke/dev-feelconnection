@@ -1,5 +1,6 @@
 <?php namespace App\Libraries\Logic\Music;
 
+use App\Exceptions\IllegalParameterException;
 use App\Libraries\Logger;
 use App\Libraries\Logic\BaseLogic;
 use App\Models\LessonMaster;
@@ -27,9 +28,9 @@ class SelectLogic extends BaseLogic
     public function getPlayLists()
     {
         logger('Music SelectLogic getPlayLists start');
-//        $lesson = new LessonMaster();
-//        logger($lesson->primaryKey);
-        // lesson_master.flgが有効、lesson_class1～3がnullではない条件で絞込
+
+//        // todo データ取得処置はモデルに移す↓
+////         lesson_master.flgが有効、lesson_class1～3がnullではない条件で絞込
 //        $query = LessonMaster::where('lesson_master.flg', 1)
 //            ->whereNotNull('lesson_master.lesson_class1')
 //            ->whereNotNull('lesson_master.lesson_class2')
@@ -39,7 +40,7 @@ class SelectLogic extends BaseLogic
 //            ->leftjoin('lesson_class2', 'lesson_master.lesson_class2', 'lesson_class2.id')
 //            ->leftjoin('lesson_class3', 'lesson_master.lesson_class3', 'lesson_class3.id');
 //        // 必要な情報を取得
-//        $lessonLIst = $query->groupBy('lesson_master.lid')->select(
+//        $lessonList = $query->groupBy('lesson_master.lid')->select(
 //            'lesson_master.lid',
 ////            DB::raw('min(lesson_master.path) as path'),
 ////            DB::raw('min(lesson_master.image_path) as image_path'),
@@ -48,11 +49,29 @@ class SelectLogic extends BaseLogic
 //            DB::raw('min(lesson_class3.name) as lesson_class3_name')
 //        )->get();
 //
-//        foreach($lessonLIst as $lesson) {
+//        // todo データ取得処置はモデルに移す↑
+//        logger('lessonList');
+//        logger($lessonList);
 //
+//        // 情報を取得できなかった場合は例外
+//        if (empty($lessonList)) {
+//            throw new IllegalParameterException();
 //        }
-//        logger('lessonLIst');
-//        logger($lessonLIst);
+//        // レスポンスの形式に整形
+//        $list = [];
+//        foreach($lessonList as $lesson) {
+//            $list[$lesson->lesson_class1_name . " " . $lesson->lesson_class2_name] = [
+//                "name" => $lesson->lesson_class1_name . " " . $lesson->lesson_class2_name . " " .$lesson->lesson_class3_name,
+////                "path" => $lesson->path,
+////                "image_path" => $lesson->image_path,
+//            ];
+//        }
+//        $response = [
+//            'result_code' => 0,
+//            "list" => $list
+//        ];
+
+        // スタブレスポンス
         $response = [
             'result_code' => 0,
             "list" => [
