@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 //use App\Libraries\Logic\Loader;  実開発の場合はロジック層にて実装
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
+use App\Exceptions\ForbiddenException;
 
 ///**
 // * 認証コントローラー
@@ -89,32 +89,15 @@ class AuthController extends ApiController
 
         logger("getUserInfo() Start");
 
-        // ▼実実装用
-        //$payload = $request->getContent();
-        //$payload = json_decode($payload, true);
-        //$this->validateApiPayload('admin.accountManagement.userInfo', $payload);
-        //$response = $this->getUserLogic()->getAdminUser($payload);
-        // ▼stub用
-        $response = [
-	        "result_code" => 0,
-	        "name" => "鈴木太郎",
-	        "kana" => "スズキタロウ",
-	        "pc_mail" => "you@feelcycle.com",
-	        "b_birthday" => "昭和55年1月1日",
-	        "b_year" => 1980,
-	        "b_month" => 1,
-	        "b_day" => 1,
- 	        "sex" => "1",
-            "h_zip" => "104-0061",
-            "h_pref" => "東京都",
-            "h_addr" => "中央区銀座 GINZA SIX 10F",
-            "h_tel" => "0363161005",
-	        "memtype_name" => "マンスリーメンバー",
-            "store_name" => "銀座（GNZ）、自由が丘（JYO）",
-            "dm_list" => "1,,,,",
-   	        "pc_conf" => 1,
-	        "gmo_credit" => "XXXXXXXXXXX",
-        ];
+        // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
+        //$payload = $this->getPayload();
+        //logger('payload');
+        //logger($payload);
+        // ペイロードバリデーション
+        //$this->validateApiPayload('cust.auth', $payload);
+
+        // TBD:認証情報からIDを特定する
+        $response = $this->getAuthSelectLogic()->getAuthInfo();
         logger("getUserInfo() End");
         return response()->json($response);
 

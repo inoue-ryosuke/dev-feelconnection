@@ -7,6 +7,7 @@ use App\Libraries\Logic\Loader;
 use App\Libraries\Logic\Instructor\SelectLogic as InstructorSelectLogic;
 use App\Libraries\Logic\Invite\SelectLogic as InviteSelectLogic;
 use App\Libraries\Logic\Music\SelectLogic as MusicSelectLogic;
+use App\Libraries\Logic\Authentication\SelectLogic as AuthSelectLogic;
 
 /**
  * API用ロジックに関するトレイト
@@ -51,6 +52,14 @@ trait ApiLogicTrait {
      */
     public function getMusicSelectLogic() {
         return $this->getApiLogic(Loader::Music, Loader::SELECT);
+    }
+
+    /**
+     * AuthのSelectロジックを取得する
+     * @return AuthSelectLogic
+     */
+    public function getAuthSelectLogic() {
+        return $this->getApiLogic(Loader::Auth, Loader::SELECT);
     }
 
 }

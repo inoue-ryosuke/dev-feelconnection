@@ -17,6 +17,7 @@ class Loader
     const Instructor   = 'Instructor';
     const Invite        = 'Invite';
     const Music        = 'Music';
+    const Auth          = "Authentication";
 
     // 機能
     const SELECT = 'Select';

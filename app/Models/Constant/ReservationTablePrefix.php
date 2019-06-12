@@ -5,7 +5,7 @@ namespace App\Models\Constant;
 /**
  * 予約で使用するテーブル別名のプレフィックス
  */
-class ReservationModalTablePrefix
+class ReservationTablePrefix
 {
     /** shift_master */
     const SM = 'SM_';
