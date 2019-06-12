@@ -310,9 +310,11 @@ class Cust extends BaseFormModel implements Authenticatable
 		if ($all->isEmpty()) {
 			return "";
 		}
-        //print "<pre>"; print_r($all->implode("tenpo_name","、")); print "</pre>"; exit;
-		return $all->implode("tenpo_name","、");
-		//"銀座（GNZ）、自由が丘（JYO）";
+		// 銀座（GNZ）という文字列を作る
+		$tenpostr = $all->map(function($tenpo) {
+			return ["tenpo_str" => $tenpo->tenpo_name."(".$tenpo->tenpo_code.")"];
+		});
+		return $tenpostr->implode("tenpo_str","、");
 	}
 	/**
 	 * 案内メール設定を返却する
@@ -332,6 +334,25 @@ class Cust extends BaseFormModel implements Authenticatable
 	 */
 	public function getGmoId() {
 		return $this->gmo_credit ?? null;
+	}
+	/**
+	 * キャンペーン一覧を取得返却する
+	 */
+	public function getCampaignList() {
+		//TBD:テーブル構造次第。今はスタブ返却
+		$campaign = [
+			[
+				"code" => "XXXXXXXXXX",
+				"name" => "NEW YEARキャンペーン",
+				"flag" => 1,
+			],
+			[
+				"code" => "XXXXXXXXXX",
+				"name" => "お友達紹介キャンペーン",
+				"flag" => 1,
+			]
+		];
+        return $campaign;
 	}
 
 }
