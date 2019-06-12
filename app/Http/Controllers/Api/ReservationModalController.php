@@ -57,9 +57,15 @@ class ReservationModalController extends Controller
             throw new BadRequestException('未公開のレッスンです。');
         }
 
-        // レッスンスケジュールフラグ(shift_master.flg)のバリデーション
+        // レッスンスケジュールフラグ(shift_master.flg)が有効(Y)かどうか
+        if (!VaidationLogic::isShiftMasterFlgValid($shiftMaster['flg'])) {
+            throw new BadRequestException('無効なレッスンです。');
+        }
 
-        // レッスンスケジュールレッスン開催日時(shift_master.shift_date, shift_master.ls_st)のバリデーション
+        // レッスンスケジュールレッスン開催日時(shift_master.shift_date, shift_master.ls_st)が未来の日付かどうか
+        if (!VaidationLogic::isShiftDateTimeComing($shiftMaster['shift_date'], $shiftMaster['ls_st'])) {
+            throw new BadRequestException('無効なレッスンです。');
+        }
 
         // ネット・トライアル会員が体験予約不可のレッスンを指定した場合エラー
         if (!VaidationLogic::canReserveByNetTrialMember($custMaster['memtype'], $shiftMaster['taiken_les_flg'])) {
@@ -80,6 +86,11 @@ class ReservationModalController extends Controller
                 }
             } else {
                 // 体験レッスン受講済みでないかつ予約済み
+                $shiftDateTime = $shiftMaster['shift_date'] . $shiftMaster['ls_et'];
+                if (!VaidationLogic::validateTrialReservationDate($custMaster['memtype'], $shiftDateTime, $trialLessonStatus[2])) {
+                    // 予約済みの体験レッスンより前の日付のレッスンを指定
+                    throw new BadRequestException('予約済みの体験レッスンより後の日付を指定してください。');
+                }
             }
         }
 

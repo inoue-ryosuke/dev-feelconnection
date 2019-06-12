@@ -29,7 +29,7 @@ class VaidationLogic
     /**
      * ネット予約公開日時が過去の日付かどうか
      *
-     * @param string $openDateTime ネット予約公開日時
+     * @param string $openDateTime ネット予約公開日時 yyyy/mm/dd hh:ii:ss
      * @return bool
      */
     public static function isOpenDateTimePassed(string $openDateTime) {
@@ -40,13 +40,27 @@ class VaidationLogic
     }
 
     /**
-     * レッスンスケジュールフラグ(shift_master.flg)のバリデーション
+     * レッスンスケジュールフラグ(shift_master.flg)が有効(Y)かどうか
      *
-     * @param int $shiftMasterflag Y:有効、N：削除済み、C：休講
+     * @param string $shiftMasterflag Y:有効、N：削除済み、C：休講
      * @return bool
      */
-    public static function isShiftMasterFlgValid(int $shiftMasterflag) {
+    public static function isShiftMasterFlgValid(string $shiftMasterflag) {
         return $shiftMasterflag === ShiftMasterFlg::VALID;
+    }
+
+    /**
+     * レッスンスケジュールレッスン開催日時(shift_master.shift_date, shift_master.ls_st)が未来の日付かどうか
+     *
+     * @param string $shiftDate レッスン開催日 yyyy/mm/dd
+     * @param string $startTime レッスン開催時間 hh:ii:ss
+     * @return bool
+     */
+    public static function isShiftDateTimeComing(string $shiftDate, string $startTime) {
+        $currentDateTime = new \DateTime();
+        $shiftDateTime = new \DateTime("{$shiftDate} {$startTime}");
+
+        return $currentDateTime < $shiftDateTime;
     }
 
     /**
@@ -75,6 +89,29 @@ class VaidationLogic
      */
     public static function canTrialReservation(int $taikenLessonFlag) {
         return $taikenLessonFlag === TaikenLesFlg::POSSIBLE;
+    }
+
+    /**
+     * 体験レッスン受講済みでないかつ予約済みの場合は、予約した体験レッスンより前の日時のレッスンは選択不可
+     * ※体験レッスン予約時にマンスリー会員で入会して、体験レッスンと通常レッスンを同時に予約。
+     *
+     * @param int $memberType 会員種別(cust_memtype.mid)
+     * @param string $shiftDateTime 予約予定レッスン開催日時 yyyy/mm/dd hh:ii:ss
+     * @param string $reservedDateTime 予約済みレッスン終了日時 yyyy/mm/dd hh:ii:ss
+     * @return bool
+     */
+    public static function validateTrialReservationDate(int $memberType, string $shiftDateTime, string $reservedDateTime) {
+        // TODO: 会員種別を渡してマンスリー会員か判別
+        if (false) {
+            // マンスリー会員でない
+
+            return false;
+        }
+
+        $shiftDateTime = new \DateTime($shiftDateTime);
+        $reservedDateTime = new \DateTime($reservedDateTime);
+
+        return destDateTime > $reservedDateTime;
     }
 
     /**
