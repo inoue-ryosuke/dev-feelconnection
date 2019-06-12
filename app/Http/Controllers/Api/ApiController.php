@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Exceptions\MalformedPayloadException;
 use App\Exceptions\IllegalParameterException;
 use App\Libraries\Logger;
-//use Debugbar;
 
 /**
  */
@@ -71,27 +70,27 @@ class ApiController extends Controller
         }
 
         $rules = config('validation.'.$key.'.rules', []);
-        $mapper = config('validation.'.$key.'.mapper', []);
-
-        // バリデーションルールに validation.*.mapperのデータ組み込みロジックをもとに調整。
-        foreach ($mapper as $key => $record) {
-            $recordMapper = array_map(function ($v) use ($record) {
-                if (!isset($record->{$v})) {
-                    return "";
-                }
-                return $record->{$v};
-            }, $mapper);
-            $value = data_get($rules, $key);
-            $value = vsprintf($value, $recordMapper);
-            data_set($rules, $key, $value);
-        }
+//        $mapper = config('validation.'.$key.'.mapper', []);
+//
+//        // バリデーションルールに validation.*.mapperのデータ組み込みロジックをもとに調整。
+//        foreach ($mapper as $key => $record) {
+//            $recordMapper = array_map(function ($v) use ($record) {
+//                if (!isset($record->{$v})) {
+//                    return "";
+//                }
+//                return $record->{$v};
+//            }, $mapper);
+//            $value = data_get($rules, $key);
+//            $value = vsprintf($value, $recordMapper);
+//            data_set($rules, $key, $value);
+//        }
 
         $validator = validator(
             $payload,
             $rules,
             config('validation.common.errors'),
             config('validation.'.$key.'.attributes')
-            );
+        );
         if ($validator->fails()) {
             logger()->debug($validator->errors());
             $errors = json_encode($validator->errors(), JSON_UNESCAPED_UNICODE);
@@ -99,15 +98,5 @@ class ApiController extends Controller
         }
     }
 
-//    /**
-//     * レスポンス値をfieldsによって絞り込む対応
-//     * @param $response
-//     * @return array
-//     */
-//    protected function filterByFields($response) {
-//        if (!request()->has('fields') || empty(request()->get('fields'))) {
-//            return $response;
-//        }
-//        return array_filter_by_keys($response, explode(',', "error,".request()->get('fields')));
-//    }
+
 }

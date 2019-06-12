@@ -22,6 +22,7 @@ return [
     'connectionFailed' => '接続に失敗しました。',
     'api' => [
         'tokenExpired' => '有効期限が切れました。再度ログインし直してください。',
+        'badRequest' => 'リクエストが不正です。',
         'illigalToken' => '要求されたトークンが不正です',
         'notAcceptable' => 'リクエストを受理できませんでした。',
         'notFound' => 'APIが見つかりません。',

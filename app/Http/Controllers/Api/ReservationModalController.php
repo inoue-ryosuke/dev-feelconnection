@@ -29,17 +29,9 @@ class ReservationModalController extends Controller
         if (!VaidationLogic::validateShiftIdHash($params)) {
             // エラー
             return response()
-                    ->json([ 'エラー' ])
+                    ->json([ 'sidエラー' ])
                     ->setStatusCode(Response::HTTP_BAD_REQUEST);
         }
-
-        /*
-         * shift_master、lesson_master、tenpo_master、cust_master、user_master、
-         * lesson_class1、lesson_class2、lesson_class3
-         * あたりの更新頻度が低くて管理画面からのみ更新がかかりそうなマスタデータをRedisにキャッシュする
-         * 「lesson_master:ID」のようにキーを指定・Hashで登録して、O(1)で取得できるようにする
-         *
-         */
 
         // 予約モーダルで必要なマスターデータ取得
         $resource = new ReservationModalMasterResource($sid);
@@ -48,6 +40,14 @@ class ReservationModalController extends Controller
             $resource->createDBResource();
         }
 
-        return response()->json([ 'shift_master' => $resource->getShitMasterResource() ]);
+        // ネット予約公開日時が過去の日付かどうか
+        if (!VaidationLogic::isOpenDateTimePassed($resource->getShitMasterColumn('open_datetime'))) {
+            // エラー
+            return response()
+                ->json([ 'open_datetimeエラー' ])
+                ->setStatusCode(Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json([ 'resources' => $resource->getAllResource() ]);
     }
 }

@@ -1,5 +1,21 @@
 <?php 
 
+$router->post('api/get_json_sample', [
+	'uses' => 'App\Http\Controllers\Api\ApiTestController@getJsonSample',
+	'as' => 'api.get_json_sample.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->get('api', [
+	'uses' => 'App\Http\Controllers\Api\AuthController@index',
+	'as' => 'api.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->post('api/auth', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
 	'as' => 'api.auth.get',
@@ -17,7 +33,7 @@ $router->get('api/invite/{invite_code}', [
 ]);
 
 $router->post('api/instructors', [
-	'uses' => 'App\Http\Controllers\Api\UserMasterController@getInstructors',
+	'uses' => 'App\Http\Controllers\Api\InstructorController@getInstructors',
 	'as' => 'api.instructors.get',
 	'middleware' => [],
 	'where' => [],
