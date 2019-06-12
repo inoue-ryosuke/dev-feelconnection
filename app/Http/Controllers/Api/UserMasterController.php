@@ -67,47 +67,12 @@ class UserMasterController extends ApiController
         $payload = $this->getPayload();
         logger('payload');
         logger($payload);
+        // バリデーションチェック
         $this->validateApiPayload('instructors.search', $payload);
-
-        $response = [
-            'result_code' => 0,
-            "list" => [
-                [
-                     "uid" => 151,
-                     "name" => "AAAA太郎",
-                     "assigned_at" => "2019/06/10",
-                     "comment" =>  "AAAA太郎の自己紹介文",
-                     "image_path" => "/images/aaaa_tarou.jpg"
-                ],
-                [
-                     "uid" => 152,
-                     "name" => "BBBB太郎",
-                     "assigned_at" => "2019/06/11",
-                     "comment" =>  "BBBB太郎の自己紹介文",
-                     "image_path" => "/images/bbbb_tarou.jpg"
-                ]
-            ],
-            "sort_results" => [
-                [
-                      "name" => "銀座(GNZ)",
-                      "instructors" => [
-                           [ "uid" => 151 ],
-                           [ "uid" => 152 ]
-                      ]
-                ],
-                [
-                    "name" => "渋谷(SBY)",
-                    "instructors" => [
-                            [ "uid" => 151 ]
-                    ]
-                ]
-            ],
-            "total_count" => 2,
-            "list_count" => 2,
-            "limit" => 100,
-            "offset" => 0,
-            "type" => 1
-        ];
+        // レスポンスを取得
+        $response = $this->getUserMasterSelectLogic()->getInstructors($payload);
+        logger('response');
+        logger($response);
         logger('getInstructors end');
         return response()->json($response);
 
