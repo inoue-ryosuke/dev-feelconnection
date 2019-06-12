@@ -25,7 +25,7 @@ class TenpoMaster extends BaseModel
      */
     public static function findInstructorsShops ($instructorIds) {
         if (empty($instructorIds)) {
-            throw new IllegalParameterException();
+            return [];
         }
         //user_master_histテーブルと結合
         $query = self::leftjoin('user_master_hist', 'tenpo_master.tid', 'user_master_hist.tid');
@@ -38,6 +38,6 @@ class TenpoMaster extends BaseModel
             'user_master_hist.uid'
         );
 
-        return $query->get();
+        return $query->orderBy('prefecture_code', 'ASC')->get();
     }
 }
