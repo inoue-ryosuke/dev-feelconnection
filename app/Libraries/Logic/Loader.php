@@ -18,6 +18,7 @@ class Loader
     const Invite        = 'Invite';
     const Music        = 'Music';
     const Auth          = "Authentication";
+    const MailCheck     = "MailCheck";
 
     // 機能
     const SELECT = 'Select';
