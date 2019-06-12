@@ -6,6 +6,7 @@ use App\Exceptions\IllegalParameterException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 use Carbon\Carbon;
+use App\Libraries\Common\JpDateTime as JpDateTime;
 
 class Cust extends BaseFormModel implements Authenticatable
 {
@@ -165,20 +166,25 @@ class Cust extends BaseFormModel implements Authenticatable
     ];
 
 	// モデル結合アクセサ
-    public function hasMemType() {
-		$this->hasOne(self::Class,"mid","memtype");
+    public function joinAllMemType() {
+		return $this->hasOne(CustMemType::Class,"mid","memtype");
 	}
-
+    public function hasOneMemType() {
+		return $this->joinAllMemType->first();
+	}
+    public function hasManyMemType() {
+		return $this->joinAllMemType->get();
+	}
     /**
 	 * IDでcust情報を取得する
 	 */
 	public static function getAuthInfo($cid) {
 		if (empty($cid)) {
-			return false;
+			return null;
 		}
 		$authcust = Cust::find($cid);
         if (is_null($authcust)) {
-			return false;
+			return  null;
 		}
 		return $authcust;
 	}
@@ -188,7 +194,7 @@ class Cust extends BaseFormModel implements Authenticatable
 	 */
     public function getNameInfo() {
 		if (is_null($this->type_edit_date)) {
-			return "";
+			return $this->name;
 		}
 		$append = "";
 		$c = Carbon::parse($this->type_edit_date);
@@ -212,9 +218,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		// 和暦変換返却
     	if ($mode="jp") {
 			$c = Carbon::createFromDate($y,$m,$d,'Asia/Tokyo');
-			setlocale(LC_TIME, 'ja_JP.utf8');
-			$format = '%EC%Ey年%-m月%-d日';
-			return $c->formatLocalized($format);
+			return JpDateTime::date("JK年n月j日",$c->timestamp);
 		}
 		// 西暦返却
 		return sprintf("%04d",$y).sprintf("%02d",$m).sprintf("%02d",$d);
@@ -232,14 +236,11 @@ class Cust extends BaseFormModel implements Authenticatable
 	 * 会員種別を返却する
 	 */
 	public function getMemTypeName() {
-		/*
-		$memtype = $this->hasMemType->get();
+		$memtype = $this->hasOneMemType();
 		if (is_null($memtype)) {
 			return "";
 		}
 		return $memtype->type_name ?? "";
-		*/
-		return "マンスリーメンバー";
 	}
 	/**
 	 * 所属店舗を返却する（TBD:他箇所で取得する処理があればそれを用いる）

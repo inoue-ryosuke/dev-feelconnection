@@ -35,9 +35,7 @@ class CustMemType extends BaseFormModel implements Authenticatable
 		"seq",
 		"mem_prod",
 	];
-
-    const CREATED_AT = false;
-    const UPDATED_AT = false;
-	const DELETED_AT = false;
-	
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
+	const DELETED_AT = null;
 }

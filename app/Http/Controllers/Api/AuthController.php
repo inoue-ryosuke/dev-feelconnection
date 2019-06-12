@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 //use App\Libraries\Logic\Loader;  実開発の場合はロジック層にて実装
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Libraries\Logic\Authentication\DataProviderLogic;  // 情報取得系
+use App\Libraries\Logic\Authentication\SelectLogic as AuthSelectLogic;  // 情報取得系
+use App\Exceptions\ForbiddenException;
+use App\Models\Cust;
 
 ///**
 // * 認証コントローラー
@@ -89,25 +91,15 @@ class AuthController extends ApiController
 
         logger("getUserInfo() Start");
 
-        // ▼実実装用
-        $payload = $this->getPayload();
-        logger('payload');
-        logger($payload);
+        // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
+        //$payload = $this->getPayload();
+        //logger('payload');
+        //logger($payload);
         // ペイロードバリデーション
-        $this->validateApiPayload('cust.auth', $payload);
+        //$this->validateApiPayload('cust.auth', $payload);
 
         // TBD:認証情報からIDを特定する
-        $id = 1;
-        $custinfo = DataManagerLogic::getAuthInfo($id);
-        if (!$custinfo) {
-            // エラー
-            //throw new AuthenticationErrorException(); Handler経由レスポンスの場合
-            // 手動レスポンス形成
-            return response()
-                    ->json([ 'エラー' ])
-                    ->setStatusCode(Response::HTTP_BAD_REQUEST);
-        }
-        $response = DataManagerLogic::getUserInfo($cid);
+        $response = AuthSelectLogic::getAuthInfo();
         logger("getUserInfo() End");
         return response()->json($response);
 
