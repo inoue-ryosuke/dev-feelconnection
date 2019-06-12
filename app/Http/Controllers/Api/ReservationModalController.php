@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Libraries\Logic\ReservationModal\VaidationLogic;
 use App\Libraries\Logic\ReservationModal\ReservationModalMasterResource;
+use App\Models\OrderLesson;
+
+use App\Exceptions\BadRequestException;
+use App\Exceptions\IllegalParameterException;
 
 /**
  * 予約モーダルコントローラー
@@ -28,9 +32,7 @@ class ReservationModalController extends Controller
         // レッスンスケジュールIDハッシュのバリデーション
         if (!VaidationLogic::validateShiftIdHash($params)) {
             // エラー
-            return response()
-                    ->json([ 'sidエラー' ])
-                    ->setStatusCode(Response::HTTP_BAD_REQUEST);
+            throw new BadRequestException('レッスンスケジュールIDが不正です。');
         }
 
         // 予約モーダルで必要なマスターデータ取得
@@ -40,34 +42,51 @@ class ReservationModalController extends Controller
             $resource->createDBResource();
         }
 
+        $shiftMaster = $resource->getShitMasterResource();
+        $lessonMaster = $resource->getLessonMasterResource();
+        $lessonClass1 = $resource->getLessonClass1Resource();
+        $lessonClass2 = $resource->getLessonClass2Resource();
+        $lessonClass3 = $resource->getLessonClass3Resource();
+        $custMaster = $resource->getCustMasterResource();
+        $tenpoMaster = $resource->getTenpoMasterResource();
+        $userMaster = $resource->getUserMasterResource();
+
         // ネット予約公開日時が過去の日付かどうか
-        $openDateTime = $resource->getShitMasterColumn('open_datetime');
-        if (!VaidationLogic::isOpenDateTimePassed($openDateTime)) {
-            // エラー
-            return response()
-                ->json([ 'open_datetimeエラー' ])
-                ->setStatusCode(Response::HTTP_BAD_REQUEST);
+        if (!VaidationLogic::isOpenDateTimePassed($shiftMaster['open_datetime'])) {
+            // ネット予約公開日時が未来
+            throw new BadRequestException('未公開のレッスンです。');
         }
 
+        // レッスンスケジュールフラグ(shift_master.flg)のバリデーション
+
+        // レッスンスケジュールレッスン開催日時(shift_master.shift_date, shift_master.ls_st)のバリデーション
+
         // ネット・トライアル会員が体験予約不可のレッスンを指定した場合エラー
-        $memberType = $resource->getCustMasterColumn('memtype');
-        $taikenLessonFlag = $resource->getShitMasterColumn('taiken_les_flg');
-        if (!VaidationLogic::canReserveByNetTrialMember($memberType, $taikenLessonFlag)) {
-            // エラー
-            return response()
-            ->json([ 'ネット・トライアル会員予約不可エラー' ])
-            ->setStatusCode(Response::HTTP_BAD_REQUEST);
+        if (!VaidationLogic::canReserveByNetTrialMember($custMaster['memtype'], $shiftMaster['taiken_les_flg'])) {
+            // 体験予約不可のレッスンを指定
+            throw new BadRequestException('ネット・トライアル会員が体験予約不可のレッスンを指定しました。');
+        }
+
+        // 体験レッスン受講済み状態、体験レッスン予約済み状態取得
+        $trialLessonStatus = OrderLesson::getTrialLessonStatus($custMaster['cid']);
+
+        if (!$trialLessonStatus[0]) {
+            // 体験レッスン受講済みでない
+            if (!$trialLessonStatus[1]) {
+                // 体験レッスン受講済みでないかつ予約済みでない
+                if (!VaidationLogic::canTrialReservation($shiftMaster['taiken_les_flg'])) {
+                    // 体験予約不可のレッスンを指定
+                    throw new BadRequestException('体験予約不可のレッスンが指定されました。');
+                }
+            } else {
+                // 体験レッスン受講済みでないかつ予約済み
+            }
         }
 
         // 予約受付時間内かどうか
-        $shiftDate = $resource->getShitMasterColumn('shift_date');
-        $startTime = $resource->getShitMasterColumn('ls_st');
-        $timeLimit = $resource->getShitMasterColumn('tlimit');
-        if (!VaidationLogic::validateTimeLimit($shiftDate, $startTime, $timeLimit)) {
-            // エラー
-            return response()
-            ->json([ '予約受付時間外エラー' ])
-            ->setStatusCode(Response::HTTP_CONFLICT);
+        if (!VaidationLogic::validateTimeLimit($shiftMaster['shift_date'], $shiftMaster['ls_st'], $shiftMaster['tlimit'])) {
+            // 予約受付時間外
+            throw new IllegalParameterException('予約受付時間外です。');
         }
 
         return response()->json([ 'resources' => $resource->getAllResource() ]);
