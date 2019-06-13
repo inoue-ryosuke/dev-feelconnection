@@ -27,6 +27,7 @@ return [
     "cust_kubun4",	//顧客項目4
     "cust_master",	//会員
     "cust_memtype",	//会員種別
+    "cust_tenpo",	//会員店舗（複数所属用ピボットテーブル）
     "cust_set",	//項目表示設定
     "cust_syokugyo",	////顧客項目3
     "customer_img",	//会員写真
@@ -51,6 +52,7 @@ return [
     "perf_log",	//日報更新履歴
     "preparation",	//開店時釣銭
     "prev_select",	//権限
+    "pref_master",	//都道府県マスタ
     "prod_master",	//商品
     "prod_tenpo",	//商品表示
     "prodclass1_master",	//商品分類

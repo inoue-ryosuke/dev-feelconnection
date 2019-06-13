@@ -131,7 +131,12 @@ return [
 				"password_change_datetime"=>"2019-06-10 16:02:43.563",
 				"login_trial_count"=>0,
 				"assign" => [
-					"tenpo_name" => "銀座",
+					// ピボットテーブル系の情報はここで作る
+					"tenpo_name" => [
+						"銀座",
+						"自由が丘"
+					],
+					// 関連テーブル系の情報はここで作る
 			        "cust_memtype" => [
 	//                  "mid" => 1,
 				        "type_name" => "マンスリーメンバー",

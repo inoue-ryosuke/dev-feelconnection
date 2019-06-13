@@ -20,12 +20,19 @@ class CustTenpo extends BaseFormModel implements Authenticatable
      */
     protected $table = 'cust_tenpo';
     protected $primaryKey = 'ctenpo_id';
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
+    const DELETED_AT = null;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
+        "cid",
+        "tenpo_id",
+        "flg"
     ];
     /**
      * The attributes that should be hidden for arrays.
