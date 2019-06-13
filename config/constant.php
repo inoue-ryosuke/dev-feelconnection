@@ -13,6 +13,11 @@ return [
         'limit'  => 100,
         'offset' => 0
     ],
+    'loginRedirect' => [
+        "customer" => 'top', // cust_master(会員マスタ)のログインルーティング
+        "user_master" => 'top',// user_master(スタッフ)のログインルーティング
+        "default" => 'top', // 会員でもスタッフでもない場合。会員のログインページへルーティング
+    ],
     'app' => [
         'limit' => 50,
         'topLimit' => 20,
