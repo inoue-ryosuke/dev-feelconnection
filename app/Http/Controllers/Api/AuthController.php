@@ -140,15 +140,14 @@ class AuthController extends ApiController
         $payload = $this->getPayload();
         logger('payload');
         logger($payload);
-//        print "<pre>"; print_r($payload); print "</pre>"; exit;        
         // ペイロードバリデーション
         $this->validateApiPayload('cust.dm_update', $payload);
-        $cid = array_get($payload,"cid",null);
 
         // TBD:認証情報からIDを特定する
-        $response = $this->getAuthSelectLogic()->getUserMoreInfo($cid);
+        $response = $this->getAuthUpdateLogic()->setDmList($payload);
         logger("getUserInfo() End");
         return response()->json($response);
+
     }
 
 }

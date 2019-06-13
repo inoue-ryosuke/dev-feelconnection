@@ -8,6 +8,7 @@ use App\Libraries\Logic\Instructor\SelectLogic as InstructorSelectLogic;
 use App\Libraries\Logic\Invite\SelectLogic as InviteSelectLogic;
 use App\Libraries\Logic\Music\SelectLogic as MusicSelectLogic;
 use App\Libraries\Logic\Authentication\SelectLogic as AuthSelectLogic;
+use App\Libraries\Logic\Authentication\UpdateLogic as AuthUpdateLogic;
 use App\Libraries\Logic\MailCheck\SelectLogic as MailCheckSelectLogic;
 
 /**
@@ -61,6 +62,14 @@ trait ApiLogicTrait {
      */
     public function getAuthSelectLogic() {
         return $this->getApiLogic(Loader::Auth, Loader::SELECT);
+    }
+
+    /**
+     * AuthのUpdateロジックを取得する
+     * @return AuthUpdateLogic
+     */
+    public function getAuthUpdateLogic() {
+        return $this->getApiLogic(Loader::Auth, Loader::UPDATE);
     }
 
     /**

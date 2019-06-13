@@ -183,6 +183,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		}
 		return $this->joinAllMemType->get();
 	}
+	
 	// モデル結合アクセサ（所属店舗）
     public function joinAllStoreTenpo() {
 		return $this->hasOne(TenpoMaster::Class,"tid","store_id");
@@ -237,13 +238,17 @@ class Cust extends BaseFormModel implements Authenticatable
     /**
 	 * IDでcust情報を取得する
 	 */
-	public static function getAuthInfo($cid) {
+	public static function getAuthInfo($cid,$lock=false) {
 		if (empty($cid)) {
 			return null;
 		}
-		$authcust = Cust::find($cid);
+		if ($lock) {
+		    $authcust = Cust::lockForUpdate()->find($cid);
+		} else {
+		    $authcust = Cust::find($cid);
+		}
         if (is_null($authcust)) {
-			return  null;
+			return null;
 		}
 		return $authcust;
 	}
