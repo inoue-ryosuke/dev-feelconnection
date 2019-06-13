@@ -28,5 +28,18 @@ class PrefMaster extends BaseFormModel implements Authenticatable
 	];
     const CREATED_AT = null;
     const UPDATED_AT = null;
-	const DELETED_AT = null;
+    const DELETED_AT = null;
+    /**
+     * 国に対応する都道府県一覧を返却する
+     */
+    public static function getPref($country="JPN") {
+        return self::where("country",$country)->get()->map(function($item) {
+            return $item->only(["pid","name"]);
+            /* 項目名を変えてレスポンスしたい場合はこちら
+            return [
+                "pid" =>$item->pid,
+                "name"=>$item->name
+            ];*/
+        });
+    }
 }
