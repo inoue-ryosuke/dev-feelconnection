@@ -1,22 +1,26 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 
 abstract class BaseSeeder extends Seeder
 {
+    const ConfigFolderPath = "config/seeder";
+
     /**
-     * Run the database seeds.
-     * @param $target
-     * @return void
+     * config/seeder/(develop or other)配下のSeederファイルをconfigヘルパで取得する
      */
-    public function getConfig($target=null)
-    {
+    public function getConfig($target=null) {
         if (config('app.env') === 'production') {
-            $config = require(base_path('database/seeds/default_production.php'));
-            return array_get($config, $target);
+            if ($target) {
+                return config("seeder.production.".$target);
+            }
+            return config("seeder.production");
         }
-        $config = require(base_path('database/seeds/default.php'));
-        return array_get($config, $target);
+        if ($target) {
+            return config("seeder.develop.".$target);
+        }
+        return config("seeder.develop");
     }
 
     /**

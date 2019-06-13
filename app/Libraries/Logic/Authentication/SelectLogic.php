@@ -42,7 +42,7 @@ class SelectLogic
             "dm_list" => $custinfo->getDmLists(),       //"1,,,,",
             "pc_conf" => $custinfo->getPcConf(),        // 1,
             "gmo_credit" => $custinfo->getGmoId(),       // "XXXXXXXXXXX",
-            "pref" => PrefMaster::getPref("JPN")
+            "pref" => PrefMaster::getPref("JPN") ?? []  // JSONレスポンス型の事を考えて、nullの時は空配列
         ];
         return $response;
     }
@@ -77,7 +77,7 @@ class SelectLogic
             "pc_conf" => $custinfo->getPcConf(),        // 1,
             "campaign_list" => $custinfo->getCampaignList(),    // TBD:現在スタブ
             "gmo_credit" => $custinfo->getGmoId(),       // "XXXXXXXXXXX",
-            "pref" => PrefMaster::getPref("JPN")
+            "pref" => PrefMaster::getPref("JPN") ?? []  // JSONレスポンス型の事を考えて、nullの時は空配列
         ];        
         return $response;
     }
