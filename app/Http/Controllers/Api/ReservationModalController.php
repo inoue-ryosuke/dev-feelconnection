@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Libraries\Logic\ReservationModal\CommonLogic;
 use App\Libraries\Logic\ReservationModal\VaidationLogic;
 use App\Libraries\Logic\ReservationModal\ReservationModalMasterResource;
 use App\Models\OrderLesson;
@@ -45,8 +46,8 @@ class ReservationModalController extends Controller
 
         $shiftMaster = $resource->getShitMasterResource();
         $lessonMaster = $resource->getLessonMasterResource();
-        $custMaster = $resource->getCustMasterResource();
         $tenpoMaster = $resource->getTenpoMasterResource();
+        $custMaster = $resource->getCustMasterResource();
 
         // ネット予約公開日時が過去の日付かどうか
         if (!VaidationLogic::isOpenDateTimePassed($shiftMaster['open_datetime'])) {
@@ -100,7 +101,25 @@ class ReservationModalController extends Controller
         // 座席情報取得
         $sheetManager = new SheetManager($shiftMaster['shiftid']);
         $sheetManager->setSheetStatusAndModalType($custMaster['cid']);
+        $sheetManager->fillNotSpecialSheetTrial($custMaster['memtype']);
 
-        return response()->json([ 'resources' => $resource->getAllResource() ]);
+        return response()->json([
+            'response_code' => Response::HTTP_OK,
+            'modal_type' => $sheetManager->getReservationModalType(),
+            'lesson_date' => $shiftMaster['shift_date'],
+            'lesson_day_week' => CommonLogic::getDayWeek($shiftMaster['shift_date']),
+            'lesson_start_time' => $shiftMaster['ls_st'],
+            'lesson_end_time' => $shiftMaster['ls_et'],
+            'store_name' => $tenpoMaster['tenpo_name'],
+            'studio_image_path' => 'https://xxx/yyy/zzz', // TODO スタジオ画像パス
+            'lesson_name' => $resource->getLessonName(),
+            'instructor_name' => $shiftMaster['instructor_name'],
+            'trial_capacity' => $shiftMaster['taiken_capa'],
+            'instructor_image_path' => 'https://xxx/yyy/zzz', // TODO インストラクター画像パス
+            'cancel_waiting_no' => $shiftMaster['taiken_capa'],
+            'sheets' => $sheetManager->getResponseSheetsArray()
+
+        ])
+        ->setStatusCode(Response::HTTP_OK);
     }
 }

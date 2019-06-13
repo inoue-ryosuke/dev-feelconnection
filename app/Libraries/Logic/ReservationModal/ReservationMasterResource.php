@@ -2,8 +2,6 @@
 
 namespace App\Libraries\Logic\ReservationModal;
 
-use Illuminate\Support\Facades\Redis;
-
 /**
  * 予約で必要なRedis・DBのマスター情報
  *
@@ -85,7 +83,7 @@ abstract class ReservationMasterResource {
      * @return bool 成功=true, 失敗=false
      */
     protected function createRedisResourceByKey(string $keyName, &$resource) {
-        $resource = Redis::hgetall($keyName);
+        $resource = RedisWrapper::hGetAll($keyName);
         if (!empty($resource)) {
             return true;
         } else {
@@ -133,5 +131,18 @@ abstract class ReservationMasterResource {
             'cust_master' => $this->getCustMasterResource(),
             'tenpo_master' => $this->getTenpoMasterResource(),
         );
+    }
+
+    /**
+     * レッスン名取得
+     *
+     * @return string レッスン名
+     */
+    public function getLessonName() {
+        return
+           $this->lessonMaster['lesson_class1_name'] . ' '
+             . $this->lessonMaster['lesson_class2_name'] . ' '
+             . $this->lessonMaster['lesson_class3_name']
+        ;
     }
 }
