@@ -111,7 +111,7 @@ class VaidationLogic
         $shiftDateTime = new \DateTime($shiftDateTime);
         $reservedDateTime = new \DateTime($reservedDateTime);
 
-        return destDateTime > $reservedDateTime;
+        return $shiftDateTime > $reservedDateTime;
     }
 
     /**

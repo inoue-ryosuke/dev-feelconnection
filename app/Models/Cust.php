@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Libraries\Common\JpDateTime as JpDateTime;
 
 use App\Models\TenpoMaster as TenpoMaster;
+use App\Models\CustTenpo as CustTenpo;
 
 class Cust extends BaseFormModel implements Authenticatable
 {
@@ -183,7 +184,9 @@ class Cust extends BaseFormModel implements Authenticatable
 		}
 		return $this->joinAllMemType->get();
 	}
+	
 	// モデル結合アクセサ（所属店舗）
+	/*
     public function joinAllStoreTenpo() {
 		return $this->hasOne(TenpoMaster::Class,"tid","store_id");
 	}
@@ -198,6 +201,26 @@ class Cust extends BaseFormModel implements Authenticatable
 			return null;
 		}
 		return $this->joinAllStoreTenpo->get();
+	}
+	*/
+	// モデル結合アクセサ（所属店舗：複数対応）
+    public function joinAllStoreTenpo() {
+		//$query = $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,"cid","tenpo_id")->toSql();
+		//echo $query; exit;
+		return $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,"cid","tenpo_id");
+	}
+    public function hasOneStoreTenpo() {
+		if (!$this->joinAllStoreTenpo->count()) {
+			return null;
+		}
+		return $this->joinAllStoreTenpo()->first();
+	}
+    public function hasManyStoreTenpo() {
+		if (!$this->joinAllStoreTenpo->count()) {
+			return null;
+		}
+//		print "<pre>"; print_r($this->joinAllStoreTenpo()->get()); print "</pre>"; exit;
+		return $this->joinAllStoreTenpo()->get();
 	}
 	// モデル結合アクセサ（登録店舗）
     public function joinAllLastTenpo() {
@@ -218,32 +241,28 @@ class Cust extends BaseFormModel implements Authenticatable
 	// 全店舗情報（所属店舗＋登録店舗）
     public function hasManyAllTenpo() {
 
-		$all = collect([]);
-		if (!$this->store_id && !$this->last_tenpo) {
-			return null;
+		$all = $this->hasManyStoreTenpo();
+		if (!$all) {
+			return collect([]);
 		}
-		$store  = $this->hasOneStoreTenpo();
-		if ($store) {
-             $all->add($store);
-		} 
-		//print "<pre>"; print_r($store); print "</pre>";
-		$last   = $this->hasOneLastTenpo();
-		if ($last) {
-             $all->add($last);
-		} 
+//		print "<pre>"; print_r($all); print "</pre>"; exit;
 		return $all;
 	}
 
     /**
 	 * IDでcust情報を取得する
 	 */
-	public static function getAuthInfo($cid) {
+	public static function getAuthInfo($cid,$lock=false) {
 		if (empty($cid)) {
 			return null;
 		}
-		$authcust = Cust::find($cid);
+		if ($lock) {
+		    $authcust = Cust::lockForUpdate()->find($cid);
+		} else {
+		    $authcust = Cust::find($cid);
+		}
         if (is_null($authcust)) {
-			return  null;
+			return null;
 		}
 		return $authcust;
 	}

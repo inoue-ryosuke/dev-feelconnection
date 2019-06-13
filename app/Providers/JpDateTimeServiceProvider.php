@@ -13,7 +13,10 @@ class JpDateTimeServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(
+            'JpDateTime',
+            'App\Libraries\Common\JpDateTime'
+        );
     }
 
     /**
