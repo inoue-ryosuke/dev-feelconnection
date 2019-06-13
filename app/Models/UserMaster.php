@@ -9,6 +9,14 @@ class UserMaster extends BaseModel
      */
     protected $table = 'user_master';
     protected $primaryKey = 'uid';
+    protected $fillable = [
+        'seq','login_id',
+        'login_pass','prev_id',
+        'alive_flg', 'user_name',
+        'teacher','salt'
+    ];
+    // テーブルにtimestamps系カラムがないのでfalseを設定
+    public $timestamps = false;
 
     // インストラクター紹介一覧取得APIで使用するソート対象
     const SORT_TYPE_SHOP = 1;

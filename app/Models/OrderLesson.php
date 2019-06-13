@@ -55,9 +55,21 @@ class OrderLesson extends Model
         } else {
             // 体験レッスン受講済みでない、体験レッスン予約済み
             $model = $collection->last();
-            $lessonDateTime = new \DateTime("{$model->shift_date} {$model->ls_st}");
+            $lessonDateTime = new \DateTime("{$model->shift_date} {$model->ls_et}");
 
             return [ false, true, $lessonDateTime->format('Y-m-d H:i:s') ];
         }
+    }
+
+    /**
+     * 予約済み座席一覧取得
+     *
+     * @param int $shiftId レッスンスケジュールID
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public static function getReservedSheetsList(int $shiftId) {
+        return self::where('sid', '=', $shiftId)
+            ->where('flg', '=', OrderLessonFlg::RESERVED)
+            ->get();
     }
 }

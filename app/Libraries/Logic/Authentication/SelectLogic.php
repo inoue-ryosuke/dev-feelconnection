@@ -4,7 +4,7 @@ namespace App\Libraries\Logic\Authentication;
 
 use App\Exceptions\BadRequestException;
 use App\Models\Cust;
-
+use App\Models\PrefMaster;
 /**
  * 認証で使用するバリデーション
  *
@@ -41,7 +41,8 @@ class SelectLogic
             "store_name" => $custinfo->getStoreNames(), //"銀座（GNZ）、自由が丘（JYO）",
             "dm_list" => $custinfo->getDmLists(),       //"1,,,,",
             "pc_conf" => $custinfo->getPcConf(),        // 1,
-            "gmo_credit" => $custinfo->getGmoId()       // "XXXXXXXXXXX",
+            "gmo_credit" => $custinfo->getGmoId(),       // "XXXXXXXXXXX",
+            "pref" => PrefMaster::getPref("JPN")
         ];
         return $response;
     }
@@ -74,8 +75,9 @@ class SelectLogic
             "store_name" => $custinfo->getStoreNames(), //"銀座（GNZ）、自由が丘（JYO）",
             "dm_list" => $custinfo->getDmLists(),       //"1,,,,",
             "pc_conf" => $custinfo->getPcConf(),        // 1,
-            "campaign_list" => $custinfo->getCampaignList(),
-            "gmo_credit" => $custinfo->getGmoId()       // "XXXXXXXXXXX",
+            "campaign_list" => $custinfo->getCampaignList(),    // TBD:現在スタブ
+            "gmo_credit" => $custinfo->getGmoId(),       // "XXXXXXXXXXX",
+            "pref" => PrefMaster::getPref("JPN")
         ];        
         return $response;
     }
