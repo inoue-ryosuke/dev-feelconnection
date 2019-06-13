@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 
+use App\Models\RegistAuth;
+
 class MailCheckController extends ApiController
 {
     //
@@ -27,16 +29,16 @@ class MailCheckController extends ApiController
         $payload = $request->getContent();
         $payload = json_decode($payload, true);
         //  処理分岐
-        if ($type == 1) {
+        if ($type == RegistAuth::IS_REGIST) {
             //  登録
 //            $this->validateApiPayload('mailcheck.accountRegist', $payload);
-            $response = $this->getAccountRegistSelectLogic()->validateMailAddress($payload);
+            $response = $this->getAccountRegistSelectLogic()->validateRegistMailAddress($payload);
         }
-        elseif ($type == 2) {
+        elseif ($type == RegistAuth::IS_PASSWD) {
             //  パスワード再設定
             $result = self::passwd($request);
         }
-        elseif ($type == 3) {
+        elseif ($type == RegistAuth::IS_MAILADDRESS) {
             //  メールドレス再設定
             $result = self::mail($request);
         }

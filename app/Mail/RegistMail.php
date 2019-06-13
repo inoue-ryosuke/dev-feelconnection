@@ -11,10 +11,6 @@ class RegistMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    const SUBJECT = '登録認証メール';  //  TODO    constの置き場に移動
-    const FROM = 'kawai.toshifumi@xchange.jp';  //  TODO    constの置き場に移動
-
-
     protected $mailaddress;
     protected $token;
 
@@ -37,10 +33,10 @@ class RegistMail extends Mailable
     public function build()
     {
         
-        $authUrl = 
+        $authUrl = route('api.mailauth.get', ['token' => $this->token]);
         
-        return $this->from(self::FROM)
-                    ->subject(self::SEBJECT)
+        return $this->from(config('constant.mailCheck.registMailFrom', []))
+                    ->subject(config('constant.mailCheck.registMailSubject', []))
                     ->view('mails.regist_mail')
                     ->with(['authUrl' => $authUrl]);
     }
