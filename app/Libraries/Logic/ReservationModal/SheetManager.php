@@ -3,10 +3,11 @@
 namespace App\Libraries\Logic\ReservationModal;
 
 use App\Models\OrderLesson;
-use Illuminate\Support\Facades\Redis;
 use App\Models\Constant\SheetStatus;
 use App\Models\Constant\ReservationModalType;
 use App\Models\Constant\OrderLessonSbFlg;
+use App\Models\Constant\RedisKeyLimit;
+use App\Models\Constant\SpecialSheetType;
 
 /**
  * 座席情報、バイク枠確保の管理
@@ -29,14 +30,14 @@ class SheetManager
         $this->shiftId = $shiftId;
 
         // スタジオ情報([座席番号, x, y, 座席ステータス, 特別エリア情報]のオブジェクト配列)の初期化
-        // $this->studio = $studio;
+        // $this->studio = new Studio($shiftId);
         // 仮データ
         $this->studio = array(
-            1 => [ 'x' => 1, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [1, 2] ],
-            2 => [ 'x' => 2, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [] ],
-            3 => [ 'x' => 2, 'y' => 2, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [] ],
-            4 => [ 'x' => 2, 'y' => 3, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [] ],
-            5 => [ 'x' => 1, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [] ],
+            1 => [ 'x' => 1, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ] ],
+            2 => [ 'x' => 2, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ] ],
+            3 => [ 'x' => 2, 'y' => 2, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ] ],
+            4 => [ 'x' => 2, 'y' => 3, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ] ],
+            5 => [ 'x' => 5, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [] ]
         );
 
         // 予約モーダル-1 (通常予約）
@@ -58,15 +59,16 @@ class SheetManager
             $this->modalType = ReservationModalType::MODAL_3;
         }
 
+        // DBから取得した予約状態から、座席予約状態を登録
         foreach ($collection as $model) {
             if ($model->customer_id !== $customerId) {
                 // 予約済みバイク
                 // $this->studio->setSheetStatus();
-                $this->studio[$model->sheet_no]['status'] = SheetStatus::RESERVED;
+                $this->studio[$model->sheet]['status'] = SheetStatus::RESERVED;
             } else {
                 // お客様の予約されたバイク
                 // $this->studio->setSheetStatus();
-                $this->studio[$model->sheet_no]['status'] = SheetStatus::RESERVED_CUSTOMER;
+                $this->studio[$model->sheet]['status'] = SheetStatus::RESERVED_CUSTOMER;
 
                 if ($model->sb_flg === OrderLessonSbFlg::NORMAL) {
                     // 通常予約している場合は、予約モーダル-2(通常キャンセル、バイク変更)
@@ -77,6 +79,32 @@ class SheetManager
                 }
             }
         }
+
+        // Redisから取得したバイク枠確保情報から、座席予約状態を登録
+        $keyLimt = RedisKeyLimit::SHEET_LOCK;
+        $shiftIdHashKey = 'sheet_lock_shiftid:' . $this->shiftId;
+        $currentDateTime = new \DateTime();
+        foreach ($secureSheetList as $customerIdkey => $value) {
+            $sheetNoDateTime = CommonLogic::pasrseSheetLockRecord($value);
+
+            $recordDateTime = new \DateTime($sheetNoDateTime[1]);
+            $recordDateTime->modify("+{$keyLimt} second");
+
+            // キーの有効期限(10分)を過ぎているかどうか
+            if ($currentDateTime > $recordDateTime) {
+                // レッスンスケジュールごとのバイク枠確保キーを削除
+                RedisWrapper::hDel($shiftIdHashKey, $customerIdkey);
+                // 会員IDごとのバイク枠確保キーを削除
+                RedisWrapper::hDel("shift_lock_cid:{$customerIdkey}", $this->shiftId);
+
+                continue;
+            }
+
+            // ログインユーザーがバイク枠確保していない場合は、予約済みに変更
+            if ($customerIdkey !== $customerId) {
+                $this->studio[$sheetNoDateTime[0]]['status'] = SheetStatus::RESERVED;
+            }
+        }
     }
 
     /**
@@ -85,16 +113,26 @@ class SheetManager
      * @return array バイク枠確保している座席一覧(Redis)
      */
     private function getSecureSheetList() {
-        return Redis::hgetall('sheet_lock_shiftid:' . $this->shiftId);;
+        return RedisWrapper::hGetAll('sheet_lock_shiftid:' . $this->shiftId);
     }
 
     /**
      * ネット・トライアル会員の場合は、体験座席以外を予約済みに変更
      *
-     * @param int $customerId cust_master.cid
+     * @param int $customerType cust_master.memtype
      */
-    public function setNetTrialMemberSheet(int $customerId) {
-
+    public function fillNotSpecialSheetTrial(int $customerType) {
+        // TODO 会員種別を受け取って、ネット・トライアル会員を判別
+        if (true) {
+            // $sheetNoSpecialAreaInfo = $this->studio->getSheetNoSpecialAreaInfo();
+            // $this->studio->setSheetStatus();
+            foreach ($this->studio as $key => &$value) {
+                if (!in_array(SpecialSheetType::TRIAL, $value['special_area_info'], true)) {
+                    // 予約済みに変更
+                    $value['status'] = SheetStatus::RESERVED;
+                }
+            }
+        }
     }
 
     /**
@@ -104,5 +142,22 @@ class SheetManager
      */
     public function getReservationModalType() {
         return $this->modalType;
+    }
+
+    /**
+     * レスポンスとして渡す座席情報配列取得
+     *
+     * @return array 座席情報
+     */
+    public function getResponseSheetsArray() {
+        //return $this->studio->getSheetsArray();
+
+        $sheets = array();
+
+        foreach ($this->studio as $key => $value) {
+            $sheets[] = array_merge([ 'sheet_no' => $key], $value);
+        }
+
+        return $sheets;
     }
 }
