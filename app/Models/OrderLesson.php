@@ -67,7 +67,7 @@ class OrderLesson extends Model
      * @param int $shiftId レッスンスケジュールID
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getReservedSheetsList(int $shiftId) {
+    public static function getReservedSheetList(int $shiftId) {
         return self::where('sid', '=', $shiftId)
             ->where('flg', '=', OrderLessonFlg::RESERVED)
             ->get();

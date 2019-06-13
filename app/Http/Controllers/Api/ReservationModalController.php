@@ -10,7 +10,8 @@ use App\Libraries\Logic\ReservationModal\ReservationModalMasterResource;
 use App\Models\OrderLesson;
 
 use App\Exceptions\BadRequestException;
-use App\Exceptions\IllegalParameterException;
+use App\Exceptions\ApplicationException;
+use App\Libraries\Logic\ReservationModal\SheetManager;
 
 /**
  * 予約モーダルコントローラー
@@ -44,12 +45,8 @@ class ReservationModalController extends Controller
 
         $shiftMaster = $resource->getShitMasterResource();
         $lessonMaster = $resource->getLessonMasterResource();
-        $lessonClass1 = $resource->getLessonClass1Resource();
-        $lessonClass2 = $resource->getLessonClass2Resource();
-        $lessonClass3 = $resource->getLessonClass3Resource();
         $custMaster = $resource->getCustMasterResource();
         $tenpoMaster = $resource->getTenpoMasterResource();
-        $userMaster = $resource->getUserMasterResource();
 
         // ネット予約公開日時が過去の日付かどうか
         if (!VaidationLogic::isOpenDateTimePassed($shiftMaster['open_datetime'])) {
@@ -97,8 +94,12 @@ class ReservationModalController extends Controller
         // 予約受付時間内かどうか
         if (!VaidationLogic::validateTimeLimit($shiftMaster['shift_date'], $shiftMaster['ls_st'], $shiftMaster['tlimit'])) {
             // 予約受付時間外
-            throw new IllegalParameterException('予約受付時間外です。');
+            throw new ApplicationException('予約受付時間外です。', 409);
         }
+
+        // 座席情報取得
+        $sheetManager = new SheetManager($shiftMaster['shiftid']);
+        $sheetManager->setSheetStatusAndModalType($custMaster['cid']);
 
         return response()->json([ 'resources' => $resource->getAllResource() ]);
     }
