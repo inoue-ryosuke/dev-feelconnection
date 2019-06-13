@@ -125,4 +125,30 @@ class AuthController extends ApiController
         logger("getUserInfo() End");
         return response()->json($response);
     }
+    /**
+     * API-03: 受け取りメール設定表示更新
+     * 
+     * @POST("api/auth/user/dm_list/update", as="api.auth.user.dm_list.update")
+     * @param $request
+     * @return Response
+     */
+    public function updateUserDmList(Request $request) {
+
+        logger("updateUserDmList() Start");
+
+        // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
+        $payload = $this->getPayload();
+        logger('payload');
+        logger($payload);
+//        print "<pre>"; print_r($payload); print "</pre>"; exit;        
+        // ペイロードバリデーション
+        $this->validateApiPayload('cust.dm_update', $payload);
+        $cid = array_get($payload,"cid",null);
+
+        // TBD:認証情報からIDを特定する
+        $response = $this->getAuthSelectLogic()->getUserMoreInfo($cid);
+        logger("getUserInfo() End");
+        return response()->json($response);
+    }
+
 }

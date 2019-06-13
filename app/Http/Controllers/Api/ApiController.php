@@ -42,6 +42,12 @@ class ApiController extends Controller
         $file = request()->files;
         //logger($body);
         $json =  json_decode($body, true);
+        foreach ($json as $key => $value) {
+            // カンマ区切り文字列を配列に変換して受け取る
+            if (!is_array($value) && is_string($value) && preg_match("#^(.+\,)+$#",$value)) {
+                $json[$key] = explode(",",$value);
+            }
+        }
         if (!empty($body) && is_null($json)) {
             /** @throws APIリクエストペイロードのJSONが不正な場合 */
             $message = config('error.api.illFormedPayload');

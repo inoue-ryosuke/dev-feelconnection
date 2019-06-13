@@ -32,6 +32,14 @@ $router->post('api/auth/user', [
 	'domain' => NULL,
 ]);
 
+$router->post('api/auth/user/dm_list/update', [
+	'uses' => 'App\Http\Controllers\Api\AuthController@updateUserDmList',
+	'as' => 'api.auth.user.dm_list.update',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->get('api/invite/{invite_code}', [
 	'uses' => 'App\Http\Controllers\Api\InviteController@validateInviteCode',
 	'as' => 'api.invite.get',

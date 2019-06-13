@@ -74,7 +74,13 @@ return [
         'before' => ':attributeは現在より過去の日時で指定してください。',
         'line_max' => ':attributeは１行あたり:max文字以下で入力してください。',
         'row_max' => ':attributeは:max行以下で入力してください。',
-        'size' => ':attributeは:size文字入力してください。',
+        //カンマ区切り文字列をgetPayloadで配列化した際の判定用　TBD:日本語に置き換え
+        'size' => [
+            'numeric' => 'The :attribute must be :size.',
+            'file' => 'The :attribute must be :size kilobytes.',
+            'string' => 'The :attribute must be :size characters.',
+            'array' => ':attributeは:size項目のパラメータが必要です.',
+        ],
         'zenkaku_max' => ':attributeは全角:max文字以内で入力してください。',
         'duplicated_date' => '利用期間は重複して設定されています。',
         'not_campaign_pin' => 'キャンペーン向けプリペイド番号をポイント追加することはできません。',
