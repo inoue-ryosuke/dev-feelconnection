@@ -58,4 +58,9 @@ return [
             'a',
         ],
     ],
+    'mailCheck' => [
+        'registMailSubject' => '登録認証メール',
+        'registMailFrom'    => 'toshifumi.kawai@xchange.jp',
+        'authExpireHours'   => '24',
+    ],
 ];
