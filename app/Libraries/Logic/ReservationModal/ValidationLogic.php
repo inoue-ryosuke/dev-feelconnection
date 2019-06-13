@@ -27,6 +27,21 @@ class VaidationLogic
     }
 
     /**
+     * レッスンスケジュールIDハッシュ(shift_master.shiftid_hash)、座席番号のバリデーション
+     *
+     * @param array $params リクエストパラメータ
+     * @return bool
+     */
+    public static function validateShiftIdHashAndSheetNo(array $params) {
+        $validator = Validator::make($params, [
+            'sid' => 'required|string|exists:shift_master,shiftid_hash',
+            'sheet_no' => 'required|integer|min:1'
+        ]);
+
+        return !$validator->fails();
+    }
+
+    /**
      * ネット予約公開日時が過去の日付かどうか
      *
      * @param string $openDateTime ネット予約公開日時 yyyy/mm/dd hh:ii:ss

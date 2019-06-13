@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use App\Libraries\Logic\ReservationModal\CommonLogic;
 use App\Libraries\Logic\ReservationModal\VaidationLogic;
 use App\Libraries\Logic\ReservationModal\ReservationModalMasterResource;
+use App\Libraries\Logic\ReservationModal\SheetStatusMasterResource;
 use App\Models\OrderLesson;
 
 use App\Exceptions\BadRequestException;
@@ -25,6 +26,7 @@ class ReservationModalController extends Controller
      *
      * @GET("api/reservation_modal/{sid}", as="api.reservation_modal.get")
      * @param Request $request
+     * @param int $sid レッスンスケジュールIDハッシュ値(shift_master.shiftid_hash)
      * @return \Illuminate\Http\JsonResponse
      */
     public function reservationModalApi(Request $request, $sid)
@@ -121,5 +123,37 @@ class ReservationModalController extends Controller
 
         ])
         ->setStatusCode(Response::HTTP_OK);
+    }
+
+    /**
+     * バイク予約状態取得API
+     *
+     * @GET("api/sheet_status/{sid}/{sheet_no}", as="api.sheet_status.get")
+     * @param Request $request
+     * @param int $sid レッスンスケジュールIDハッシュ値(shift_master.shiftid_hash)
+     * @param int $sheet_no 座席番号
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sheetStatusApi(Request $request, $sid, $sheet_no)
+    {
+        $params = array('sid' => $sid, 'sheet_no' => $sheet_no);
+
+        // レッスンスケジュールIDハッシュ、座席番号のバリデーション
+        if (!VaidationLogic::validateShiftIdHashAndSheetNo($params)) {
+            // エラー
+            throw new BadRequestException('レッスンスケジュールID、座席番号が不正です。');
+        }
+
+        // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
+        if (false) {
+
+        }
+
+        // バイク予約状態取得APIで必要なマスターデータ取得
+        $resource = new SheetStatusMasterResource($sid);
+        if(!$resource->createRedisResource()) {
+            // Redisキャッシュの取得に失敗
+            $resource->createDBResource();
+        }
     }
 }
