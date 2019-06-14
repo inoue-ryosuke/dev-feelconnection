@@ -40,12 +40,13 @@ class ApiController extends Controller
         // $body = file_get_contents('php://input');
         $body = request()->getContent();
         $file = request()->files;
-        //logger($body);
-        $json =  json_decode($body, true);
-        foreach ($json as $key => $value) {
-            // カンマ区切り文字列を配列に変換して受け取る
-            if (!is_array($value) && is_string($value) && preg_match("#^(.+\,)+$#",$value)) {
-                $json[$key] = explode(",",$value);
+        $json = json_decode($body, true);
+        if (is_array($json)) {
+            foreach ($json as $key => $value) {
+                // カンマ区切り文字列を配列に変換して受け取る
+                if (!is_array($value) && is_string($value) && preg_match("#^(.+\,)+$#",$value)) {
+                    $json[$key] = explode(",",$value);
+                }
             }
         }
         if (!empty($body) && is_null($json)) {

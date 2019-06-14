@@ -152,7 +152,7 @@ class AuthController extends ApiController
     /**
      * API-04: 認証会員情報更新
      * 
-     * @POST("api/auth/user/dm_list/update", as="api.auth.user.dm_list.update")
+     * @POST("api/auth/user/update", as="api.auth.user.update")
      * @param $request
      * @return Response
      */

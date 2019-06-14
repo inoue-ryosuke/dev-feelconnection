@@ -40,6 +40,14 @@ $router->post('api/auth/user/dm_list/update', [
 	'domain' => NULL,
 ]);
 
+$router->post('api/auth/user/update', [
+	'uses' => 'App\Http\Controllers\Api\AuthController@updateUser',
+	'as' => 'api.auth.user.update',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->get('api/invite/{invite_code}', [
 	'uses' => 'App\Http\Controllers\Api\InviteController@validateInviteCode',
 	'as' => 'api.invite.get',
@@ -67,6 +75,30 @@ $router->get('api/apple_music', [
 $router->get('api/reservation_modal/{sid}', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@reservationModalApi',
 	'as' => 'api.reservation_modal.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->get('api/sheet_status/{sid}/{sheet_no}', [
+	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusApi',
+	'as' => 'api.sheet_status.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/mailcheck', [
+	'uses' => 'App\Http\Controllers\Api\MailCheckController@chkMail',
+	'as' => 'api.mailcheck.post',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->get('api/mailauth/{token}', [
+	'uses' => 'App\Http\Controllers\Api\MailAuthController@index',
+	'as' => 'api.mailauth.get',
 	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
