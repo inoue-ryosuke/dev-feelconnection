@@ -338,7 +338,7 @@ class Cust extends BaseFormModel implements Authenticatable
 					break;
 				}
 			}
-		    return ["tenpo_str" => $tenpo->tenpo_name."(".$tenpo->tenpo_code.")"/*.$append*/];
+		    return ["tenpo_str" => $tenpo->tenpo_name/*.$append*/];
 		});
 		return $tenpostr->implode("tenpo_str","、").$append;
 	}
