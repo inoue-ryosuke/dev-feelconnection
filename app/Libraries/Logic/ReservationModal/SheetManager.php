@@ -28,9 +28,14 @@ class SheetManager
      */
     public function __construct(int $shiftId) {
         $this->shiftId = $shiftId;
+    }
 
+    /**
+     * スタジオ情報の初期化
+     */
+    public function initStudio() {
         // スタジオ情報([座席番号, x, y, 座席ステータス, 特別エリア情報]のオブジェクト配列)の初期化
-        // $this->studio = new Studio($shiftId);
+        // $this->studio = new Studio($this->shiftId);
         // 仮データ
         $this->studio = array(
             1 => [ 'x' => 1, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ] ],

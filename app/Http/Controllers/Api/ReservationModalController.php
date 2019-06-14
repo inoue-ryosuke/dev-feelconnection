@@ -57,11 +57,6 @@ class ReservationModalController extends Controller
             throw new BadRequestException('未公開のレッスンです。');
         }
 
-        // レッスンスケジュールフラグ(shift_master.flg)が有効(Y)かどうか
-        if (!VaidationLogic::isShiftMasterFlgValid($shiftMaster['flg'])) {
-            throw new BadRequestException('無効なレッスンです。');
-        }
-
         // レッスンスケジュールレッスン開催日時(shift_master.shift_date, shift_master.ls_st)が未来の日付かどうか
         if (!VaidationLogic::isShiftDateTimeComing($shiftMaster['shift_date'], $shiftMaster['ls_st'])) {
             throw new BadRequestException('無効なレッスンです。');
@@ -102,6 +97,7 @@ class ReservationModalController extends Controller
 
         // 座席情報取得
         $sheetManager = new SheetManager($shiftMaster['shiftid']);
+        $sheetManager->initStudio();
         $sheetManager->setSheetStatusAndModalType($custMaster['cid']);
         $sheetManager->fillNotSpecialSheetTrial($custMaster['memtype']);
 

@@ -20,7 +20,7 @@ class VaidationLogic
      */
     public static function validateShiftIdHash(array $params) {
         $validator = Validator::make($params, [
-            'sid' => 'required|string|exists:shift_master,shiftid_hash'
+            'sid' => 'required|string|exists:shift_master,shiftid_hash,flg,' . ShiftMasterFlg::VALID
         ]);
 
         return !$validator->fails();
@@ -34,7 +34,7 @@ class VaidationLogic
      */
     public static function validateShiftIdHashAndSheetNo(array $params) {
         $validator = Validator::make($params, [
-            'sid' => 'required|string|exists:shift_master,shiftid_hash',
+            'required|string|exists:shift_master,shiftid_hash,flg,' . ShiftMasterFlg::VALID,
             'sheet_no' => 'required|integer|min:1'
         ]);
 
