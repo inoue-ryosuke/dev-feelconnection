@@ -237,9 +237,8 @@ class Cust extends BaseFormModel implements Authenticatable
 		// 所属店舗ID一覧を取得する
 		$allTenpo   = $this->hasManyAllTenpo();
 		$allTenpoId = $allTenpo->implode("tid",",");
-        //2.現在の会員種別ID、店舗IDと、契約変更履歴の「会員種別ID（更新前）、所属店舗ID（更新前）」・
-        // 「自動変更処理会員種別ID（更新前）、自動変更処理所属店舗ID（更新前）」いずれかが一致するレコードを抽出。  
-		return $this->joinSchedule->whereIn("sc_tenpo",$allTenpoId);
+		// 
+		return $this->joinSchedule;
 	}
 
 	/**
@@ -327,17 +326,20 @@ class Cust extends BaseFormModel implements Authenticatable
 		}
 		// 変更スケジュール情報を取得
 		$changeSchedule = $this->getChangeSchedule() ?? collect([]);
+		$sc_tenpos = [];
 		if ($changeSchedule->isNotEmpty()) {
 			$sc_tenpos = $changeSchedule->pluck("sc_tenpo")->unique();
 		}
 		// 銀座（GNZ）という文字列を作る
 		$tenpostr = $all->map(function($tenpo) use($sc_tenpos,&$append) {
-			foreach ($sc_tenpos as $change_tenpo_id) {
-				if ($tenpo->tid != $change_tenpo_id) {
-					$append = "（変更登録あり）";
-					break;
-				}
-			}
+			if (!empty($sc_tenpos)) {
+			    foreach ($sc_tenpos as $change_tenpo_id) {
+				    if ($tenpo->tid != $change_tenpo_id) {
+					    $append = "（変更登録あり）";
+					    break;
+				    }
+			    }
+		    }
 		    return ["tenpo_str" => $tenpo->tenpo_name/*.$append*/];
 		});
 		return $tenpostr->implode("tenpo_str","、").$append;
