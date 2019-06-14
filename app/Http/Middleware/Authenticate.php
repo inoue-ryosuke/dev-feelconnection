@@ -9,7 +9,7 @@ use Closure;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Support\MessageBag;
 
-class Authenticate extends Middleware
+class Authenticate
 {
     /**
      * Handle an incoming request.
@@ -24,12 +24,11 @@ class Authenticate extends Middleware
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        logger('Auth Middleware: (guard type) ' . $guard);
+        logger('Auth Middleware: (guard type) '.$guard);
 
         // 認証済みの場合抜ける
+        logger('ここAuth handle');
         if (auth($guard)->check()) {
-            // 次の処理へ
-            $user = auth($guard)->user();
 
             logger('Auth Middleware: logined.');
             $response = $next($request);

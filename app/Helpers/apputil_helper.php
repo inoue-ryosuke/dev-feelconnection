@@ -137,7 +137,7 @@ if (!function_exists('makeExportHeader')) {
             return;
         }
         $header = array_map(function ($v) use ($mapper) {
-            return array_get($mapper, $v.'.name', '-');
+            return data_get($mapper, $v.'.name', '-');
         }, array_keys($mapper));
         return implode($splitter, $header);
     }
@@ -162,9 +162,9 @@ if (!function_exists('outputExportRecord')) {
     {
         // レコード一覧から変換処理
         foreach ($mapper as $key => $rule) {
-            $value = array_get($record, $key);
+            $value = data_get($record, $key);
             if (!empty($rule['table'])) {
-                $value = array_get(array_get($form, $rule['table'], []), $value);
+                $value = data_get(data_get($form, $rule['table'], []), $value);
             }
             $value = preg_replace("/(\r\n|\r|\n)/", "\\n", $value);
             echo $value . $splitter;

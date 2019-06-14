@@ -66,9 +66,9 @@ class Logger extends BaseLogger {
         $userId = self::getGuid();
         $message = sprintf("%s:%s\t%s\t%s\t%s\t%s\t%s",
             getmypid(),
-            array_get($_SERVER, 'REMOTE_ADDR', '-'),
-            array_get($_SERVER, 'REQUEST_METHOD', '-'),
-            array_get($_SERVER, 'REQUEST_URI', '-'),
+            data_get($_SERVER, 'REMOTE_ADDR', '-'),
+            data_get($_SERVER, 'REQUEST_METHOD', '-'),
+            data_get($_SERVER, 'REQUEST_URI', '-'),
             $type,
             $message,
             $userId
@@ -129,8 +129,8 @@ class Logger extends BaseLogger {
 
         $log = sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s",
             self::LEVEL_INFO,
-            array_get($_SERVER, 'REQUEST_METHOD', '-'),
-            array_get($_SERVER, 'REQUEST_URI', '-'),
+            data_get($_SERVER, 'REQUEST_METHOD', '-'),
+            data_get($_SERVER, 'REQUEST_URI', '-'),
             $userId,
             $header,
             $responseHeader,
@@ -170,8 +170,8 @@ class Logger extends BaseLogger {
 
         $log = sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
             self::LEVEL_INFO,
-            array_get($_SERVER, 'REQUEST_METHOD', '-'),
-            array_get($_SERVER, 'REQUEST_URI', '-'),
+            data_get($_SERVER, 'REQUEST_METHOD', '-'),
+            data_get($_SERVER, 'REQUEST_URI', '-'),
             $message,
             $errorCode,
             $responseContent,
@@ -241,7 +241,7 @@ class Logger extends BaseLogger {
         $userId = self::getGuid();
         $message = sprintf("%s:%s\t%s\t%s\t%s\n%s\n-------\n",
             getmypid(),
-            array_get($_SERVER, 'REMOTE_ADDR', '-'),
+            data_get($_SERVER, 'REMOTE_ADDR', '-'),
             $pos,
             $userId,
             $memo,

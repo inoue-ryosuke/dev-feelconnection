@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 //use App\Libraries\Logic\Loader;  実開発の場合はロジック層にて実装
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Exceptions\IllegalParameterException;
+use App\Models\Cust;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Exceptions\ForbiddenException;
 
-///**
-// * 認証コントローラー
-//// * @Middleware({"logger", "ua", "append", "maintenance", "api"})
-// */
+/**
+ * 認証コントローラー
+ * @Middleware({"api", "auth:customer"})
+ */
 class AuthController extends ApiController
 {
 
@@ -88,7 +91,6 @@ class AuthController extends ApiController
     public function getUserInfo(Request $request) {
 
         logger("getUserInfo() Start");
-
         // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
         //$payload = $this->getPayload();
         //logger('payload');
@@ -118,7 +120,7 @@ class AuthController extends ApiController
         logger($payload);
         // ペイロードバリデーション
         $this->validateApiPayload('cust.auth_user', $payload);
-        $cid = array_get($payload,"cid",null);
+        $cid = data_get($payload,"cid",null);
 
         // TBD:認証情報からIDを特定する
         $response = $this->getAuthSelectLogic()->getUserMoreInfo($cid);

@@ -70,10 +70,7 @@ class Handler extends ExceptionHandler
         $userId = $request->headers->get('X-FeelConnection-GuardUID');
         $device = $request->headers->get('X-FeelConnection-Device');
         $version = $request->headers->get('X-FeelConnection-Version');
-//        $method = array_selector('REQUEST_METHOD', $_SERVER, '-');
-//        $uri = array_selector('REQUEST_URI', $_SERVER, '-');
-//        $method = array_get($_SERVER, 'REQUEST_METHOD', '-');
-//        $uri = array_get($_SERVER,'REQUEST_URI', '-');
+
         $method = data_get($_SERVER, 'REQUEST_METHOD', '-');
         $uri = data_get($_SERVER,'REQUEST_URI', '-');
         $ua = $request->headers->get('USER_AGENT');

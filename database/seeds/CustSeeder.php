@@ -4,7 +4,7 @@ use Illuminate\Database\Seeder;
 use App\Models\BaseFormModel;
 use App\Http\Requests\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Illuminate\Support\Facades\Hash;
 use App\Models\Cust as Cust;
 use App\Models\CustMemType as CustMemType;
 use App\Models\TenpoMaster as TenpoMaster;
@@ -54,12 +54,15 @@ class CustSeeder extends BaseSeeder
             if (isset($assign["cust_memtype"])) {
                 $memdao = new CustMemType();
                 $memdao->mergeRequest($assign["cust_memtype"]);
+
                 $memdao->save();
                 echo "\n   ---> " . "CustMemType Insert End [".$memdao->type_name."]" . "\n";
             }
             // 
             $dao = new Cust();
+//        $record['password'] = Hash::make('password');
             $dao->mergeRequest($record);
+//            $memdao->password = Hash::make('password');
             $dao->save();
             echo "\n   ---> " . "Cust Insert End [".$dao->name."]" . "\n";
             if ($memdao) {

@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+/**
+ * 認証コントローラー
+ * @Middleware({"api"})
+ */
 class InstructorController extends ApiController
 {
     /**

@@ -11,7 +11,7 @@ $router->post('api/get_json_sample', [
 $router->get('api', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@index',
 	'as' => 'api.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -19,7 +19,7 @@ $router->get('api', [
 $router->post('api/auth', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
 	'as' => 'api.auth.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -27,7 +27,7 @@ $router->post('api/auth', [
 $router->post('api/auth/user', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserMoreInfo',
 	'as' => 'api.auth.user.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -35,7 +35,7 @@ $router->post('api/auth/user', [
 $router->get('api/invite/{invite_code}', [
 	'uses' => 'App\Http\Controllers\Api\InviteController@validateInviteCode',
 	'as' => 'api.invite.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -60,6 +60,14 @@ $router->get('api/reservation_modal/{sid}', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@reservationModalApi',
 	'as' => 'api.reservation_modal.get',
 	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/user/login', [
+	'uses' => 'App\Http\Controllers\Auth\LoginController@login',
+	'as' => 'api.user.login',
+	'middleware' => ['guest', 'api'],
 	'where' => [],
 	'domain' => NULL,
 ]);
