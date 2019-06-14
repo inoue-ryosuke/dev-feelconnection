@@ -10,6 +10,7 @@ use App\Libraries\Common\JpDateTime as JpDateTime;
 
 use App\Models\TenpoMaster as TenpoMaster;
 use App\Models\CustTenpo as CustTenpo;
+use App\Models\Schedule as Schedule;
 
 class Cust extends BaseFormModel implements Authenticatable
 {
@@ -185,24 +186,6 @@ class Cust extends BaseFormModel implements Authenticatable
 		return $this->joinAllMemType->get();
 	}
 	
-	// モデル結合アクセサ（所属店舗）
-	/*
-    public function joinAllStoreTenpo() {
-		return $this->hasOne(TenpoMaster::Class,"tid","store_id");
-	}
-    public function hasOneStoreTenpo() {
-		if (!$this->joinAllStoreTenpo) {
-			return null;
-		}
-		return $this->joinAllStoreTenpo->first();
-	}
-    public function hasManyStoreTenpo() {
-		if (!$this->joinAllStoreTenpo) {
-			return null;
-		}
-		return $this->joinAllStoreTenpo->get();
-	}
-	*/
 	// モデル結合アクセサ（所属店舗：複数対応）
     public function joinAllStoreTenpo() {
 		//$query = $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,"cid","tenpo_id")->toSql();
@@ -240,16 +223,26 @@ class Cust extends BaseFormModel implements Authenticatable
 	}
 	// 全店舗情報（所属店舗＋登録店舗）
     public function hasManyAllTenpo() {
-
-		$all = $this->hasManyStoreTenpo();
-		if (!$all) {
-			return collect([]);
+		return $this->hasManyStoreTenpo() ?? collect([]);
+	}
+	// モデル結合アクセサ（）
+	// 1.ログインユーザーの会員ID、契約変更履歴の会員IDからレコード抽出。
+    public function joinSchedule() {
+		return $this->hasMany(Schedule::Class,"sc_cid","cid");
+	}
+    public function getChangeSchedule() {
+		if (!$this->joinSchedule) {
+			return null;
 		}
-//		print "<pre>"; print_r($all); print "</pre>"; exit;
-		return $all;
+		// 所属店舗ID一覧を取得する
+		$allTenpo   = $this->hasManyAllTenpo();
+		$allTenpoId = $allTenpo->implode("tid",",");
+        //2.現在の会員種別ID、店舗IDと、契約変更履歴の「会員種別ID（更新前）、所属店舗ID（更新前）」・
+        // 「自動変更処理会員種別ID（更新前）、自動変更処理所属店舗ID（更新前）」いずれかが一致するレコードを抽出。  
+		return $this->joinSchedule->whereIn("sc_tenpo",$allTenpoId);
 	}
 
-    /**
+	/**
 	 * IDでcust情報を取得する
 	 */
 	public static function getAuthInfo($cid,$lock=false) {
@@ -265,22 +258,6 @@ class Cust extends BaseFormModel implements Authenticatable
 			return null;
 		}
 		return $authcust;
-	}
-
-	/**
-	 * 変更登録情報を不可する判定結果により文言を加えた名前を返却する
-	 */
-    public function getNameInfo() {
-		if (is_null($this->type_edit_date)) {
-			return $this->name;
-		}
-		$append = "";
-		$c = Carbon::parse($this->type_edit_date);
-		// 変更日が当日かそれ以下（過去）の場合
-		if ($c->lte(Carbon::today())) {
-			$append = "（変更登録あり）";
-		}
-		return $this->name.$append;
 	}
 
 	/**
@@ -314,7 +291,25 @@ class Cust extends BaseFormModel implements Authenticatable
 	 * 会員種別を返却する
 	 */
 	public function getMemTypeName() {
+		$append = "";
+        // 会員種別情報取得
 		$memtype = $this->hasOneMemType();
+        // 変更スケジュール情報取得
+		$changeSchedule = $this->getChangeSchedule() ?? collect([]);
+		//$allTenpo = $this->hasManyAllTenpo();
+		// 会員種別変更があった場合、会員名に変更文言を付加
+		// 前提：変更scheduleデータがある場合
+	    if ($changeSchedule->count()) {
+            foreach ($changeSchedule as $schedule) {
+			    if ($schedule->sc_memtype != $memtype->mid) {
+					$append = "（変更登録あり）";
+					break;
+			    }
+			}
+		}
+		return $this->name.$append;
+
+
 		if (is_null($memtype)) {
 			return "";
 		}
@@ -324,16 +319,28 @@ class Cust extends BaseFormModel implements Authenticatable
 	 * 所属店舗を返却する（TBD:他箇所で取得する処理があればそれを用いる）
 	 */
 	public function getStoreNames() {
+        $append = "";
 		//"銀座（GNZ）、自由が丘（JYO）",	
 		$all = $this->hasManyAllTenpo();
 		if ($all->isEmpty()) {
 			return "";
 		}
+		// 変更スケジュール情報を取得
+		$changeSchedule = $this->getChangeSchedule() ?? collect([]);
+		if ($changeSchedule->isNotEmpty()) {
+			$sc_tenpos = $changeSchedule->pluck("sc_tenpo")->unique();
+		}
 		// 銀座（GNZ）という文字列を作る
-		$tenpostr = $all->map(function($tenpo) {
-			return ["tenpo_str" => $tenpo->tenpo_name."(".$tenpo->tenpo_code.")"];
+		$tenpostr = $all->map(function($tenpo) use($sc_tenpos,&$append) {
+			foreach ($sc_tenpos as $change_tenpo_id) {
+				if ($tenpo->tid != $change_tenpo_id) {
+					$append = "（変更登録あり）";
+					break;
+				}
+			}
+		    return ["tenpo_str" => $tenpo->tenpo_name."(".$tenpo->tenpo_code.")"/*.$append*/];
 		});
-		return $tenpostr->implode("tenpo_str","、");
+		return $tenpostr->implode("tenpo_str","、").$append;
 	}
 	/**
 	 * 案内メール設定を返却する

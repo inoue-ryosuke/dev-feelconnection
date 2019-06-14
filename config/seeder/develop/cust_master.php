@@ -133,21 +133,21 @@ return [
 				"assign" => [
 					// ピボットテーブル系の情報はここで作る
 					"tenpo_name" => [
-						"銀座",
-						"自由が丘"
+						"銀座 1st(GNZ 1st)",
+						"自由が丘(JYO)"
 					],
 					// 関連テーブル系の情報はここで作る
-			        "cust_memtype" => [
-	//                  "mid" => 1,
-				        "type_name" => "マンスリーメンバー",
-				        "status" => "ステータス名",
-				        "flg" => "Y",
-				        "rescnt_mem" => 0,
-				        "resspan" => 0,
-				        "attend_count" => 0,
-				        "seq" => 0,
-					    "mem_prod" => 0
-				    ],
+			        "cust_memtype_name" => "マンスリーメンバー",
+			        "schedule" => [
+						"sc_soid"   => 0,    // 売り上げID（shop_order.id）
+						"sc_flg"    => 1,    // 1:スケジュール実行前 （変更予約は1を対象？）
+						"appli_flg" => 0,               // 0： マンスリー種別／所属店変更／継続課金 application.apid
+						//"sc_cid"    => ,              // cust_master.cid シーダーで紐づけ
+						"sc_date"   => date("Y-m-d"),   // スケジュール実行日（NOTNULLだけど、sc_flg=1の場合何の日付？）
+						//"sc_memtype"=> ,   // 変更先会員種別ID：シーダーで自種別以外を割当
+						//"sc_tenpo"=> ,     // 変更先店舗ID：シーダーで自所属店舗以外を割当
+						"sc_regdate" => date('Y-m-d')
+					],
 				],
             ],
             //
