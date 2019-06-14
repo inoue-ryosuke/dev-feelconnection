@@ -8,11 +8,25 @@ use App\Models\PrefMaster;
 use DB;
 
 /**
- * 認証で使用するバリデーション
- *
+ * 認証ユーザーの参照・登録・更新
  */
 class UpdateLogic
 {
+    /**
+     * 会員情報登録更新用
+     */
+    public static function updateUser($payload) {
+        // TBD:認証情報からCustを特定する
+        $cid = Cust::first()->cid;
+        $result = DB::transaction(function() use($cid,$payload) {
+             $custinfo = Cust::getAuthInfo($cid,true);
+             $custinfo->margeRequest($payload);
+             $custinfo->save();
+             return ["result_code" => 0];
+        });
+        return $result;        
+    }
+
     /**
      * 
      */
