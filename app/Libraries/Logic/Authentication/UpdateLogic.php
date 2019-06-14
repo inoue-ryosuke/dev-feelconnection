@@ -19,7 +19,7 @@ class UpdateLogic
         // TBD:認証情報からCustを特定する
         $cid = Cust::first()->cid;
         $result = DB::transaction(function() use($cid,$payload) {
-             $custinfo = Cust::getAuthInfo($cid,true);
+             $custinfo = Cust::getUserInfoById($cid,true);
              $custinfo->margeRequest($payload);
              $custinfo->save();
              return ["result_code" => 0];
@@ -37,7 +37,7 @@ class UpdateLogic
         $result = DB::transaction(function() use($cid,$payload) {
              $dmlist = data_get($payload,'dm_list');
              $pcconf = data_get($payload,'pc_conf');
-             $custinfo = Cust::getAuthInfo($cid,true);
+             $custinfo = Cust::getUserInfoById($cid,true);
              $custinfo->dm_list = implode(",",$dmlist);
              $custinfo->pc_conf = $pcconf;
              $custinfo->save();

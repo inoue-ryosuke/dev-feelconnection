@@ -245,7 +245,7 @@ class Cust extends BaseFormModel implements Authenticatable
 	/**
 	 * IDでcust情報を取得する
 	 */
-	public static function getAuthInfo($cid,$lock=false) {
+	public static function getUserInfoById($cid,$lock=false) {
 		if (empty($cid)) {
 			return null;
 		}
