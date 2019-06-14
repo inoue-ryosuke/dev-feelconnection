@@ -46,7 +46,7 @@ class ReservationModalController extends Controller
             $resource->createDBResource();
         }
 
-        $shiftMaster = $resource->getShitMasterResource();
+        $shiftMaster = $resource->getShiftMasterResource();
         $lessonMaster = $resource->getLessonMasterResource();
         $tenpoMaster = $resource->getTenpoMasterResource();
         $custMaster = $resource->getCustMasterResource();
@@ -117,8 +117,7 @@ class ReservationModalController extends Controller
             'cancel_waiting_no' => $shiftMaster['taiken_capa'],
             'sheets' => $sheetManager->getResponseSheetsArray()
 
-        ])
-        ->setStatusCode(Response::HTTP_OK);
+        ])->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -140,16 +139,36 @@ class ReservationModalController extends Controller
             throw new BadRequestException('レッスンスケジュールID、座席番号が不正です。');
         }
 
-        // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
-        if (false) {
-
-        }
-
         // バイク予約状態取得APIで必要なマスターデータ取得
         $resource = new SheetStatusMasterResource($sid);
         if(!$resource->createRedisResource()) {
             // Redisキャッシュの取得に失敗
             $resource->createDBResource();
         }
+
+        $shiftMaster = $resource->getShiftMasterResource();
+        $custMaster = $resource->getCustMasterResource();
+
+        // ネット予約公開日時が過去の日付かどうか
+        if (!VaidationLogic::isOpenDateTimePassed($shiftMaster['open_datetime'])) {
+            // ネット予約公開日時が未来
+            throw new BadRequestException('未公開のレッスンです。');
+        }
+
+        // 座席情報取得
+        $sheetManager = new SheetManager($shiftMaster['shiftid']);
+        $sheetManager->initStudio();
+
+        // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
+        if (!$sheetManager->isSheetNoValid($sheet_no)) {
+
+        }
+
+        $sheetStatus = $sheetManager->getSheetStatus($sheet_no, $custMaster['cid'], $custMaster['memtype']);
+
+        return response()->json([
+            'response_code' => Response::HTTP_OK,
+            'status' => $sheetStatus
+        ])->setStatusCode(Response::HTTP_OK);
     }
 }
