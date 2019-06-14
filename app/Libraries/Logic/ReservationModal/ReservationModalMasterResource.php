@@ -7,7 +7,7 @@ use App\Models\ShiftMaster;
 use App\Models\Constant\ReservationTablePrefix;
 
 /**
- * 予約モーダルで必要なRedis・DBのマスター情報
+ * 予約モーダルAPIで必要なRedis・DBのマスター情報
  *
  */
 class ReservationModalMasterResource extends ReservationMasterResource {
