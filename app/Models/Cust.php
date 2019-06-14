@@ -238,7 +238,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		$allTenpo   = $this->hasManyAllTenpo();
 		$allTenpoId = $allTenpo->implode("tid",",");
 		// 
-		return $this->joinSchedule;
+		return $this->joinSchedule->where("sc_flg",1); 
 	}
 
 	/**
@@ -295,12 +295,14 @@ class Cust extends BaseFormModel implements Authenticatable
 		$memtype = $this->hasOneMemType();
         // 変更スケジュール情報取得
 		$changeSchedule = $this->getChangeSchedule() ?? collect([]);
-		//$allTenpo = $this->hasManyAllTenpo();
+		$allTenpo = $this->hasManyAllTenpo();
 		// 会員種別変更があった場合、会員名に変更文言を付加
 		// 前提：変更scheduleデータがある場合
 	    if ($changeSchedule->count()) {
             foreach ($changeSchedule as $schedule) {
-			    if ($schedule->sc_memtype != $memtype->mid) {
+				$okTenpoIds = $allTenpo->pluck("tid")->unique();
+				// 店舗の変更履歴ではなく（所属店舗ID配列内に変更履歴の店舗IDがある）、会員種別変更時（現在の種別IDと違う）
+			    if ($schedule->sc_memtype != $memtype->mid && in_array($schedule->sc_tenpo,$okTenpoIds->toArray())) {
 					$append = "（変更登録あり）";
 					break;
 			    }
@@ -324,23 +326,23 @@ class Cust extends BaseFormModel implements Authenticatable
 		if ($all->isEmpty()) {
 			return "";
 		}
+        $memtype = $this->hasOneMemType();		
+		$okTenpoIds = $all->pluck("tid")->unique();
+
 		// 変更スケジュール情報を取得
 		$changeSchedule = $this->getChangeSchedule() ?? collect([]);
-		$sc_tenpos = [];
-		if ($changeSchedule->isNotEmpty()) {
-			$sc_tenpos = $changeSchedule->pluck("sc_tenpo")->unique();
+	    if ($changeSchedule->count()) {
+            foreach ($changeSchedule as $schedule) {
+				// 会員種別が現在と同一かつ、所属店舗ID配列内に変更履歴の店舗IDがない場合
+			    if ($schedule->sc_memtype == $memtype->mid && !in_array($schedule->sc_tenpo,$okTenpoIds->toArray())) {
+					$append = "（変更登録あり）";
+					break;
+			    }
+			}
 		}
 		// 銀座（GNZ）という文字列を作る
-		$tenpostr = $all->map(function($tenpo) use($sc_tenpos,&$append) {
-			if (!empty($sc_tenpos)) {
-			    foreach ($sc_tenpos as $change_tenpo_id) {
-				    if ($tenpo->tid != $change_tenpo_id) {
-					    $append = "（変更登録あり）";
-					    break;
-				    }
-			    }
-		    }
-		    return ["tenpo_str" => $tenpo->tenpo_name/*.$append*/];
+		$tenpostr = $all->map(function($tenpo) {
+		    return ["tenpo_str" => $tenpo->tenpo_name];
 		});
 		return $tenpostr->implode("tenpo_str","、").$append;
 	}
