@@ -45,6 +45,7 @@ class AnnotationsServiceProvider extends ServiceProvider
             'App\Http\Controllers\Api\MusicController',
             'App\Http\Controllers\Api\ReservationModalController',
             'App\Http\Controllers\Api\MailCheckController',
+            'App\Http\Controllers\Api\MailAuthController',
             'App\Http\Controllers\Auth\LoginController'
         ]);
 

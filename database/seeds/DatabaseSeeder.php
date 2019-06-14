@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             //DB::statement('TRUNCATE sessions CASCADE');
             //$this->call(UserMasterSeeder::class);
             $this->call(PrefSeeder::class);
+            $this->call(CustMemTypeSeeder::class);
             $this->call(TenpoSeeder::class);
             $this->call(CustSeeder::class);
 

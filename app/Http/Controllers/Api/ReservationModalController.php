@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Libraries\Logic\ReservationModal\CommonLogic;
 use App\Libraries\Logic\ReservationModal\VaidationLogic;
 use App\Libraries\Logic\ReservationModal\ReservationModalMasterResource;
+use App\Libraries\Logic\ReservationModal\SheetStatusMasterResource;
 use App\Models\OrderLesson;
 
 use App\Exceptions\BadRequestException;
-use App\Exceptions\IllegalParameterException;
+use App\Exceptions\ApplicationException;
+use App\Libraries\Logic\ReservationModal\SheetManager;
 
 /**
  * 予約モーダルコントローラー
@@ -23,6 +26,7 @@ class ReservationModalController extends Controller
      *
      * @GET("api/reservation_modal/{sid}", as="api.reservation_modal.get")
      * @param Request $request
+     * @param int $sid レッスンスケジュールIDハッシュ値(shift_master.shiftid_hash)
      * @return \Illuminate\Http\JsonResponse
      */
     public function reservationModalApi(Request $request, $sid)
@@ -44,12 +48,8 @@ class ReservationModalController extends Controller
 
         $shiftMaster = $resource->getShitMasterResource();
         $lessonMaster = $resource->getLessonMasterResource();
-        $lessonClass1 = $resource->getLessonClass1Resource();
-        $lessonClass2 = $resource->getLessonClass2Resource();
-        $lessonClass3 = $resource->getLessonClass3Resource();
-        $custMaster = $resource->getCustMasterResource();
         $tenpoMaster = $resource->getTenpoMasterResource();
-        $userMaster = $resource->getUserMasterResource();
+        $custMaster = $resource->getCustMasterResource();
 
         // ネット予約公開日時が過去の日付かどうか
         if (!VaidationLogic::isOpenDateTimePassed($shiftMaster['open_datetime'])) {
@@ -97,9 +97,63 @@ class ReservationModalController extends Controller
         // 予約受付時間内かどうか
         if (!VaidationLogic::validateTimeLimit($shiftMaster['shift_date'], $shiftMaster['ls_st'], $shiftMaster['tlimit'])) {
             // 予約受付時間外
-            throw new IllegalParameterException('予約受付時間外です。');
+            throw new ApplicationException('予約受付時間外です。', 409);
         }
 
-        return response()->json([ 'resources' => $resource->getAllResource() ]);
+        // 座席情報取得
+        $sheetManager = new SheetManager($shiftMaster['shiftid']);
+        $sheetManager->setSheetStatusAndModalType($custMaster['cid']);
+        $sheetManager->fillNotSpecialSheetTrial($custMaster['memtype']);
+
+        return response()->json([
+            'response_code' => Response::HTTP_OK,
+            'modal_type' => $sheetManager->getReservationModalType(),
+            'lesson_date' => $shiftMaster['shift_date'],
+            'lesson_day_week' => CommonLogic::getDayWeek($shiftMaster['shift_date']),
+            'lesson_start_time' => $shiftMaster['ls_st'],
+            'lesson_end_time' => $shiftMaster['ls_et'],
+            'store_name' => $tenpoMaster['tenpo_name'],
+            'studio_image_path' => 'https://xxx/yyy/zzz', // TODO スタジオ画像パス
+            'lesson_name' => $resource->getLessonName(),
+            'instructor_name' => $shiftMaster['instructor_name'],
+            'trial_capacity' => $shiftMaster['taiken_capa'],
+            'instructor_image_path' => 'https://xxx/yyy/zzz', // TODO インストラクター画像パス
+            'cancel_waiting_no' => $shiftMaster['taiken_capa'],
+            'sheets' => $sheetManager->getResponseSheetsArray()
+
+        ])
+        ->setStatusCode(Response::HTTP_OK);
+    }
+
+    /**
+     * バイク予約状態取得API
+     *
+     * @GET("api/sheet_status/{sid}/{sheet_no}", as="api.sheet_status.get")
+     * @param Request $request
+     * @param int $sid レッスンスケジュールIDハッシュ値(shift_master.shiftid_hash)
+     * @param int $sheet_no 座席番号
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sheetStatusApi(Request $request, $sid, $sheet_no)
+    {
+        $params = array('sid' => $sid, 'sheet_no' => $sheet_no);
+
+        // レッスンスケジュールIDハッシュ、座席番号のバリデーション
+        if (!VaidationLogic::validateShiftIdHashAndSheetNo($params)) {
+            // エラー
+            throw new BadRequestException('レッスンスケジュールID、座席番号が不正です。');
+        }
+
+        // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
+        if (false) {
+
+        }
+
+        // バイク予約状態取得APIで必要なマスターデータ取得
+        $resource = new SheetStatusMasterResource($sid);
+        if(!$resource->createRedisResource()) {
+            // Redisキャッシュの取得に失敗
+            $resource->createDBResource();
+        }
     }
 }

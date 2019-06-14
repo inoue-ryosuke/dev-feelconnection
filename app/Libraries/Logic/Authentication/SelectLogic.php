@@ -16,16 +16,20 @@ class SelectLogic
      */
     public static function getAuthInfo() {
 
-
-        // TBD:認証情報からCustを特定する
-        $cid = Cust::first()->cid;
+       // TBD:認証情報からCustを特定する---------------------------------
+        $cust = Cust::first();
+        if (!$cust) {
+            throw new BadRequestException(); // Hander経由レスポンスの場合
+        }
+        // --------------------------------------------------------------
+        $cid = $cust->cid;
         $custinfo = Cust::getAuthInfo($cid);
         if (!$custinfo) {
             throw new BadRequestException(); // Hander経由レスポンスの場合
         }
         $response = [
             "result_code" => 0,
-            "name" => $custinfo->getNameInfo(),
+            "name" => $custinfo->name,    
             "kana" => $custinfo->kana,
             "pc_mail" => $custinfo->pc_mail,
             "b_birthday" => $custinfo->getBirthDayWord("jp"), //"昭和55年1月1日",
@@ -37,8 +41,8 @@ class SelectLogic
             "h_pref" => $custinfo->h_addr1,
             "h_addr" => $custinfo->h_addr2,
             "h_tel" => $custinfo->getTelNo(),
-            "memtype_name" => $custinfo->getMemTypeName(),  //"マンスリーメンバー",
-            "store_name" => $custinfo->getStoreNames(), //"銀座（GNZ）、自由が丘（JYO）",
+            "memtype_name" => $custinfo->getMemTypeName(),  //"マンスリーメンバー",        // ここで会員種別変更があれば変更あり文言追加
+            "store_name" => $custinfo->getStoreNames(), //"銀座（GNZ）、自由が丘（JYO）",　// ここで所属店舗変更があれば変更あり文言追加
             "dm_list" => $custinfo->getDmLists(),       //"1,,,,",
             "pc_conf" => $custinfo->getPcConf(),        // 1,
             "gmo_credit" => $custinfo->getGmoId(),       // "XXXXXXXXXXX",
@@ -48,18 +52,23 @@ class SelectLogic
     }
 
     public static function getUserMoreInfo($cid) {
-        // TBD:認証情報からCustを特定する
         if (!$cid) {
             throw new BadRequestException(); // Hander経由レスポンスの場合
         }
-        $cid = Cust::first()->cid;
+        // TBD:認証情報からCustを特定する---------------------------------
+        $cust = Cust::first();
+        if (!$cust) {
+            throw new BadRequestException(); // Hander経由レスポンスの場合
+        }
+        // --------------------------------------------------------------
+
         $custinfo = Cust::getAuthInfo($cid);
         if (!$custinfo) {
             throw new BadRequestException(); // Hander経由レスポンスの場合
         }
         $response = [
             "result_code" => 0,
-            "name" => $custinfo->getNameInfo(),
+            "name" => $custinfo->name,    
             "kana" => $custinfo->kana,
             "pc_mail" => $custinfo->pc_mail,
             "b_birthday" => $custinfo->getBirthDayWord("jp"), //"昭和55年1月1日",
@@ -71,8 +80,8 @@ class SelectLogic
             "h_pref" => $custinfo->h_addr1,
             "h_addr" => $custinfo->h_addr2,
             "h_tel" => $custinfo->getTelNo(),
-            "memtype_name" => $custinfo->getMemTypeName(),  //"マンスリーメンバー",
-            "store_name" => $custinfo->getStoreNames(), //"銀座（GNZ）、自由が丘（JYO）",
+            "memtype_name" => $custinfo->getMemTypeName(),  //"マンスリーメンバー",        // ここで会員種別変更があれば変更あり文言追加
+            "store_name" => $custinfo->getStoreNames(), //"銀座（GNZ）、自由が丘（JYO）",　// ここで所属店舗変更があれば変更あり文言追加
             "dm_list" => $custinfo->getDmLists(),       //"1,,,,",
             "pc_conf" => $custinfo->getPcConf(),        // 1,
             "campaign_list" => $custinfo->getCampaignList(),    // TBD:現在スタブ

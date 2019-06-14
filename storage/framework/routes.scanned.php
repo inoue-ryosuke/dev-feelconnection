@@ -11,7 +11,7 @@ $router->post('api/get_json_sample', [
 $router->get('api', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@index',
 	'as' => 'api.get',
-	'middleware' => ['api', 'auth:customer'],
+	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -19,7 +19,7 @@ $router->get('api', [
 $router->post('api/auth', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
 	'as' => 'api.auth.get',
-	'middleware' => ['api', 'auth:customer'],
+	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -27,7 +27,23 @@ $router->post('api/auth', [
 $router->post('api/auth/user', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserMoreInfo',
 	'as' => 'api.auth.user.get',
-	'middleware' => ['api', 'auth:customer'],
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/auth/user/dm_list/update', [
+	'uses' => 'App\Http\Controllers\Api\AuthController@updateUserDmList',
+	'as' => 'api.auth.user.dm_list.update',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/auth/user/update', [
+	'uses' => 'App\Http\Controllers\Api\AuthController@updateUser',
+	'as' => 'api.auth.user.update',
+	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -35,7 +51,7 @@ $router->post('api/auth/user', [
 $router->get('api/invite/{invite_code}', [
 	'uses' => 'App\Http\Controllers\Api\InviteController@validateInviteCode',
 	'as' => 'api.invite.get',
-	'middleware' => ['api', 'auth:customer'],
+	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -64,10 +80,26 @@ $router->get('api/reservation_modal/{sid}', [
 	'domain' => NULL,
 ]);
 
-$router->post('api/user/login', [
-	'uses' => 'App\Http\Controllers\Auth\LoginController@login',
-	'as' => 'api.user.login',
-	'middleware' => ['guest', 'api'],
+$router->get('api/sheet_status/{sid}/{sheet_no}', [
+	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusApi',
+	'as' => 'api.sheet_status.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/mailcheck', [
+	'uses' => 'App\Http\Controllers\Api\MailCheckController@chkMail',
+	'as' => 'api.mailcheck.post',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->get('api/mailauth/{token}', [
+	'uses' => 'App\Http\Controllers\Api\MailAuthController@index',
+	'as' => 'api.mailauth.get',
+	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
 ]);

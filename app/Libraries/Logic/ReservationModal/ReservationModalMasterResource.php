@@ -37,41 +37,15 @@ class ReservationModalMasterResource extends ReservationMasterResource {
         }
 
         if (!$this->createRedisResourceByKey(
-            'lesson_class1:' . $this->lessonMaster['lesson_class1'], $this->lessonClass1)) {
-            // lesson_class1のRedisキャッシュ取得失敗
-            return false;
-        }
-
-        if (!$this->createRedisResourceByKey(
-            'lesson_class2:' . $this->lessonMaster['lesson_class2'], $this->lessonClass2)) {
-            // lesson_class2のRedisキャッシュ取得失敗
-            return false;
-        }
-
-        if (!$this->createRedisResourceByKey(
-            'lesson_class3:' . $this->lessonMaster['lesson_class3'], $this->lessonClass3)) {
-            // lesson_class3のRedisキャッシュ取得失敗
-            return false;
-        }
-
-        if (!$this->createRedisResourceByKey(
-            'cust_master:' . Auth::id(), $this->custMaster)) {
-            // cust_masterのRedisキャッシュ取得失敗
-            return false;
-        }
-
-        if (!$this->createRedisResourceByKey(
             'tenpo_master:' . $this->shiftMaster['shift_tenpoid'], $this->tenpoMaster)) {
             // tenpo_masterのRedisキャッシュ取得失敗
             return false;
         }
-
-        if (!$this->createRedisResourceByKey(
-            'user_master:' . $this->shiftMaster['teacher'], $this->userMaster)) {
-            // user_masterのRedisキャッシュ取得失敗
-            return false;
-        }
         */
+
+        // TODO 会員情報取得処理
+        $this->custMaster['cid'] = 1;
+        $this->custMaster['memtype'] = 2; // マンスリー会員
 
         return true;
     }
@@ -97,11 +71,7 @@ class ReservationModalMasterResource extends ReservationMasterResource {
 
         $smLength = strlen(ReservationTablePrefix::SM);
         $lmLength = strlen(ReservationTablePrefix::LM);
-        $lc1Length = strlen(ReservationTablePrefix::LC1);
-        $lc2Length = strlen(ReservationTablePrefix::LC1);
-        $lc3Length = strlen(ReservationTablePrefix::LC3);
         $tmLength = strlen(ReservationTablePrefix::TM);
-        $umLength = strlen(ReservationTablePrefix::UM);
 
         foreach ($attributes as $key => $value) {
             if (strpos($key, ReservationTablePrefix::SM) !== FALSE) {
@@ -116,37 +86,14 @@ class ReservationModalMasterResource extends ReservationMasterResource {
                 continue;
             }
 
-            if (strpos($key, ReservationTablePrefix::LC1) !== FALSE) {
-                // lesson_class1のカラム
-                $this->lessonClass1[substr($key, $lc1Length)] = $value;
-                continue;
-            }
-
-            if (strpos($key, ReservationTablePrefix::LC2) !== FALSE) {
-                // lesson_class2のカラム
-                $this->lessonClass2[substr($key, $lc2Length)] = $value;
-                continue;
-            }
-
-            if (strpos($key, ReservationTablePrefix::LC3) !== FALSE) {
-                // lesson_class3のカラム
-                $this->lessonClass3[substr($key, $lc3Length)] = $value;
-                continue;
-            }
-
             if (strpos($key, ReservationTablePrefix::TM) !== FALSE) {
                 // tenpo_masterのカラム
                 $this->tenpoMaster[substr($key, $tmLength)] = $value;
                 continue;
             }
-
-            if (strpos($key, ReservationTablePrefix::UM) !== FALSE) {
-                // user_masterのカラム
-                $this->userMaster[substr($key, $umLength)] = $value;
-            }
         }
 
-        // TODO cust_masterの必要カラムをDBから取得
+        // TODO 会員情報取得処理
         $this->custMaster['cid'] = 1;
         $this->custMaster['memtype'] = 2; // マンスリー会員
     }

@@ -2,8 +2,6 @@
 
 namespace App\Libraries\Logic\ReservationModal;
 
-use Illuminate\Support\Facades\Redis;
-
 /**
  * 予約で必要なRedis・DBのマスター情報
  *
@@ -25,37 +23,23 @@ use Illuminate\Support\Facades\Redis;
  * @var time ls_et レッスン終了時間
  * @var int shift_tenpo_id 店舗ID(tenpo_master.tid)
  * @var int teacher インストラクターID(user_master.uid)
+ * @var string instructor_name インストラクター名
+ * @var string instructor_path_img インストラクター写真の画像パス
  *
  * @lesson_master:ID
  * @var int lid 主キー
  * @var int lesson_class1 lesson_class1.id
  * @var int lesson_class2 lesson_class2.id
  * @var int lesson_class3 lesson_class3.id
- *
- * @lesson_class1:ID
- * @var int id 主キー
- * @var string name 分類名
- *
- * @lesson_class2:ID
- * @var int id 主キー
- * @var string name 分類名
- *
- * @lesson_class3:ID
- * @var int id 主キー
- * @var string name 分類名
- *
- * @cust_master:ID
- * @var int cid 主キー
- * @var int memtype 会員種別(cust_memtype.mid)
+ * @var string lesson_class1_name レッスン分類1名
+ * @var string lesson_class2_name レッスン分類2名
+ * @var string lesson_class3_name レッスン分類3名
  *
  * @tenpo_master:ID
  * @var int tid 主キー
  * @var string tenpo_name 店舗名
- *
- * @user_master:ID
- * @var int uid 主キー
- * @var string user_name インストラクター名
- * @var string path_img インストラクター写真の画像パス
+ * @var string monthly_avail_tenpo 利用可能マンスリー所属店 tenpo_master.tid ※カンマ区切りで複数 -1： 全店
+ * @var string tenpo_memtype 予約可能会員種別 cust_memtype.mid ※カンマ区切りで複数
  *
  */
 abstract class ReservationMasterResource {
@@ -65,12 +49,8 @@ abstract class ReservationMasterResource {
     /** 各Redis・DBデータは連想配列で作成して、キー名はDBのカラム名とする */
     protected $shiftMaster;
     protected $lessonMaster;
-    protected $lessonClass1;
-    protected $lessonClass2;
-    protected $lessonClass3;
-    protected $custMaster;
     protected $tenpoMaster;
-    protected $userMaster;
+    protected $custMaster;
 
     /**
      *
@@ -81,12 +61,7 @@ abstract class ReservationMasterResource {
 
         $this->shiftMaster = null;
         $this->lessonMaster = null;
-        $this->lessonClass1 = null;
-        $this->lessonClass2 = null;
-        $this->lessonClass3 = null;
-        $this->custMaster = null;
         $this->tenpoMaster = null;
-        $this->userMaster = null;
     }
 
     /**
@@ -108,7 +83,7 @@ abstract class ReservationMasterResource {
      * @return bool 成功=true, 失敗=false
      */
     protected function createRedisResourceByKey(string $keyName, &$resource) {
-        $resource = Redis::hgetall($keyName);
+        $resource = RedisWrapper::hGetAll($keyName);
         if (!empty($resource)) {
             return true;
         } else {
@@ -133,24 +108,10 @@ abstract class ReservationMasterResource {
     }
 
     /**
-     * @return array lesson_class1のリソース
+     * @return array tenpo_masterのリソース
      */
-    public function getLessonClass1Resource() {
-        return $this->lessonClass1;
-    }
-
-    /**
-     * @return array lesson_class2のリソース
-     */
-    public function getLessonClass2Resource() {
-        return $this->lessonClass2;
-    }
-
-    /**
-     * @return array lesson_class3のリソース
-     */
-    public function getLessonClass3Resource() {
-        return $this->lessonClass3;
+    public function getTenpoMasterResource() {
+        return $this->tenpoMaster;
     }
 
     /**
@@ -161,46 +122,27 @@ abstract class ReservationMasterResource {
     }
 
     /**
-     * @return array tenpo_masterのリソース
-     */
-    public function getTenpoMasterResource() {
-        return $this->tenpoMaster;
-    }
-
-    /**
-     * @return array user_masterのリソース
-     */
-    public function getUserMasterResource() {
-        return $this->userMaster;
-    }
-
-    /**
      * @return array 予約のリソース
      */
     public function getAllResource() {
         return array(
             'shift_master' => $this->getShitMasterResource(),
             'lesson_master' => $this->getLessonMasterResource(),
-            'lesson_class1' => $this->getLessonClass1Resource(),
-            'lesson_class2' => $this->getLessonClass2Resource(),
-            'lesson_class3' => $this->getLessonClass3Resource(),
             'cust_master' => $this->getCustMasterResource(),
             'tenpo_master' => $this->getTenpoMasterResource(),
-            'user_master' => $this->getUserMasterResource()
         );
     }
 
     /**
-     * @return string shift_masterリソースのカラム名に対応する値
+     * レッスン名取得
+     *
+     * @return string レッスン名
      */
-    public function getShitMasterColumn($key) {
-        return $this->shiftMaster[$key];
-    }
-
-    /**
-     * @return string cust_masterリソースのカラム名に対応する値
-     */
-    public function getCustMasterColumn($key) {
-        return $this->custMaster[$key];
+    public function getLessonName() {
+        return
+           $this->lessonMaster['lesson_class1_name'] . ' '
+             . $this->lessonMaster['lesson_class2_name'] . ' '
+             . $this->lessonMaster['lesson_class3_name']
+        ;
     }
 }
