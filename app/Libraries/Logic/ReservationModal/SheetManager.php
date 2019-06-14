@@ -194,6 +194,17 @@ class SheetManager
     }
 
     /**
+     * 指定された座席が体験バイクかどうか
+     *
+     * @param int $sheetNo 座席番号
+     * @return bool
+     */
+    public function isSheetSpecialTrial(int $sheetNo) {
+        // return $this->studio->isSpecialSheetTrial();
+        return $this->studio[$sheetNo]['special_area_info'] === SpecialSheetType::TRIAL;
+    }
+
+    /**
      * 座席予約状態取得
      *
      * @param int $sheetNo 座席番号

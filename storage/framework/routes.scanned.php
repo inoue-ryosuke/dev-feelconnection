@@ -88,6 +88,14 @@ $router->get('api/sheet_status/{sid}/{sheet_no}', [
 	'domain' => NULL,
 ]);
 
+$router->post('api/sheet_status_extend/{sid}/{sheet_no}', [
+	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusExtendApi',
+	'as' => 'api.sheet_status_extend.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->post('api/mailcheck', [
 	'uses' => 'App\Http\Controllers\Api\MailCheckController@chkMail',
 	'as' => 'api.mailcheck.post',
