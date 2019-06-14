@@ -72,4 +72,18 @@ class OrderLesson extends Model
             ->where('flg', '=', OrderLessonFlg::RESERVED)
             ->get();
     }
+
+    /**
+     * 指定したレッスンスケジュールID、座席番号の予約済みレコード取得
+     *
+     * @param int $shiftId レッスンスケジュールID
+     * @param int $sheetNo 座席番号
+     * @return \App\Models\OrderLesson|null
+     */
+    public static function getReservedSheet(int $shiftId, int $sheetNo) {
+        return self::where('sid', '=', $shiftId)
+            ->where('sheet', '=', $sheetNo)
+            ->where('flg', '=', OrderLessonFlg::RESERVED)
+            ->first();
+    }
 }
