@@ -11,7 +11,7 @@ $router->post('api/get_json_sample', [
 $router->get('api', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@index',
 	'as' => 'api.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -19,7 +19,7 @@ $router->get('api', [
 $router->post('api/auth', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
 	'as' => 'api.auth.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -27,7 +27,7 @@ $router->post('api/auth', [
 $router->post('api/auth/user', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@getUserMoreInfo',
 	'as' => 'api.auth.user.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -35,7 +35,7 @@ $router->post('api/auth/user', [
 $router->post('api/auth/user/dm_list/update', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@updateUserDmList',
 	'as' => 'api.auth.user.dm_list.update',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -43,7 +43,7 @@ $router->post('api/auth/user/dm_list/update', [
 $router->post('api/auth/user/update', [
 	'uses' => 'App\Http\Controllers\Api\AuthController@updateUser',
 	'as' => 'api.auth.user.update',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -51,7 +51,7 @@ $router->post('api/auth/user/update', [
 $router->get('api/invite/{invite_code}', [
 	'uses' => 'App\Http\Controllers\Api\InviteController@validateInviteCode',
 	'as' => 'api.invite.get',
-	'middleware' => [],
+	'middleware' => ['api', 'guest'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -59,7 +59,7 @@ $router->get('api/invite/{invite_code}', [
 $router->post('api/instructors', [
 	'uses' => 'App\Http\Controllers\Api\InstructorController@getInstructors',
 	'as' => 'api.instructors.get',
-	'middleware' => [],
+	'middleware' => ['api'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -67,7 +67,7 @@ $router->post('api/instructors', [
 $router->get('api/apple_music', [
 	'uses' => 'App\Http\Controllers\Api\MusicController@getMusicPlaylist',
 	'as' => 'api.apple_music.get',
-	'middleware' => [],
+	'middleware' => ['api'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -100,6 +100,14 @@ $router->get('api/mailauth/{token}', [
 	'uses' => 'App\Http\Controllers\Api\MailAuthController@index',
 	'as' => 'api.mailauth.get',
 	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/user/login', [
+	'uses' => 'App\Http\Controllers\Auth\LoginController@login',
+	'as' => 'api.user.login',
+	'middleware' => ['guest', 'api'],
 	'where' => [],
 	'domain' => NULL,
 ]);
