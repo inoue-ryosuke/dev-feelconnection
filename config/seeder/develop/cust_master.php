@@ -73,7 +73,7 @@ return [
 				"c_mail"=>"nuzigepyo@eay.jp",
 				"c_conf"=>1,
 				"ng_c_mail"=>0,
-				"pc_mail"=>"miyazato@neko2.net",
+				"pc_mail"=>"hobyo53@neko2.net",
 				"pc_conf"=>1,
 				"ng_pc_mail"=>0,
 				"job_id"=>1,

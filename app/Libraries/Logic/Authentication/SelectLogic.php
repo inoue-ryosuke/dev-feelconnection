@@ -16,14 +16,8 @@ class SelectLogic
      */
     public static function getAuthInfo() {
 
-       // TBD:認証情報からCustを特定する---------------------------------
-        $cust = Cust::first();
-        if (!$cust) {
-            throw new BadRequestException(); // Hander経由レスポンスの場合
-        }
-        // --------------------------------------------------------------
-        $cid = $cust->cid;
-        $custinfo = Cust::getAuthInfo($cid);
+        //ログイン認証情報から関連情報を取得する
+        $custinfo = auth("customer")->user();
         if (!$custinfo) {
             throw new BadRequestException(); // Hander経由レスポンスの場合
         }
@@ -51,18 +45,12 @@ class SelectLogic
         return $response;
     }
 
-    public static function getUserMoreInfo($cid) {
+    public static function getUserInfo($cid) {
+
         if (!$cid) {
             throw new BadRequestException(); // Hander経由レスポンスの場合
         }
-        // TBD:認証情報からCustを特定する---------------------------------
-        $cust = Cust::first();
-        if (!$cust) {
-            throw new BadRequestException(); // Hander経由レスポンスの場合
-        }
-        // --------------------------------------------------------------
-
-        $custinfo = Cust::getAuthInfo($cid);
+        $custinfo = Cust::getUserInfoById($cid);
         if (!$custinfo) {
             throw new BadRequestException(); // Hander経由レスポンスの場合
         }

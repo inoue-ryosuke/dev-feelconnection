@@ -17,7 +17,7 @@ $router->get('api', [
 ]);
 
 $router->post('api/auth', [
-	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
+	'uses' => 'App\Http\Controllers\Api\AuthController@getAuthInfo',
 	'as' => 'api.auth.get',
 	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
@@ -25,7 +25,7 @@ $router->post('api/auth', [
 ]);
 
 $router->post('api/auth/user', [
-	'uses' => 'App\Http\Controllers\Api\AuthController@getUserMoreInfo',
+	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
 	'as' => 'api.auth.user.get',
 	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
