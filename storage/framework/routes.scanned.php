@@ -115,7 +115,7 @@ $router->get('api/mailauth/{token}', [
 $router->post('api/user/login', [
 	'uses' => 'App\Http\Controllers\Auth\LoginController@login',
 	'as' => 'api.user.login',
-	'middleware' => ['guest', 'api'],
+	'middleware' => ['api', 'guest'],
 	'where' => [],
 	'domain' => NULL,
 ]);

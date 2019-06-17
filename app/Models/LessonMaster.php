@@ -6,7 +6,7 @@ use App\Exceptions\IllegalParameterException;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
-class LessonMaster extends Model
+class LessonMaster extends BaseFormModel
 {
     /** Salesforceのテーブルサフィックス(__c) */
     const SF = '';
@@ -26,7 +26,8 @@ class LessonMaster extends Model
     protected $primaryKey = 'lid';
 
     protected $guarded = [
-        'lessontime',
+        'cid',
+        'lid',
     ];
 
     public $timestamps = false;
