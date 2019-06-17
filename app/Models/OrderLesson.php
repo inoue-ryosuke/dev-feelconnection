@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Constant\OrderLessonFlg;
+use App\Models\Constant\OrderLessonTrialFlg;
 
 class OrderLesson extends Model
 {
@@ -40,7 +41,7 @@ class OrderLesson extends Model
             ])
             ->join("{$shiftMasterTableName} AS SM", "OL.sid", '=', "SM.shiftid")
             ->where('OL.customer_id', '=', $customerId)
-            ->where('OL.trial_flg', '=', 1)
+            ->where('OL.trial_flg', '=', OrderLessonTrialFlg::TRIAL_LESSON)
             ->whereIn('OL.flg', [ OrderLessonFlg::RESERVED, OrderLessonFlg::ATTENDED ])
             ->get();
 

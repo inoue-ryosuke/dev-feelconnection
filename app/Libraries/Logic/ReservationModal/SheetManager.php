@@ -50,6 +50,95 @@ class SheetManager
     }
 
     /**
+     * 予約モーダル種別を取得
+     *
+     * @return int 予約モーダル種別
+     */
+    public function getReservationModalType() {
+        return $this->modalType;
+    }
+
+    /**
+     * レスポンスとして渡す座席情報配列取得
+     *
+     * @return array 座席情報
+     */
+    public function getResponseSheetsArray() {
+        //return $this->studio->getSheetsArray();
+
+        $sheets = array();
+
+        foreach ($this->studio as $key => $value) {
+            $sheets[] = array_merge([ 'sheet_no' => $key], $value);
+        }
+
+        return $sheets;
+    }
+
+    /**
+     * 座席番号が該当スタジオで有効か
+     *
+     * @param int $sheetNo 座席番号
+     * @return bool
+     */
+    public function isSheetNoValid(int $sheetNo) {
+        // $this->studio->isSheetNoValid($sheetNo);
+        // 仮
+        return $sheetNo >= 1 && $sheetNo <= 5;
+    }
+
+    /**
+     * 指定されたバイクが、ログインユーザー or 他のユーザーによって枠確保済み・予約済みかどうか
+     * 体験レッスンで指定した座席が体験バイクでない場合は、予約済みとなりバリデーションで弾かれる
+     *
+     * @param int $sheetNo 座席番号
+     * @return bool
+     */
+    public function isSheetReserved(int $sheetNo) {
+        // return $this->studio->isSheetReserved();
+        return $this->studio[$sheetNo]['status'] === SheetStatus::RESERVED
+        || $this->studio[$sheetNo]['status'] === SheetStatus::RESERVED_CUSTOMER;
+    }
+
+    /**
+     * 定員、体験定員が満席かどうか
+     *
+     * @param bool $trialFlag 体験レッスン受講済み状態
+     * @param int $capacity 定員
+     * @param int $trialCapacity 体験定員
+     * @return bool
+     */
+    public function isStudioFull(bool $trialFlag, int $capacity, int $trialCapacity) {
+        // return $this->studio->isFull();
+
+        if ($trialFlag) {
+            // 定員
+            $filtered = array_filter($this->studio, function ($sheet) {
+                return $sheet['status'] === SheetStatus::RESERVED || $sheet['status'] === SheetStatus::RESERVED_CUSTOMER;
+            });
+
+            return count($filtered) < $capacity;
+        } else {
+            // 体験定員
+            $filtered = array_filter($this->studio, function ($sheet) {
+                return in_array(SpecialSheetType::TRIAL, $sheet['special_area_info'], true)
+                && ($sheet['status'] === SheetStatus::RESERVED || $sheet['status'] === SheetStatus::RESERVED_CUSTOMER);
+            });
+
+            return count($filtered) < $trialCapacity;
+        }
+    }
+
+    /**
+     * バイク枠確保している座席情報一覧を取得
+     *
+     * @return array バイク枠確保している座席一覧(Redis)
+     */
+    private function getSecureSheetList() {
+        return RedisWrapper::hGetAll('sheet_lock_shiftid:' . $this->shiftId);
+    }
+
+    /**
      * バイクの予約状態をスタジオ情報に登録、予約モーダル種別を登録
      *
      * @param int $customerId cust_master.cid
@@ -93,15 +182,6 @@ class SheetManager
                 $this->studio[$sheetNoCustomerId['sheet_no']]['status'] = SheetStatus::RESERVED;
             }
         }
-    }
-
-    /**
-     * バイク枠確保している座席情報一覧を取得
-     *
-     * @return array バイク枠確保している座席一覧(Redis)
-     */
-    private function getSecureSheetList() {
-        return RedisWrapper::hGetAll('sheet_lock_shiftid:' . $this->shiftId);
     }
 
     /**
@@ -158,53 +238,6 @@ class SheetManager
     }
 
     /**
-     * 予約モーダル種別を取得
-     *
-     * @return int 予約モーダル種別
-     */
-    public function getReservationModalType() {
-        return $this->modalType;
-    }
-
-    /**
-     * レスポンスとして渡す座席情報配列取得
-     *
-     * @return array 座席情報
-     */
-    public function getResponseSheetsArray() {
-        //return $this->studio->getSheetsArray();
-
-        $sheets = array();
-
-        foreach ($this->studio as $key => $value) {
-            $sheets[] = array_merge([ 'sheet_no' => $key], $value);
-        }
-
-        return $sheets;
-    }
-
-    /**
-     * 座席番号が該当スタジオで有効か
-     *
-     * @param int $sheetNo 座席番号
-     * @return bool
-     */
-    public function isSheetNoValid(int $sheetNo) {
-        return true;
-    }
-
-    /**
-     * 指定された座席が体験バイクかどうか
-     *
-     * @param int $sheetNo 座席番号
-     * @return bool
-     */
-    public function isSheetSpecialTrial(int $sheetNo) {
-        // return $this->studio->isSpecialSheetTrial();
-        return $this->studio[$sheetNo]['special_area_info'] === SpecialSheetType::TRIAL;
-    }
-
-    /**
      * 座席予約状態取得
      *
      * @param int $sheetNo 座席番号
@@ -250,4 +283,5 @@ class SheetManager
             return SheetStatus::RESERVABLE;
         }
     }
+
 }

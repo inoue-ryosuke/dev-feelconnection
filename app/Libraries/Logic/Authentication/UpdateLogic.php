@@ -33,7 +33,8 @@ class UpdateLogic
     public static function setDmList($payload) {
 
         // TBD:認証情報からCustを特定する
-        $cid = Cust::first()->cid;
+//        $cid = Cust::first()->cid;
+        $cid = Cust::first()->getAuthIdentifier();
         $result = DB::transaction(function() use($cid,$payload) {
              $dmlist = data_get($payload,'dm_list');
              $pcconf = data_get($payload,'pc_conf');
