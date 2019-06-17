@@ -3,6 +3,7 @@
 namespace App\Libraries\Logic\ReservationModal;
 
 use Illuminate\Support\Facades\Validator;
+use App\Models\Constant\TaikenMess;
 use App\Models\Constant\TaikenLesFlg;
 use App\Models\Constant\ShiftMasterFlg;
 
@@ -54,20 +55,6 @@ class VaidationLogic
         $openDateTime = new \DateTime($openDateTime);
 
         return $currentDateTime >= $openDateTime;
-    }
-
-    /**
-     * レッスンスケジュールレッスン開催日時(shift_master.shift_date, shift_master.ls_st)が未来の日付かどうか
-     *
-     * @param string $shiftDate レッスン開催日 yyyy/mm/dd
-     * @param string $startTime レッスン開催時間 hh:ii:ss
-     * @return bool
-     */
-    public static function isShiftDateTimeComing(string $shiftDate, string $startTime) {
-        $currentDateTime = new \DateTime();
-        $shiftDateTime = new \DateTime("{$shiftDate} {$startTime}");
-
-        return $currentDateTime < $shiftDateTime;
     }
 
     /**
@@ -123,6 +110,7 @@ class VaidationLogic
 
     /**
      * 予約受付時間内かどうか
+     * 過去の日付のレッスンを指定した場合も、このバリデーションで弾かれる
      *
      * @param string $shiftDate レッスン日(yyyy/mm/dd)
      * @param string $startTime 開始時間(hh:ii:ss)
@@ -145,7 +133,7 @@ class VaidationLogic
      *
      * @param array $shiftMaster
      * @param array $custMaster
-     * @return bool
+     * @return array [ result => バリデーション結果, 'error_message' => エラーメッセージ, 'trial_flag' => 体験レッスン受講状態(true=受講済み、false=未受講) ]
      */
     public static function validateNotTakenTrialLesson(array &$shiftMaster, array &$custMaster) {
         // 体験レッスン受講済み状態、体験レッスン予約済み状態取得
@@ -153,22 +141,28 @@ class VaidationLogic
 
         if (!$trialLessonStatus[0]) {
             // 体験レッスン受講済みでない
+
+            // 体験制限非表示かどうか
+            if ($shiftMaster['taiken_mess'] === TaikenMess::NO_DISPLAY) {
+                return [ 'result' => false, 'error_message' => '体験制限のレッスンです。', 'trial_flag' => $trialLessonStatus[0] ];
+            }
+
             if (!$trialLessonStatus[1]) {
                 // 体験レッスン受講済みでないかつ予約済みでない
                 if (!VaidationLogic::canTrialReservation($shiftMaster['taiken_les_flg'])) {
                     // 体験予約不可のレッスンを指定
-                    return false;
+                    return [ 'result' => false, 'error_message' => '体験予約不可のレッスンが指定されました。', 'trial_flag' => $trialLessonStatus[0] ];
                 }
             } else {
                 // 体験レッスン受講済みでないかつ予約済み
                 $shiftDateTime = $shiftMaster['shift_date'] . $shiftMaster['ls_et'];
                 if (!VaidationLogic::validateTrialReservationDate($custMaster['memtype'], $shiftDateTime, $trialLessonStatus[2])) {
                     // 予約済みの体験レッスンより前の日付のレッスンを指定
-                    return false;
+                    return [ 'result' => false, 'error_message' => '予約済みの体験レッスンより後の日付を指定してください。', 'trial_flag' => $trialLessonStatus[0] ];
                 }
             }
         }
 
-        return true;
+        return [ 'result' => true, 'error_message' => '', 'trial_flag' => $trialLessonStatus[0] ];
     }
 }
