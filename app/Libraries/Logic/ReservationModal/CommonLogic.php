@@ -42,4 +42,32 @@ class CommonLogic
 
         return self::DAY_WEEK[(int)$dateTime->format('w')];
     }
+
+    /**
+     * エラー配列取得
+     *
+     * @param string $code
+     * @param string $message
+     * @param array $paremeters
+     * @return array
+     */
+    public static function getErrorArray(string $code, string $message, array $paremeters) {
+        return [ 'code' => $code, 'message' => $message, 'parameters' => $paremeters  ];
+    }
+
+    /**
+     * エラーレスポンスJson取得
+     *
+     * @param string $message
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public static function getErrorJsonResponse(int $responseCode, array ...$errors) {
+        // ログ出力
+        logger()->debug("ErrorResponse\nresponse_code: " . $responseCode . "\n" . var_export($errors, true));
+
+        return response()->json([
+            'response_code' => $responseCode,
+            'errors' => $errors
+        ])->setStatusCode($responseCode);
+    }
 }
