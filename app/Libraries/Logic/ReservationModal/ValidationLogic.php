@@ -165,4 +165,16 @@ class VaidationLogic
 
         return [ 'result' => true, 'error_message' => '', 'trial_flag' => $trialLessonStatus[0] ];
     }
+
+    /**
+     * 会員種別が予約可能会員種別(tenpo_master.tenpo_memtype, カンマ区切り複数)かどうか
+     * 未来の会員種別(レッスン開催日時点の会員種別)で判別
+     *
+     * @param int $futureMemberType レッスン日(yyyy/mm/dd)
+     * @param string $availableTenpos 開始時間(hh:ii:ss)
+     * @return bool
+     */
+    public static function isMemberTypeReservable(int $futureMemberType, string $availableTenpos) {
+
+    }
 }

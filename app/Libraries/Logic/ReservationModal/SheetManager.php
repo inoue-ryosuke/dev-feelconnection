@@ -223,7 +223,7 @@ class SheetManager
      *
      * @param int $customerType cust_master.memtype
      */
-    public function fillNotSpecialSheetTrial(int $customerType) {
+    public function fillNotSpecialTrialSheet(int $customerType) {
         // TODO 会員種別を受け取って、ネット・トライアル会員を判別
         if (true) {
             // $sheetNoSpecialAreaInfo = $this->studio->getSheetNoSpecialAreaInfo();

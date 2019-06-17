@@ -30,7 +30,7 @@ class SheetStatusExtendMasterResource extends ReservationMasterResource {
 
         // TODO 会員情報取得処理
         $this->custMaster['cid'] = 1;
-        $this->custMaster['memtype'] = 2;
+        $this->custMaster['memtype'] = 3;
 
         return true;
     }
@@ -51,7 +51,7 @@ class SheetStatusExtendMasterResource extends ReservationMasterResource {
 
         // TODO 会員情報取得処理
         $this->custMaster['cid'] = 1;
-        $this->custMaster['memtype'] = 2;
+        $this->custMaster['memtype'] = 3;
     }
 
 }
