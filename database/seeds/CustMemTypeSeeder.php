@@ -43,11 +43,13 @@ class CustMemTypeSeeder extends BaseSeeder
     protected function insertRecord($record = []) {
 
             $memdao = $tenpo = null;
-            $tenpoModels = collect();
-            $memdao = new CustMemType();
-            $memdao->mergeRequest($record);
-            $memdao->save();
-            echo "\n   ---> " . "CustMemType Insert End [".$memdao->type_name."]" . "\n";
+            $tempoModels = CustMemType::where("type_name",$record["type_name"])->first();
+            if (is_null($tempoModels)) {
+                $tempoModels = new CustMemType();
+            }
+            $tempoModels->mergeRequest($record);
+            $tempoModels->save();
+            echo "\n   ---> " . "CustMemType Insert End [".$tempoModels->type_name."]" . "\n";
     }
 
 }

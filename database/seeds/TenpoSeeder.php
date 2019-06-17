@@ -76,7 +76,10 @@ class TenpoSeeder extends BaseSeeder
             }
 
             //echo "\n   ---> " . "Cust Insert Start" . "\n";
-            $dao = new TenpoMaster();
+            $dao = TenpoMaster::where("tenpo_name",$record["tenpo_name"])->first();
+            if (is_null($dao)) {
+                $dao = new TenpoMaster();
+            }
             $dao->mergeRequest($record);
             $dao->save();
             echo "\n   ---> " . "Tenpo Insert End [".$dao->tenpo_name."]" . "\n";

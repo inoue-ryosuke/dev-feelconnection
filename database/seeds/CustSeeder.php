@@ -45,6 +45,7 @@ class CustSeeder extends BaseSeeder
 
             $memdao = $tenpo = null;
             $tenpoModels = $memtypeModels = collect();
+
             // メインModel用の関連情報を取り除く
             if (isset($record["assign"])) {
                 $assign = $record["assign"];
@@ -58,10 +59,15 @@ class CustSeeder extends BaseSeeder
             if (isset($assign["cust_memtype_name"])) {
                 $memtypeModels = CustMemType::where("type_name",$assign["cust_memtype_name"])->first();
             }
-            // 
-            $dao = new Cust();
+
+            $dao = Cust::where("name",$record["name"])->first();
+            if (is_null($dao)) {
+                $dao = new Cust();
+            }
             $dao->mergeRequest($record);
             $dao->save();
+
+
             echo "\n   ---> " . "Cust Insert End [".$dao->name."]" . "\n";
             if ($memtypeModels) {
                 // Cust と CustMemTypeを紐づけ
@@ -85,13 +91,15 @@ class CustSeeder extends BaseSeeder
                     $notInTenpos  = TenpoMaster::all()->whereNotIn("tid",$tenpoModels->pluck("tid"));
                     $notInMemtype = CustMemType::where("mid","<>",$dao->memtype)->get();
                     // 存在したら変更スケジュールを登録
-
                     // 所属店舗以外の店舗が存在したら、店舗IDを変更するスケジュール登録
                     if ($notInTenpos->isNotEmpty()) {
                         $changeTenpo = $notInTenpos->first();
                         // 取得した店舗のIDが、スケジュール内に存在していなければ登録
-                        $schdao = new Schedule();
-                        $assign["schedule"]["sc_cid"]     = $dao->cid;           // 会員ID
+                        $schdao = Schedule::where("sc_cid",$dao->cid)->where("sc_memtype",$dao->memtype)->where("sc_tenpo",$changeTenpo->tid)->first();
+                        if (is_null($schdao)) {
+                            $schdao = new Schedule();
+                        }
+                        $assign["schedule"]["sc_cid"]     = $dao->cid;          // 会員ID
                         $assign["schedule"]["sc_memtype"] = $dao->memtype;      // 会員種別変更なし
                         $assign["schedule"]["sc_tenpo"]   = $changeTenpo->tid;  // 店舗ID変更
                         $schdao->mergeRequest($assign["schedule"]);
@@ -103,7 +111,10 @@ class CustSeeder extends BaseSeeder
                     if ($notInMemtype->isNotEmpty()) {
                         $thisTenpo = $tenpoModels->first();
                         $changeMemType = $notInMemtype->first();
-                        $schdao = new Schedule();
+                        $schdao = Schedule::where("sc_cid",$dao->cid)->where("sc_memtype",$changeMemType->mid)->where("sc_tenpo",$thisTenpo->tid)->first();
+                        if (is_null($schdao)) {
+                            $schdao = new Schedule();
+                        }
                         $assign["schedule"]["sc_cid"]     = $dao->cid;           // 会員ID
                         $assign["schedule"]["sc_memtype"] = $changeMemType->mid; // 会員種別変更
                         $assign["schedule"]["sc_tenpo"]   = $thisTenpo->tid;     // 店舗ID変更
