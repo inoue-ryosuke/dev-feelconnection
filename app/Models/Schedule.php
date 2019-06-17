@@ -18,8 +18,8 @@ class Schedule extends BaseFormModel implements Authenticatable
     /**
      * @var string テーブル名
      */
-    protected $table = 'schedule';
-    protected $primaryKey = 'sc_id';
+    protected $table = 'schedule__c';
+    protected $primaryKey = 'sc_id__c';
     const CREATED_AT = null;
     const UPDATED_AT = null;
     const DELETED_AT = null;

@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\TenpoAreaMaster;
 use App\Models\TenpoKubun;
 
-class TenpoMaster extends BaseModel
+class TenpoMaster extends SalesBaseFormModel
 {
     //
     /**
      * @var string テーブル名
      */
-    protected $table = 'tenpo_master';
-    protected $primaryKey = 'tid';
+    protected $table = 'tenpo_master__c';
+    protected $primaryKey = 'tid__c';
 
     // 有効/無効フラグ
     const VALID = 1;

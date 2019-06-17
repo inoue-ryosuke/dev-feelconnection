@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Model;
  * Class BaseModel
  * @package App
  */
-class BaseFormModel extends BaseModel implements IEditable {
+class SalesBaseFormModel extends BaseModel implements IEditable {
 
     //use FormTrait, ImportTrait;
     protected $formKey = false;
+
     // 接続先DBを指定
-    protected $connection = 'pgsql';
+    protected $connection = 'salesforce';
+
     /**
      * BaseFormModel constructor.
      * @param array $attributes
