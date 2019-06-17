@@ -71,7 +71,7 @@ class CustSeeder extends BaseSeeder
             echo "\n   ---> " . "Cust Insert End [".$dao->name."]" . "\n";
             if ($memtypeModels) {
                 // Cust と CustMemTypeを紐づけ
-                $dao->memtype = $memtypeModels->mid;
+                $dao->memtype = $memtypeModels->getAuthIdentifier();
                 $dao->save();
                 echo "\n" . "Linked CustMemId [".$dao->memtype."]" . "\n";
             }
@@ -80,8 +80,8 @@ class CustSeeder extends BaseSeeder
                 // まずは所属店舗情報との関連付けを登録
                 foreach ($tenpoModels as $tenpoModel) {
                     $ctenpo = new CustTenpo();
-                    $ctenpo->cid = $dao->cid;
-                    $ctenpo->tenpo_id = $tenpoModel->tid;
+                    $ctenpo->cid = $dao->getAuthIdentifier();
+                    $ctenpo->tenpo_id = $tenpoModel->getAuthIdentifier();
                     $ctenpo->save();
                     echo "\n" . "Linked StoreId [".$dao->store_id."(".$tenpoModel->tenpo_name.")]" . "\n";
                 }
@@ -90,18 +90,22 @@ class CustSeeder extends BaseSeeder
                     // 所属店舗以外の店舗モデルコレクション取得
                     $notInTenpos  = TenpoMaster::all()->whereNotIn("tid",$tenpoModels->pluck("tid"));
                     $notInMemtype = CustMemType::where("mid","<>",$dao->memtype)->get();
+//                    $notInMemtype = CustMemType::where("mid__c","<>",$dao->memtype)->get();
                     // 存在したら変更スケジュールを登録
                     // 所属店舗以外の店舗が存在したら、店舗IDを変更するスケジュール登録
                     if ($notInTenpos->isNotEmpty()) {
                         $changeTenpo = $notInTenpos->first();
                         // 取得した店舗のIDが、スケジュール内に存在していなければ登録
-                        $schdao = Schedule::where("sc_cid",$dao->cid)->where("sc_memtype",$dao->memtype)->where("sc_tenpo",$changeTenpo->tid)->first();
+                        $schdao = Schedule::where("sc_cid",$dao->getAuthIdentifier())
+                                        ->where("sc_memtype",$dao->memtype)
+                                        ->where("sc_tenpo",$changeTenpo->getAuthIdentifier())
+                                        ->first();
                         if (is_null($schdao)) {
                             $schdao = new Schedule();
                         }
-                        $assign["schedule"]["sc_cid"]     = $dao->cid;          // 会員ID
-                        $assign["schedule"]["sc_memtype"] = $dao->memtype;      // 会員種別変更なし
-                        $assign["schedule"]["sc_tenpo"]   = $changeTenpo->tid;  // 店舗ID変更
+                        $assign["schedule"]["sc_cid"]     = $dao->getAuthIdentifier();           // 会員ID
+                        $assign["schedule"]["sc_memtype"] = $dao->memtype;                       // 会員種別変更なし
+                        $assign["schedule"]["sc_tenpo"]   = $changeTenpo->getAuthIdentifier();   // 店舗ID変更
                         $schdao->mergeRequest($assign["schedule"]);
                         $schdao->save();
                         echo "\n" . "Linked Schedule Store Change [".$dao->store_id." -> ".$changeTenpo->tid."]" . "\n";
@@ -111,16 +115,19 @@ class CustSeeder extends BaseSeeder
                     if ($notInMemtype->isNotEmpty()) {
                         $thisTenpo = $tenpoModels->first();
                         $changeMemType = $notInMemtype->first();
-                        $schdao = Schedule::where("sc_cid",$dao->cid)->where("sc_memtype",$changeMemType->mid)->where("sc_tenpo",$thisTenpo->tid)->first();
+                        $schdao = Schedule::where("sc_cid",$dao->getAuthIdentifier())
+                                        ->where("sc_memtype",$changeMemType->getAuthIdentifier())
+                                        ->where("sc_tenpo",$thisTenpo->getAuthIdentifier())
+                                        ->first();
                         if (is_null($schdao)) {
                             $schdao = new Schedule();
                         }
-                        $assign["schedule"]["sc_cid"]     = $dao->cid;           // 会員ID
-                        $assign["schedule"]["sc_memtype"] = $changeMemType->mid; // 会員種別変更
-                        $assign["schedule"]["sc_tenpo"]   = $thisTenpo->tid;     // 店舗ID変更
+                        $assign["schedule"]["sc_cid"]     = $dao->getAuthIdentifier();           // 会員ID
+                        $assign["schedule"]["sc_memtype"] = $changeMemType->getAuthIdentifier(); // 会員種別変更
+                        $assign["schedule"]["sc_tenpo"]   = $thisTenpo->getAuthIdentifier();     // 店舗ID変更
                         $schdao->mergeRequest($assign["schedule"]);
                         $schdao->save();
-                        echo "\n" . "Linked Schedule MemType Change [".$dao->memtype." -> ".$changeMemType->mid."]" . "\n";
+                        echo "\n" . "Linked Schedule MemType Change [".$dao->memtype." -> ".$changeMemType->getAuthIdentifier()."]" . "\n";
                     }
                 }
 
