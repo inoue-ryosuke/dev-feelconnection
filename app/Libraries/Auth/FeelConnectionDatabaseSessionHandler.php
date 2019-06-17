@@ -11,7 +11,6 @@ use Illuminate\Session\DatabaseSessionHandler;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Container\Container;
-use App\Libraries\Auth\FeelConnectionSessionGuard;
 
 class FeelConnectionDatabaseSessionHandler extends DatabaseSessionHandler
 {
