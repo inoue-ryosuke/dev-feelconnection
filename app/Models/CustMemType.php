@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 use Carbon\Carbon;
 
-class CustMemType extends SalesBaseFormModel implements Authenticatable
+class CustMemType extends BaseFormModel implements Authenticatable
+//class CustMemType extends SalesBaseFormModel implements Authenticatable
 {
 //    use AuthenticatableTrait, ListingTrait, SoftDeletes, TokenizerTrait,UserTrait, UserStatusTrait;
     use AuthenticatableTrait;
@@ -15,8 +16,10 @@ class CustMemType extends SalesBaseFormModel implements Authenticatable
     /**
      * @var string テーブル名
      */
-    protected $table = 'cust_memtype__c';
-    protected $primaryKey = 'mid__c';
+    protected $table = 'cust_memtype';
+    protected $primaryKey = 'mid';
+//    protected $table = 'cust_memtype__c';
+//    protected $primaryKey = 'mid__c';
     /**
      * The attributes that are mass assignable.
      *

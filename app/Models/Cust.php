@@ -12,7 +12,8 @@ use App\Models\TenpoMaster as TenpoMaster;
 use App\Models\CustTenpo as CustTenpo;
 use App\Models\Schedule as Schedule;
 
-class Cust extends SalesBaseFormModel implements Authenticatable
+class Cust extends BaseFormModel implements Authenticatable
+//class Cust extends SalesBaseFormModel implements Authenticatable
 {
 //    use AuthenticatableTrait, ListingTrait, SoftDeletes, TokenizerTrait,UserTrait, UserStatusTrait;
     use AuthenticatableTrait;
@@ -20,9 +21,12 @@ class Cust extends SalesBaseFormModel implements Authenticatable
     /**
      * @var string テーブル名
      */
-    protected $table = 'cust_master__c';
-    protected $primaryKey = 'cid__c';
-    protected $loginKey = 'cid__c';
+    protected $table = 'cust_master';
+    protected $primaryKey = 'cid';
+    protected $loginKey = 'cid';
+//    protected $table = 'cust_master__c';
+//    protected $primaryKey = 'cid__c';
+//    protected $loginKey = 'cid__c';
     /**
      * The attributes that are mass assignable.
      *
@@ -172,7 +176,8 @@ class Cust extends SalesBaseFormModel implements Authenticatable
 
 	// モデル結合アクセサ（会員区分）
     public function joinAllMemType() {
-		return $this->hasOne(CustMemType::Class,"mid__c","memtype");
+        return $this->hasOne(CustMemType::Class,"mid","memtype");
+//		return $this->hasOne(CustMemType::Class,"mid__c","memtype");
 	}
     public function hasOneMemType() {
 		if (!$this->joinAllMemType) {

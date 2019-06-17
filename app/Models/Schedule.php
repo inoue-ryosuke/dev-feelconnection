@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 
 class Schedule extends BaseFormModel implements Authenticatable
+//class Schedule extends SalesBaseFormModel implements Authenticatable
 {
     
     /** 有効/無効フラグ */
@@ -18,8 +19,10 @@ class Schedule extends BaseFormModel implements Authenticatable
     /**
      * @var string テーブル名
      */
-    protected $table = 'schedule__c';
-    protected $primaryKey = 'sc_id__c';
+    protected $table = 'schedule';
+    protected $primaryKey = 'sc_id';
+//    protected $table = 'schedule__c';
+//    protected $primaryKey = 'sc_id__c';
     const CREATED_AT = null;
     const UPDATED_AT = null;
     const DELETED_AT = null;

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 
 class CustTenpo extends BaseFormModel implements Authenticatable
+//class CustTenpo extends SalesBaseFormModel implements Authenticatable
 {
     
     /** 有効/無効フラグ */
@@ -20,6 +21,8 @@ class CustTenpo extends BaseFormModel implements Authenticatable
      */
     protected $table = 'cust_tenpo';
     protected $primaryKey = 'ctenpo_id';
+//    protected $table = 'cust_tenpo__c';
+//    protected $primaryKey = 'ctenpo_id__c';
     const CREATED_AT = null;
     const UPDATED_AT = null;
     const DELETED_AT = null;
