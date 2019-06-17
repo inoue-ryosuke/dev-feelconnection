@@ -297,6 +297,13 @@ class Cust extends BaseFormModel implements Authenticatable
         // 変更スケジュール情報取得
 		$changeSchedule = $this->getChangeSchedule() ?? collect([]);
 		$allTenpo = $this->hasManyAllTenpo();
+		// スケジュールがない場合、会員種別名をそのまま返却
+	    if ($changeSchedule->isEmpty()) {
+			if (!isset($memtype->type_name)) {
+			    return "";
+			}
+			return $memtype->type_name;
+		}
 		// 会員種別変更があった場合、会員名に変更文言を付加
 		// 前提：変更scheduleデータがある場合
 	    if ($changeSchedule->count()) {
