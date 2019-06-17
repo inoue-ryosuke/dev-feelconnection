@@ -126,7 +126,7 @@ abstract class ReservationMasterResource {
      */
     public function getAllResource() {
         return array(
-            'shift_master' => $this->getShitMasterResource(),
+            'shift_master' => $this->getShiftMasterResource(),
             'lesson_master' => $this->getLessonMasterResource(),
             'cust_master' => $this->getCustMasterResource(),
             'tenpo_master' => $this->getTenpoMasterResource(),
