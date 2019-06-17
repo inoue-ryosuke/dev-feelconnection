@@ -17,7 +17,7 @@ $router->get('api', [
 ]);
 
 $router->post('api/auth', [
-	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
+	'uses' => 'App\Http\Controllers\Api\AuthController@getAuthInfo',
 	'as' => 'api.auth.get',
 	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
@@ -25,7 +25,7 @@ $router->post('api/auth', [
 ]);
 
 $router->post('api/auth/user', [
-	'uses' => 'App\Http\Controllers\Api\AuthController@getUserMoreInfo',
+	'uses' => 'App\Http\Controllers\Api\AuthController@getUserInfo',
 	'as' => 'api.auth.user.get',
 	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
@@ -83,6 +83,14 @@ $router->get('api/reservation_modal/{sid}', [
 $router->get('api/sheet_status/{sid}/{sheet_no}', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusApi',
 	'as' => 'api.sheet_status.get',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/sheet_status_extend/{sid}/{sheet_no}', [
+	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusExtendApi',
+	'as' => 'api.sheet_status_extend.get',
 	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,

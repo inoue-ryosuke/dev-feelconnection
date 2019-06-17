@@ -59,9 +59,9 @@ abstract class ReservationMasterResource {
     public function __construct(string $shiftIdHash) {
         $this->shiftIdHash = $shiftIdHash;
 
-        $this->shiftMaster = null;
-        $this->lessonMaster = null;
-        $this->tenpoMaster = null;
+        $this->shiftMaster = [];
+        $this->lessonMaster = [];
+        $this->tenpoMaster = [];
     }
 
     /**
@@ -82,12 +82,12 @@ abstract class ReservationMasterResource {
      * @param array $resource リソース連想配列
      * @return bool 成功=true, 失敗=false
      */
-    protected function createRedisResourceByKey(string $keyName, &$resource) {
+    protected function createRedisResourceByKey(string $keyName, array &$resource) {
         $resource = RedisWrapper::hGetAll($keyName);
         if (!empty($resource)) {
             return true;
         } else {
-            $resource = null;
+            $resource = [];
 
             return false;
         }
@@ -96,7 +96,7 @@ abstract class ReservationMasterResource {
     /**
      * @return array shift_masterのリソース
      */
-    public function getShitMasterResource() {
+    public function getShiftMasterResource() {
         return $this->shiftMaster;
     }
 
@@ -126,7 +126,7 @@ abstract class ReservationMasterResource {
      */
     public function getAllResource() {
         return array(
-            'shift_master' => $this->getShitMasterResource(),
+            'shift_master' => $this->getShiftMasterResource(),
             'lesson_master' => $this->getLessonMasterResource(),
             'cust_master' => $this->getCustMasterResource(),
             'tenpo_master' => $this->getTenpoMasterResource(),

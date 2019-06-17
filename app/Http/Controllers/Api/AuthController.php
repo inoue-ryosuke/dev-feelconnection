@@ -88,19 +88,19 @@ class AuthController extends ApiController
      * @param $request
      * @return Response
      */
-    public function getUserInfo(Request $request) {
+    public function getAuthInfo(Request $request) {
 
-        logger("getUserInfo() Start");
+        logger("getAuthUserInfo() Start");
         // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
         //$payload = $this->getPayload();
         //logger('payload');
         //logger($payload);
         // ペイロードバリデーション
         //$this->validateApiPayload('cust.auth', $payload);
-
+        
         // TBD:認証情報からIDを特定する
         $response = $this->getAuthSelectLogic()->getAuthInfo();
-        logger("getUserInfo() End");
+        logger("getAuthUserInfo() End");
         return response()->json($response);
 
     }
@@ -111,7 +111,7 @@ class AuthController extends ApiController
      * @param $request
      * @return Response
      */
-    public function getUserMoreInfo(Request $request) {
+    public function getUserInfo(Request $request) {
         logger("getUserInfo() Start");
 
         // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
@@ -123,7 +123,7 @@ class AuthController extends ApiController
         $cid = data_get($payload,"cid",null);
 
         // TBD:認証情報からIDを特定する
-        $response = $this->getAuthSelectLogic()->getUserMoreInfo($cid);
+        $response = $this->getAuthSelectLogic()->getUserInfo($cid);
         logger("getUserInfo() End");
         return response()->json($response);
     }

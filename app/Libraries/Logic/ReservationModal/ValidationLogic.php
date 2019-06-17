@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Constant\TaikenLesFlg;
 use App\Models\Constant\ShiftMasterFlg;
 
+use App\Models\OrderLesson;
+
 /**
  * 予約モーダルで使用するバリデーション
  *
@@ -20,7 +22,7 @@ class VaidationLogic
      */
     public static function validateShiftIdHash(array $params) {
         $validator = Validator::make($params, [
-            'sid' => 'required|string|exists:shift_master,shiftid_hash'
+            'sid' => 'required|string|exists:shift_master,shiftid_hash,flg,' . ShiftMasterFlg::VALID
         ]);
 
         return !$validator->fails();
@@ -34,7 +36,7 @@ class VaidationLogic
      */
     public static function validateShiftIdHashAndSheetNo(array $params) {
         $validator = Validator::make($params, [
-            'sid' => 'required|string|exists:shift_master,shiftid_hash',
+            'sid' => 'required|string|exists:shift_master,shiftid_hash,flg,' . ShiftMasterFlg::VALID,
             'sheet_no' => 'required|integer|min:1'
         ]);
 
@@ -52,16 +54,6 @@ class VaidationLogic
         $openDateTime = new \DateTime($openDateTime);
 
         return $currentDateTime >= $openDateTime;
-    }
-
-    /**
-     * レッスンスケジュールフラグ(shift_master.flg)が有効(Y)かどうか
-     *
-     * @param string $shiftMasterflag Y:有効、N：削除済み、C：休講
-     * @return bool
-     */
-    public static function isShiftMasterFlgValid(string $shiftMasterflag) {
-        return $shiftMasterflag === ShiftMasterFlg::VALID;
     }
 
     /**
@@ -144,5 +136,39 @@ class VaidationLogic
         $timeLimitDateTime->modify("-{$timeLimit} minute");
 
         return $currentDateTime <= $timeLimitDateTime;
+    }
+
+    /**
+     * 体験レッスン受講済みでないかつ予約済みでない場合
+     * 体験レッスン受講済みでないかつ予約済みの場合
+     * それぞれのバリデーション
+     *
+     * @param array $shiftMaster
+     * @param array $custMaster
+     * @return bool
+     */
+    public static function validateNotTakenTrialLesson(array &$shiftMaster, array &$custMaster) {
+        // 体験レッスン受講済み状態、体験レッスン予約済み状態取得
+        $trialLessonStatus = OrderLesson::getTrialLessonStatus($custMaster['cid']);
+
+        if (!$trialLessonStatus[0]) {
+            // 体験レッスン受講済みでない
+            if (!$trialLessonStatus[1]) {
+                // 体験レッスン受講済みでないかつ予約済みでない
+                if (!VaidationLogic::canTrialReservation($shiftMaster['taiken_les_flg'])) {
+                    // 体験予約不可のレッスンを指定
+                    return false;
+                }
+            } else {
+                // 体験レッスン受講済みでないかつ予約済み
+                $shiftDateTime = $shiftMaster['shift_date'] . $shiftMaster['ls_et'];
+                if (!VaidationLogic::validateTrialReservationDate($custMaster['memtype'], $shiftDateTime, $trialLessonStatus[2])) {
+                    // 予約済みの体験レッスンより前の日付のレッスンを指定
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

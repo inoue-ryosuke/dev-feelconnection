@@ -16,7 +16,7 @@ class CommonLogic
      * 例: 10 2019/01/01 10:00:00
      *
      * @param string $sheetLockRecord
-     * @return array [ 座席番号, タイムスタンプ(yyyy/mm/dd hh:ii:ss) ]
+     * @return array [ 'sheet_no' => 座席番号, 'timestamp' => タイムスタンプ(yyyy/mm/dd hh:ii:ss) ]
      */
     public static function pasrseSheetLockRecord(string $sheetLockRecord) {
         $index = strpos($sheetLockRecord, ' ');
@@ -28,7 +28,7 @@ class CommonLogic
         $sheetNo = substr($sheetLockRecord, 0, $index);
         $dateTime = substr($sheetLockRecord, $index + 1);
 
-        return [ (int)$sheetNo, $dateTime ];
+        return [ 'sheet_no' => (int)$sheetNo, 'timestamp' => $dateTime ];
     }
 
     /**
