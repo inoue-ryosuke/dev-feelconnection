@@ -291,7 +291,7 @@ class Cust extends BaseFormModel implements Authenticatable
 	 * 会員種別を返却する
 	 */
 	public function getMemTypeName() {
-		$append = "";
+		$memtype = $append = "";
         // 会員種別情報取得
 		$memtype = $this->hasOneMemType();
         // 変更スケジュール情報取得
@@ -305,11 +305,12 @@ class Cust extends BaseFormModel implements Authenticatable
 				// 店舗の変更履歴ではなく（所属店舗ID配列内に変更履歴の店舗IDがある）、会員種別変更時（現在の種別IDと違う）
 			    if ($schedule->sc_memtype != $memtype->mid && in_array($schedule->sc_tenpo,$okTenpoIds->toArray())) {
 					$append = "（変更登録あり）";
+					$memtype = $memtype->type_name;
 					break;
 			    }
 			}
 		}
-		return $this->name.$append;
+		return $memtype.$append;
 
 
 		if (is_null($memtype)) {
