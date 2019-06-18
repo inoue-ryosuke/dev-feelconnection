@@ -63,7 +63,7 @@ class LessonMasterSeeder extends BaseSeeder
         // レッスン分類3 ID
         $dao->lesson_class3 = 0;
         // レッスン名
-        $dao->lessonname = $lessonClass1->name . " " . $lessonClass2->name;
+        $dao->lessonname = $lessonClass1->name . " " . $lessonClass2->name ." 1";
         // アイコン名(プログラム名の取得先)
         $dao->iname = $dao->lessonname;
         // 予約可能会員種別ID cust_memtype.mid ※カンマ区切りで複数

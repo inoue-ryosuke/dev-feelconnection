@@ -7,14 +7,14 @@ use App\Exceptions\IllegalParameterException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 
-class UserMasterHist extends BaseModel implements Authenticatable
+class BelongTenpoHist extends BaseModel implements Authenticatable
 {
     use AuthenticatableTrait;
     /**
      * @var string テーブル名
      */
-    protected $table = 'user_master_hist';
-    protected $primaryKey = 'id';
+    protected $table = 'belong_tenpo_hist__c';
+    protected $primaryKey = 'id__c';
     protected $fillable = [
 
     ];

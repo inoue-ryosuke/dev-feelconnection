@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
             $this->call(LessonMasterSeeder::class);
             /** UserMasterSeederは、TenpoSeederが処理されている前提*/
             $this->call(UserMasterSeeder::class);
-            /** UserMasterHistSeederは、UserMasterSeeder,TenpoSeederが処理されている前提*/
-            $this->call(UserMasterHistSeeder::class);
+            /** BelongTenpoHistSeederは、UserMasterSeeder,TenpoSeederが処理されている前提*/
+            $this->call(BelongTenpoHistSeeder::class);
             /** ShiftMasterSeederは、TenpoSeeder、UserMasterSeeder、CustSeeder、LessonMasterSeeder、UserMasterHistSeederが処理されている前提*/
             $this->call(ShiftMasterSeeder::class);
             /** InviteSeederは、CustSeeder、LessonMasterSeederが処理されている前提*/

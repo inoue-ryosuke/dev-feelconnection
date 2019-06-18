@@ -48,7 +48,7 @@ class ShiftMasterSeeder extends BaseSeeder
         // 店舗情報の主キーを取得
         $tid = $tenpo->getAuthIdentifier();
         // スタッフ情報の取得
-        $instructor = UserMaster::leftjoin('user_master_hist', 'user_master.uid', 'user_master_hist.uid')->where('user_master_hist.tid', $tid)->where('user_master.teacher', UserMaster::TEACHER_VALID)->first();
+        $instructor = UserMaster::leftjoin('belong_tenpo_hist__c', 'user_master.uid', 'belong_tenpo_hist__c.uid__c')->where('belong_tenpo_hist__c.tid__c', $tid)->where('user_master.teacher', UserMaster::TEACHER_VALID)->first();
         //cust情報の取得
         $custList = Cust::take(5)->get();
         $custIds = $custList->implode("cid",",");

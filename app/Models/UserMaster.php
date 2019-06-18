@@ -45,6 +45,7 @@ class UserMaster extends BaseModel implements Authenticatable
      */
     public static function findInstructors ($limit, $offset, $type,$freeWord=null) {
         $query = self::makeQueryFindInstructors($freeWord);
+        logger($query->toSql());
         // レッスンスケジュールテーブルと結合
         $query->leftjoin('shift_master', 'user_master.uid', 'shift_master.teacher')
             ->whereNotNull('shift_master.shift_date');
@@ -84,12 +85,12 @@ class UserMaster extends BaseModel implements Authenticatable
         // 退職済みでないかつ先生フラグが1
         $query = self::where('user_master.alive_flg', self::ALIVE_VALID)
             ->where('user_master.teacher', self::TEACHER_VALID);
-        $query->leftjoin('user_master_hist', 'user_master.uid', 'user_master_hist.uid')
-            ->leftjoin('tenpo_master', 'user_master_hist.tid', 'tenpo_master.tid');
+        $query->leftjoin('belong_tenpo_hist__c', 'user_master.uid', 'belong_tenpo_hist__c.uid__c')
+            ->leftjoin('tenpo_master', 'belong_tenpo_hist__c.tid__c', 'tenpo_master.tid');
         // 検索ワードがリクエストされている場合、スタッフ名と店舗名で検索
         if ($freeWord) {
             $query->where(function ($obj) use ($freeWord) {
-                // 商品名またはJANコード
+                //
                 $obj->where("user_master.user_name", "LIKE", "%" . $freeWord . "%");
                 $obj->orWhere("tenpo_master.tenpo_name", "LIKE", "%" . $freeWord . "%");
             });
