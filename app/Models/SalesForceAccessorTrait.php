@@ -62,15 +62,15 @@ trait SalesForceAccessorTrait
      * @param mixed  $value
      * @return void
      */
-    public function setAttribute($key__c, $value)
+    public function setAttribute($key, $value)
     {
-        $method = array_search($key__c,static::$ex_setter);
+        $method = data_get(static::$ex_setter,$key);
         if ($method) {
             // モデル側が__c無しで記述しており、ミューテータで__cを向かせる場合はすでにカラムがある前提。
             //$this->attributes[$method] = $value;
-            $salesforceMutator = $this->attributes[$key__c] = $value;
+            $salesforceMutator = $this->attributes[$method] = $value;
             return $salesforceMutator;
         }
-        return parent::setAttribute($key__c, $value);
+        return parent::setAttribute($key, $value);
     }
 }
