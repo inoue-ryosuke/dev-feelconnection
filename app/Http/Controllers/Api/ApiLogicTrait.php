@@ -73,10 +73,10 @@ trait ApiLogicTrait {
     }
 
     /**
-     * AccountRegistのSelectロジックを取得する
-     * @return AccountRegistSelectLogic
+     * MailCheckのSelectロジックを取得する
+     * @return MailCheckSelectLogic
      */
-    public function getAccountRegistSelectLogic() {
+    public function getMailCheckSelectLogic() {
         return $this->getApiLogic(Loader::MailCheck, Loader::SELECT);
     }
 

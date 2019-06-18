@@ -8,18 +8,18 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+
 use App\Mail\RegistMail;
+use App\Mail\PasswdIssueMail;
+use App\Mail\MailResetMail;
 
 use App\Models\RegistAuth;
-
 
 class SelectLogic extends BaseLogic
 {
 
-    //  config/validation配下のファイルを指定
-    const VALIDATE_KEY_PREFIX = "mailcheck";
-
-    private $_rules;
+    private $_type;
+    private $_mail_address;
 
     /**
      * 起動時コンストラクタ
@@ -34,25 +34,31 @@ class SelectLogic extends BaseLogic
     * @param $payload
     * @return
     */
-    public function validateRegistMailAddress($payload)
+    public function validateMailAddress($type, $payload)
     {
         logger(__CLASS__.':'.__METHOD__.' start');
         
         logger($payload);
         
+        $this->_type = $type;
+        $this->_mail_address = data_get($payload, 'mail_address', null);
+        
         $result_code = 0;
-        $redirect_url = url('api/registmailcomplete');
         $errors = [];
+        //  処理区分別リダイレクトURL取得
+        $redirect_url = $this->getRedirectURL();
         
-        $key = self::getValidationKey($payload);
-        
+        //  処理区分別バリデーションキー取得
+        $key = self::getValidationKey();
         //  バリデーションチェック
+        logger('validation.mailcheck.'.$key.'.attributes');
         $validator = validator(
             $payload,
-            config('validation.'.self::VALIDATE_KEY_PREFIX.'.'.$key.'.rules', []),
+            config('validation.mailcheck.'.$key.'.rules', []),
             config('validation.common.errors'),
-            config('validation.'.self::VALIDATE_KEY_PREFIX.'.'.$key.'.attributes')
+            config('validation.mailcheck.'.$key.'.attributes')
         );
+        //  バリデーションエラー処理
         if ($validator->fails()) {
             logger()->debug($validator->errors());
             $errors = json_encode($validator->errors(), JSON_UNESCAPED_UNICODE);
@@ -65,14 +71,16 @@ class SelectLogic extends BaseLogic
             ];
         }
         
+        //  TODO    認証が通ったら正規の取得方法に変える
+        //$user = auth('customer')->user();
+        $cid = 999;
         //  バリデーションOKなら認証テーブルに登録してメール送信
-        DB::transaction(function () use($payload) {
-            $mailaddress = data_get($payload, 'mail_address', null);
+        DB::transaction(function () use($cid) {
             //  認証用ハッシュ生成
             $token = Str::random(64);
-            (new RegistAuth)->insertByEmail($mailaddress, RegistAuth::IS_REGIST, $token);
+            (new RegistAuth)->insertByEmail($this->_mail_address, $this->_type, $cid, $token);
             //  メール送信
-            Mail::to($mailaddress)->send(new RegistMail($token));
+            Mail::to($this->_mail_address)->send($this->getMailObject($token));
         });
         
         logger([$result_code, $redirect_url, $errors]);
@@ -88,18 +96,53 @@ class SelectLogic extends BaseLogic
     }
 
     /**
-    * タイプ別バリデーションキー取得
+    * 処理区分別リダイレクトURL取得
     * @param $payload
     * @return $key
     */
-    private function getValidationKey($payload)
+    private function getRedirectURL()
     {
         logger(__CLASS__.':'.__METHOD__.' start');
         
-        $type = data_get($payload, 'type', null);
+        $url = '';
+        switch ($this->_type) {
+            case RegistAuth::IS_REGIST:
+                //  登録
+                $url = url('api/registmailcomplete');
+                break;
+            
+            case RegistAuth::IS_PASSWD:
+                //  パスワード再設定
+                $url = url('api/passwdissuecomplete');
+                break;
+            
+            case RegistAuth::IS_MAILADDRESS:
+                //  メールアドレス変更
+                $url = url('api/changemailcomplete');
+                break;
+            
+            default:
+                $url = '';
+                break;
+        }
+        
+        logger(__CLASS__.':'.__METHOD__.' end');
+        
+        return $url;
+        
+    }
+    
+    /**
+    * 処理区分別バリデーションキー取得
+    * @param $payload
+    * @return $key
+    */
+    private function getValidationKey()
+    {
+        logger(__CLASS__.':'.__METHOD__.' start');
         
         $key = '';
-        switch ($type) {
+        switch ($this->_type) {
             case RegistAuth::IS_REGIST:
                 //  登録
                 $key = 'accountRegist';
@@ -107,12 +150,12 @@ class SelectLogic extends BaseLogic
             
             case RegistAuth::IS_PASSWD:
                 //  パスワード再設定
-                $key = 'passwdReset';
+                $key = 'passwdIssue';
                 break;
             
             case RegistAuth::IS_MAILADDRESS:
                 //  メールアドレス変更
-                $key = 'mailaddressChange';
+                $key = 'mailaddressReset';
                 break;
             
             default:
@@ -125,5 +168,43 @@ class SelectLogic extends BaseLogic
         return $key;
         
     }
+    
+    /**
+    * 処理区分別バリデーションキー取得
+    * @param $payload
+    * @return $key
+    */
+    private function getMailObject($token)
+    {
+        logger(__CLASS__.':'.__METHOD__.' start');
+        
+        $obj = '';
+        switch ($this->_type) {
+            case RegistAuth::IS_REGIST:
+                //  登録
+                $obj = new RegistMail($token);
+                break;
+            
+            case RegistAuth::IS_PASSWD:
+                //  パスワード再設定
+                $obj = new PasswdIssueMail($token);
+                break;
+            
+            case RegistAuth::IS_MAILADDRESS:
+                //  メールアドレス変更
+                $obj = new MailResetMail($token);
+                break;
+            
+            default:
+                $obj = '';
+                break;
+        }
+        
+        logger(__CLASS__.':'.__METHOD__.' end');
+        
+        return $obj;
+        
+    }
+    
     
 }
