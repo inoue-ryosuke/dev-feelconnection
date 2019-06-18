@@ -25,6 +25,16 @@ class CustMemType extends BaseFormModel implements Authenticatable
      *
      * @var array
      */
+    protected static $salesforceAccessor = [
+            'cid', 
+			'name',
+			'h_buil',
+			'dm_list',
+			'pc_conf'
+    ];
+    protected static $append = [
+	];
+
     protected $fillable = [
 		"type_name",
 		"status",

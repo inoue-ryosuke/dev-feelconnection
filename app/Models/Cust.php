@@ -16,9 +16,19 @@ class Cust extends BaseFormModel implements Authenticatable
 //class Cust extends SalesBaseFormModel implements Authenticatable
 {
 //    use AuthenticatableTrait, ListingTrait, SoftDeletes, TokenizerTrait,UserTrait, UserStatusTrait;
-    use AuthenticatableTrait;
+	use AuthenticatableTrait;
 
-    /**
+	protected static $salesforceAccessor = [
+            'cid', 
+			'name',
+			'h_buil',
+			'dm_list',
+			'pc_conf'
+    ];
+    protected static $append = [
+	];
+
+	/**
      * @var string テーブル名
      */
     protected $table = 'cust_master';
@@ -27,12 +37,13 @@ class Cust extends BaseFormModel implements Authenticatable
 //    protected $table = 'cust_master__c';
 //    protected $primaryKey = 'cid__c';
 //    protected $loginKey = 'cid__c';
-    /**
+
+     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
+	protected $fillable = [
 		"flg",
 		"webmem",
 		"login_pass",
@@ -176,7 +187,7 @@ class Cust extends BaseFormModel implements Authenticatable
 
 	// モデル結合アクセサ（会員区分）
     public function joinAllMemType() {
-        return $this->hasOne(CustMemType::Class,"mid","memtype");
+        return $this->hasOne(CustMemType::Class,"mid","memtype")->withDefault();
 //		return $this->hasOne(CustMemType::Class,"mid__c","memtype");
 	}
     public function hasOneMemType() {

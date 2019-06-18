@@ -18,10 +18,18 @@ class SelectLogic
 
         //ログイン認証情報から関連情報を取得する
         $custinfo = auth("customer")->user();
+        //echo "getAccess[".$custinfo->cid__c."]</br>";
+        //echo "getAccess[".$custinfo->name__c."]</br>";
+        //echo "getAccess[".$custinfo->h_buil__c."]</br>";
         if (!$custinfo) {
             throw new BadRequestException(); // Hander経由レスポンスの場合
         }
         $response = [
+            "salesforce" => [
+                "cid__c" => $custinfo->cid__c,
+                "name__c" => $custinfo->name__c,
+                "h_buil__c" => $custinfo->h_buil__c,
+            ],
             "result_code" => 0,
             "name" => $custinfo->name,    
             "kana" => $custinfo->kana,

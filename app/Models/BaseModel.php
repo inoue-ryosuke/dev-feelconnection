@@ -21,6 +21,12 @@ class BaseModel extends Model implements IEditable {
     public static function getTableName() {
         return (new static)->getTable();
     }
+    // 各モデルで定義するSalesForce用項目
+    protected static $salesforceAccessor = [
+//            'cid', 
+//			'name',
+//			'h_buil'
+    ];
 
     /**
      * フォーム値から値を取得する。

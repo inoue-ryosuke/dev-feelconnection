@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Concerns\GuardsAttributes;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\SalesForceAccessorTrait as SalesForceAccessorTrait;
 
 /**
  * 設定ベースでデータアクセスの抽象クラス
@@ -11,9 +12,12 @@ use Illuminate\Database\Eloquent\Model;
 class BaseFormModel extends BaseModel implements IEditable {
 
     //use FormTrait, ImportTrait;
+    use SalesForceAccessorTrait;
+
     protected $formKey = false;
     // 接続先DBを指定
     protected $connection = 'pgsql';
+    
     /**
      * BaseFormModel constructor.
      * @param array $attributes
