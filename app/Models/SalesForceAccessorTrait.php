@@ -1,6 +1,9 @@
 <?php
 namespace App\Models;
 
+use App\Exceptions\InternalErrorException;
+use DB;
+
 trait SalesForceAccessorTrait
 {
 
@@ -15,10 +18,30 @@ trait SalesForceAccessorTrait
     public static function boot()
     {
         parent::boot();
+        $tablename = (new static)->getTable();
+        $primary   = (new static)->primaryKey;
+        $accessorList = static::$salesforceAccessor;
+        // モデルのテーブル名が__c付きになってない場合、後続処理はさせない
+        if (!preg_match("#^(.+)__c$#",$tablename)) {
+            throw new InternalErrorException("Salesforce用のテーブル構成になっていません");
+        }
+        // モデルのプライマリキーが__c付きになってない場合、後続処理はさせない
+        if (!preg_match("#^(.+)__c$#",$primary)) {
+            throw new InternalErrorException("Salesforce用の主キー構成になっていません");
+        }
+        if (empty($accessorList)) {
+            // TBD:カラム定義がない場合は、テーブルの全カラムを取得する
+            //
+            // テーブルの全てのカラム実体は「__c付き」なので、__cなしでアクセスした場合__c付きでアクセスしたものと同一にする
+            //   「__c無し」でも「__c付き」を参照可能にする：__c無しのアクセサ準備
+            //   「__c無し」でも「__c付き」へ保存可能にする：__c無しのアクセサ準備
+            throw new InternalErrorException("Salesforce用のカラム一覧が定義されていません");
+        }
+        // アクセサ・ミューテタ定義
         foreach (static::$salesforceAccessor as $target) {
 //            echo "TARGET[".$target."]<br />";
-                self::setAccessor($target, $target."__c", 'get');
-                self::setAccessor($target, $target."__c", 'set');
+                self::setAccessor($target."__c", $target, 'get');
+                self::setAccessor($target."__c", $target, 'set');
         }
     }
 
@@ -39,38 +62,38 @@ trait SalesForceAccessorTrait
 
     /**
      * getAttributeメソッドの書き換え
+     * Salesforceスキーマは__cが存在し、__c無しは存在しない。
+     * なので、アクセサとしては__cなしを準備して、参照先を__c付き（実態）にする
      *
      * @param string $key
      * @return mixed
      */
-    public function getAttribute($key__c)
+    public function getAttribute($method)
     {
-        $method = array_search($key__c,static::$ex_getter);
-        if ($method) {
-            $salesforceAccessor = $this->attributes[$key__c] = $this->$method;
+        $key__c = array_search($method,static::$ex_getter);
+        if ($key__c) {
+            $salesforceAccessor = $this->attributes[$method] = $this->$key__c;
             return $salesforceAccessor;
         }
-        return parent::getAttribute($key__c);
+        return parent::getAttribute($method);
     }
 
     /**
      * setAttributeメソッドの書き換え　（モデル処理で $dao->column となっていても、
      * 接続先がsalesforceの場合 $dao->column__c としてアクセスする。
-     * （）
      *
      * @param string $key   
      * @param mixed  $value
      * @return void
      */
-    public function setAttribute($key, $value)
+    public function setAttribute($method, $value)
     {
-        $method = data_get(static::$ex_setter,$key);
-        if ($method) {
+        $key__c = array_search($method,static::$ex_setter);
+        if ($key__c) {
             // モデル側が__c無しで記述しており、ミューテータで__cを向かせる場合はすでにカラムがある前提。
-            //$this->attributes[$method] = $value;
-            $salesforceMutator = $this->attributes[$method] = $value;
+            $salesforceMutator = $this->attributes[$key__c] = $value;
             return $salesforceMutator;
         }
-        return parent::setAttribute($key, $value);
+        return parent::setAttribute($method, $value);
     }
 }
