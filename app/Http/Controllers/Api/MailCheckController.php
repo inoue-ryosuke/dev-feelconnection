@@ -15,154 +15,63 @@ class MailCheckController extends ApiController
     use ApiLogicTrait;
     
     /**
-     * @POST("api/mailcheck", as="api.mailcheck.post")
+     * @POST("api/mailcheck/regist", as="api.mailcheck.regist.post")
      * @param Request $request
      * @return
      */
-    public function chkMail(Request $request)
+    public function regist(Request $request)
     {
     
-        logger("chkMail() Start");
+        logger(__CLASS__.':'.__METHOD__.' start');
         logger($request->all());
 
         $type = $request->input('type');
         $payload = $request->getContent();
         $payload = json_decode($payload, true);
-        //  処理分岐
-        if ($type == RegistAuth::IS_REGIST) {
-            //  登録
-//            $this->validateApiPayload('mailcheck.accountRegist', $payload);
-            $response = $this->getAccountRegistSelectLogic()->validateRegistMailAddress($payload);
-        }
-        elseif ($type == RegistAuth::IS_PASSWD) {
-            //  パスワード再設定
-            $result = self::passwd($request);
-        }
-        elseif ($type == RegistAuth::IS_MAILADDRESS) {
-            //  メールドレス再設定
-            $result = self::mail($request);
-        }
-        else {
-            //  例外
-            //  400エラーにする
-            return response()
-                    ->json([ 'パラメータエラー' ])
-                    ->setStatusCode(Response::HTTP_BAD_REQUEST);
-        }
+        $response = $this->getMailCheckSelectLogic()->validateMailAddress(RegistAuth::IS_REGIST, $payload);
         
-        logger("chkMail() End");
+        logger(__CLASS__.':'.__METHOD__.' end');
         return response()->json($response);
     }
     
     /**
-     * 
-     * アカウント登録開始処理
-     * 
+     * @POST("api/mailcheck/passwdreset", as="api.mailcheck.passwdreset.post")
      * @param Request $request
      * @return
      */
-    private function regist(Request $request)
+    public function passwdReset(Request $request)
     {
+    
+        logger(__CLASS__.':'.__METHOD__.' start');
+        logger($request->all());
+
+        $type = $request->input('type');
+        $payload = $request->getContent();
+        $payload = json_decode($payload, true);
+        $response = $this->getMailCheckSelectLogic()->validateMailAddress(RegistAuth::IS_PASSWD, $payload);
         
-//        logger("chkMail() Start");
-        
-        $error_messages = [];
-        $result_code = 0;
-        $redirect_url = ""; //  TODO    遷移先決まったら入れる
-        
-        $redirect_url = '';
-        //  メールアドレス存在バリデーション
-        $validator = Validator::make($request->all(), [
-            'mail_address' => 'required|email|unique:cust_master,pc_mail',
-        ]);
-        
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            if ($errors->has('mail_address')) {
-                $error_messages['mail_address'] = $errors->first('mail_address');
-            }
-            //  エラーの時はリダイレクトURLをクリアにする
-            $result_code = 1;
-            $redirect_url = "";
-        }
-        else{
-            //  認証テーブルに追加及び認証付きメール送信
-        }
-        
-//        logger("getUserInfo() End");
-        return response()->json([$result_code, $redirect_url, $error_messages]);
-        
+        logger(__CLASS__.':'.__METHOD__.' end');
+        return response()->json($response);
     }
     
     /**
-     * 
-     * パスワード再発行処理
-     * 
+     * @POST("api/mailcheck/mailreset", as="api.mailcheck.mailreset.post")
      * @param Request $request
      * @return
      */
-    private function passwd(Request $request)
+    public function mailReset(Request $request)
     {
-        
-        $error_messages = [];
-        $result_code = 0;
-        $redirect_url = ""; //  TODO    遷移先決まったら入れる
-        
-        $redirect_url = '';
-        //  メールアドレス存在バリデーション
-        $validator = Validator::make($request, [
-            'mail_address' => [
-                'required', 'email', 'exists:cust_master, pc_mail',],
-        ]);
-        
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            if ($errors->has('mail_address')) {
-                $error_messages['mail_address'] = $errors->first('mail_address');
-            }
-            //  エラーの時はリダイレクトURLをクリアにする
-            $result_code = 1;
-            $redirect_url = "";
-        }
-        else{
-            //  認証テーブルに追加及び認証付きメール送信
-        }
-        
-//        logger("getUserInfo() End");
-        return response()->json([$result_code, $redirect_url, $error_messages]);
-        
-    }
     
-    /**
-     * 
-     * メールアドレス再設定処理
-     * 
-     * @param Request $request
-     * @return
-     */
-    private function mail(Request $request)
-    {
+        logger(__CLASS__.':'.__METHOD__.' start');
+        logger($request->all());
+
+        $type = $request->input('type');
+        $payload = $request->getContent();
+        $payload = json_decode($payload, true);
+        $response = $this->getMailCheckSelectLogic()->validateMailAddress(RegistAuth::IS_MAILADDRESS, $payload);
         
-        $error_messages = [];
-        $result_code = 0;
-        $redirect_url = ""; //  TODO    遷移先決まったら入れる
-        
-        $redirect_url = '';
-        //  メールアドレス存在バリデーション
-        $validator = Validator::make($request, [
-            'mail_address' => [
-                'required', 'email', 'exists:cust_master, pc_mail',],
-        ]);
-        
-        //  メールアドレスし設定の場合はエラーになっても正常終了にする
-        //  但し、認証URL付きメールの送信は行わない
-        if (!$validator->fails()) {
-            //  認証テーブルに追加及び認証付きメール送信
-        }
-        
-//        logger("getUserInfo() End");
-        return response()->json([$result_code, $redirect_url, $error_messages]);
-        
+        logger(__CLASS__.':'.__METHOD__.' end');
+        return response()->json($response);
     }
     
 }

@@ -107,5 +107,15 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
         return $query->orderBy('tid', 'ASC')->get();
 //        return $query->orderBy('prefecture_code', 'ASC')->get();
     }
-    
+
+    /**
+     * 店舗レコードを返却する
+     * 
+     * @param unknown $tid 店舗ID
+     * @return unknown
+     */
+    public static function getShopById($tid) {
+        $record = self::find($tid);
+        return $record;
+    }
 }

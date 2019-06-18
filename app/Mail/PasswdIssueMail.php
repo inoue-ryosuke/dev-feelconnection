@@ -7,14 +7,14 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class RegistMail extends Mailable
+class PasswdIssueMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     protected $mailaddress;
     protected $token;
     
-    const CONFIG_KEY = 'constant.mailCheck.regist';
+    const CONFIG_KEY = 'constant.mailCheck.passwdIssue';
     
     /**
      * Create a new message instance.

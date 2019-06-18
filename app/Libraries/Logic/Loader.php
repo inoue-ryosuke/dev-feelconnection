@@ -19,6 +19,7 @@ class Loader
     const Music        = 'Music';
     const Auth          = "Authentication";
     const MailCheck     = "MailCheck";
+    const MemtypeChange = "MemtypeChange";
 
     // 機能
     const SELECT = 'Select';

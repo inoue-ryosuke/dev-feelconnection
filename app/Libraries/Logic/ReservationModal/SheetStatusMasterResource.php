@@ -37,9 +37,12 @@ class SheetStatusMasterResource extends ReservationMasterResource {
 
     /** DBのマスタデータ取得 */
     public function createDBResource() {
-        $model = ShiftMaster::where('shiftid_hash', '=', $this->shiftIdHash)->first([ 'shiftid', 'open_datetime' ]);
-        $this->shiftMaster['shiftid'] = $model->shiftid;
-        $this->shiftMaster['open_datetime'] = $model->open_datetime;
+        $model = ShiftMaster::getShiftMasterResource($this->shiftIdHash);
+
+        $this->setShiftMasterResourceByModel($model);
+
+        // キャッシュ生成
+        $this->createShiftMasterCache();
 
         // TODO 会員情報取得処理
         $this->custMaster['cid'] = 1;

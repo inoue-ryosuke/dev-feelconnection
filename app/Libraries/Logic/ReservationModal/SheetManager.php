@@ -22,6 +22,11 @@ class SheetManager
     /** 予約モーダル種別 */
     private $modalType;
 
+    /** レッスンスケジュールIDごとのバイク枠確保キープレフィックス */
+    const SHEET_LOCK_SHIFTID_PREFIX = 'sheet_lock_shiftid:';
+    /** 会員IDごとのバイク枠確保キープレフィックス */
+    const SHEET_LOCK_CID_PREFIX = 'sheet_lock_cid:';
+
     /**
      *
      * @param int $shiftId shift_master.shiftid
@@ -135,21 +140,21 @@ class SheetManager
      * @return array バイク枠確保している座席一覧(Redis)
      */
     private function getSecureSheetList() {
-        return RedisWrapper::hGetAll('sheet_lock_shiftid:' . $this->shiftId);
+        return RedisWrapper::hGetAll(self::SHEET_LOCK_SHIFTID_PREFIX . $this->shiftId);
     }
 
     /**
      * バイクの予約状態をスタジオ情報に登録、予約モーダル種別を登録
+     * DB(order_lesson)の値のみ反映
      *
      * @param int $customerId cust_master.cid
      */
-    public function setSheetStatusAndModalType(int $customerId) {
+    public function setSheetStatusAndModalTypeByOrderLesson(int $customerId) {
         $collection = OrderLesson::getReservedSheetList($this->shiftId);
-        $secureSheetList = $this->getSecureSheetList();
 
         // 予約済み座席数 == スタジオ座席数の場合は、予約モーダル-3(キャンセル待ち登録)で登録
         // $this->studio->getSheetCount();
-        if (count($secureSheetList) !== 0 && count($secureSheetList) === count($this->studio)) {
+        if ($collection->count() !== 0 && $collection->count() === count($this->studio)) {
             $this->modalType = ReservationModalType::MODAL_3;
         }
 
@@ -173,6 +178,16 @@ class SheetManager
                 }
             }
         }
+    }
+
+    /**
+     * バイクの予約状態をスタジオ情報に登録、予約モーダル種別を登録
+     * バイク枠確保情報(Redis)の値のみ反映
+     *
+     * @param int $customerId cust_master.cid
+     */
+    public function setSheetStatusAndModalTypeBySheetLock(int $customerId) {
+        $secureSheetList = $this->getSecureSheetList();
 
         // バイク枠確保済み座席番号、会員ID一覧取得
         $sheetNoCustomerIdList = self::getReservedSheetNoCustomerIdList($secureSheetList);
@@ -192,7 +207,7 @@ class SheetManager
      */
     private function getReservedSheetNoCustomerIdList(array $secureSheetList) {
         $keyLimt = RedisKeyLimit::SHEET_LOCK;
-        $shiftIdHashKey = 'sheet_lock_shiftid:' . $this->shiftId;
+        $shiftIdHashKey = self::SHEET_LOCK_SHIFTID_PREFIX . $this->shiftId;
         $currentDateTime = new \DateTime();
         $results = array();
 
@@ -207,7 +222,7 @@ class SheetManager
                 // レッスンスケジュールごとのバイク枠確保キーを削除
                 RedisWrapper::hDel($shiftIdHashKey, $customerIdkey);
                 // 会員IDごとのバイク枠確保キーを削除
-                RedisWrapper::hDel("sheet_lock_cid:{$customerIdkey}", $this->shiftId);
+                RedisWrapper::hDel(self::SHEET_LOCK_CID_PREFIX . $customerIdkey, $this->shiftId);
 
                 continue;
             }
@@ -282,6 +297,50 @@ class SheetManager
 
             return SheetStatus::RESERVABLE;
         }
+    }
+
+    /**
+     * 指定されたバイク枠を延長、バイク枠確保していない場合は失敗
+     *
+     * @param int $sheetNo 座席番号
+     * @param int $customerId 会員ID
+     * @return bool 延長結果
+     */
+    public function extendSheetLock(int $sheetNo, int $customerId) {
+        $hash = RedisWrapper::hGetAll(self::SHEET_LOCK_SHIFTID_PREFIX . $this->shiftId);
+
+        if (!isset($hash[$customerId])) {
+            // 会員が指定したレッスンスケジュールでバイク枠確保していない
+            return false;
+        }
+
+        // 座席番号 タイムスタンプ
+        $sheetNoDateTime = $hash[$customerId];
+        $sheetNoDateTimeArray = CommonLogic::pasrseSheetLockRecord($sheetNoDateTime);
+
+        if ($sheetNoDateTimeArray['sheet_no'] !== $sheetNo) {
+            // バイク枠確保している座席と指定座席が異なる
+            return false;
+        }
+
+        // バイク枠確保延長
+        $currentDateTime = new \DateTime();
+
+        // sheet_lock_shiftid:ID 更新
+        RedisWrapper::hSet(
+            self::SHEET_LOCK_SHIFTID_PREFIX . $this->shiftId,
+            $customerId,
+            $sheetNo . ' ' . $currentDateTime->format('Y/m/d H:i:s')
+        );
+
+        // sheet_lock_cid:ID 更新
+        RedisWrapper::hSet(
+            self::SHEET_LOCK_CID_PREFIX . $customerId,
+            $this->shiftId,
+            $sheetNo . ' ' . $currentDateTime->format('Y/m/d H:i:s')
+        );
+
+        return true;
     }
 
 }

@@ -41,4 +41,15 @@ class CustMemType extends BaseFormModel implements Authenticatable
     const CREATED_AT = null;
     const UPDATED_AT = null;
 	const DELETED_AT = null;
+
+   /**
+    * 会員種別レコードを返却する
+    * 
+    * @param unknown $mid 会員種別ID
+    * @return unknown
+    */
+	public static function getMemTypeById($mid) {
+        $record = self::find($mid);
+        return $record;
+    }
 }
