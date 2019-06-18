@@ -170,11 +170,13 @@ class VaidationLogic
      * 会員種別が予約可能会員種別(tenpo_master.tenpo_memtype, カンマ区切り複数)かどうか
      * 未来の会員種別(レッスン開催日時点の会員種別)で判別
      *
-     * @param int $futureMemberType レッスン日(yyyy/mm/dd)
-     * @param string $availableTenpos 開始時間(hh:ii:ss)
+     * @param int $futureMemberType 会員種別 cust_memtype.mid
+     * @param string $availableTenpos 予約可能会員種別(tenpo_master.tenpo_memtype, カンマ区切り複数)
      * @return bool
      */
     public static function isMemberTypeReservable(int $futureMemberType, string $availableTenpos) {
+        $tenpos = explode(",", $availableTenpos);
 
+        return in_array($futureMemberType, $tenpos);
     }
 }
