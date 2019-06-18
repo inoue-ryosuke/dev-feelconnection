@@ -115,7 +115,7 @@ class ReservationModalController extends Controller
         $sheetManager = new SheetManager($shiftMaster['shiftid']);
         $sheetManager->initStudio();
         $sheetManager->setSheetStatusAndModalType($custMaster['cid']);
-        $sheetManager->fillNotSpecialSheetTrial($custMaster['memtype']);
+        $sheetManager->fillNotSpecialTrialSheet($custMaster['memtype']);
 
         return response()->json([
             'response_code' => Response::HTTP_OK,
@@ -285,7 +285,7 @@ class ReservationModalController extends Controller
         $sheetManager = new SheetManager($shiftMaster['shiftid']);
         $sheetManager->initStudio();
         $sheetManager->setSheetStatusAndModalType($custMaster['cid']);
-        $sheetManager->fillNotSpecialSheetTrial($custMaster['memtype']);
+        $sheetManager->fillNotSpecialTrialSheet($custMaster['memtype']);
 
         // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
         if (!$sheetManager->isSheetNoValid($sheet_no)) {

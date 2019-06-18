@@ -2,6 +2,8 @@
 
 namespace App\Libraries\Logic\ReservationModal;
 
+use App\Models\Schedule;
+
 /**
  * 予約で必要なRedis・DBのマスター情報
  *
@@ -52,6 +54,11 @@ abstract class ReservationMasterResource {
     protected $tenpoMaster;
     protected $custMaster;
 
+    /** 未来の会員種別 */
+    protected $futureMemberType;
+    /** 未来の所属店舗 */
+    protected $futureTenpos;
+
     /**
      *
      * @param string $shiftIdHash shift_master.shiftid_hash
@@ -62,6 +69,10 @@ abstract class ReservationMasterResource {
         $this->shiftMaster = [];
         $this->lessonMaster = [];
         $this->tenpoMaster = [];
+        $this->custMaster = [];
+
+        $this->futureMemberType = null;
+        $this->futureTenpos = [];
     }
 
     /**
@@ -144,5 +155,37 @@ abstract class ReservationMasterResource {
              . $this->lessonMaster['lesson_class2_name'] . ' '
              . $this->lessonMaster['lesson_class3_name']
         ;
+    }
+
+    /**
+     * 未来の会員種別、所属店舗登録
+     * TODO: 未来の所属店舗複数
+     *
+     */
+    public function setFutureMemberTypeTenpos() {
+        $collection = Schedule::getFutureMemberTypeList($this->custMaster['cid']);
+
+        // レッスン開催日
+        $shiftDateTime = new \DateTime($this->shiftMaster['shift_date']);
+
+        // 未来の会員種別
+        $futureMemberType = $this->custMaster['memtype'];
+        // 未来の所属店舗
+        $futureTenpos = [];
+
+        foreach ($collection as $model) {
+            $scheduleDateTime = new \DateTime($model->sc_date);
+
+            if ($scheduleDateTime > $shiftDateTime) {
+                // スケジュール実行日がレッスン開催日より後
+                break;
+            }
+
+            $futureMemberType = $model->sc_memtype;
+            $futureTenpos[0] = $model->sc_tepo;
+        }
+
+        $this->futureMemberType = $futureMemberType;
+        $this->futureTenpos = $futureTenpos;
     }
 }

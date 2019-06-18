@@ -3,20 +3,22 @@
 namespace App\Models\Constant;
 
 /**
- * taiken_mess(体験制限)値一覧
- * shift_master
- * lesson_master_tenpo
+ * schedule.sc_flg値一覧
+ *
  */
-class TaikenMess
+class ScheduleScFlg
 {
-    /** 非表示 */
-    const NO_DISPLAY = 0;
-    /** 表示 */
-    const DISPLAY = 1;
+    /** 削除済み */
+    const DELETED = 0;
+    /** スケジュール実行前 */
+    const BEFORE_EXECUTION = 1;
+    /** スケジュール実行済み */
+    const EXECUTED = 2;
 
     protected static $data = [
-        ['id' => self::NO_DISPLAY, 'name' => '非表示'],
-        ['id' => self::DISPLAY, 'name' => '表示'],
+        ['id' => self::DELETED, 'name' => '削除済み'],
+        ['id' => self::BEFORE_EXECUTION, 'name' => 'スケジュール実行前'],
+        ['id' => self::EXECUTED, 'name' => 'スケジュール実行前'],
     ];
 
     /**
