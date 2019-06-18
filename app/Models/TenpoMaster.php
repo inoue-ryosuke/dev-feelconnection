@@ -104,8 +104,8 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
             'tenpo_master.*',
             'user_master_hist.uid'
         );
-
-        return $query->orderBy('prefecture_code', 'ASC')->get();
+        return $query->orderBy('tid', 'ASC')->get();
+//        return $query->orderBy('prefecture_code', 'ASC')->get();
     }
     
 }
