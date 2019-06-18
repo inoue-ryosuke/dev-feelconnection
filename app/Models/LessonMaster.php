@@ -48,8 +48,9 @@ class LessonMaster extends BaseFormModel implements Authenticatable
         }
 
         $query = self::where(self::TABLE.'.lid', $lid)
-            ->where(self::TABLE.'.flg', self::VALID)
-            ->where(self::TABLE.'.reserve_limit',  '>=', Carbon::now()->format('Y-m-d H:i:s'));
+            ->where(self::TABLE.'.flg', self::VALID);
+            // TODO reserve_limitには何分前(実際の値は数値の10)という情報しかないので、現在時刻との比較ができない。要API設計修正。
+//            ->where(self::TABLE.'.reserve_limit',  '>=', Carbon::now()->format('Y-m-d H:i:s'));
 
         // 体験レッスンの条件を付加
         if ($trial === self::TRIAL) {

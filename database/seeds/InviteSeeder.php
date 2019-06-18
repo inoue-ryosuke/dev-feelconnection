@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\LessonClass1;
 use Illuminate\Database\Seeder;
 use App\Models\BaseFormModel;
 use App\Models\Cust;
@@ -40,7 +41,10 @@ class InviteSeeder extends BaseSeeder
 
     protected function insertRecord($record = []) {
             // 体験予約可能なレッスンIDを設定
-            $record->lid = 1;
+            //lesson_master情報の取得 TODO custに紐づくtenpo_master,shift_masterからlesson_masterを取得するように要調整
+            $lessonList = LessonMaster::get();
+            $lessonMater = $lessonList->random();
+            $record->lid = $lessonMater->getAuthIdentifier();
             $invite = new Invite;
             $invite->mergeRequest($record);
             $invite->invite_code = $invite::makeInviteCode();
