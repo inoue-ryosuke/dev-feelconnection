@@ -27,6 +27,9 @@ class SheetManager
     /** 会員IDごとのバイク枠確保キープレフィックス */
     const SHEET_LOCK_CID_PREFIX = 'sheet_lock_cid:';
 
+    /** 未予約状態の座席の会員ID */
+    const RESERVABLE_SHEET_CUSTOMER_ID = 0;
+
     /**
      *
      * @param int $shiftId shift_master.shiftid
@@ -39,15 +42,15 @@ class SheetManager
      * スタジオ情報の初期化
      */
     public function initStudio() {
-        // スタジオ情報([座席番号, x, y, 座席ステータス, 特別エリア情報]のオブジェクト配列)の初期化
+        // スタジオ情報([座席番号, x, y, 座席ステータス, 特別エリア情報, 予約した会員のID]のオブジェクト配列)の初期化
         // $this->studio = new Studio($this->shiftId);
         // 仮データ
         $this->studio = array(
-            1 => [ 'x' => 1, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ] ],
-            2 => [ 'x' => 2, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ] ],
-            3 => [ 'x' => 2, 'y' => 2, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ] ],
-            4 => [ 'x' => 2, 'y' => 3, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ] ],
-            5 => [ 'x' => 5, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [] ]
+            1 => [ 'x' => 1, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ], 'customerId' => self::RESERVABLE_SHEET_CUSTOMER_ID ],
+            2 => [ 'x' => 2, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ], 'customerId' => self::RESERVABLE_SHEET_CUSTOMER_ID ],
+            3 => [ 'x' => 2, 'y' => 2, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ], 'customerId' => self::RESERVABLE_SHEET_CUSTOMER_ID ],
+            4 => [ 'x' => 2, 'y' => 3, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [ SpecialSheetType::TRIAL ], 'customerId' => self::RESERVABLE_SHEET_CUSTOMER_ID ],
+            5 => [ 'x' => 5, 'y' => 1, 'status' => SheetStatus::RESERVABLE, 'special_area_info' => [], 'customerId' => self::RESERVABLE_SHEET_CUSTOMER_ID ]
         );
 
         // 予約モーダル-1 (通常予約）
@@ -61,6 +64,17 @@ class SheetManager
      */
     public function getReservationModalType() {
         return $this->modalType;
+    }
+
+    /**
+     * 座席予約状態取得
+     *
+     * @param int $sheetNo 座席番号
+     * @return int
+     */
+    public function getSheetStatus(int $sheetNo) {
+        // $this->studio->getSheetStatus($sheetNo);
+        return $this->studio[$sheetNo]['status'];
     }
 
     /**
@@ -160,6 +174,8 @@ class SheetManager
 
         // DBから取得した予約状態から、座席予約状態を登録
         foreach ($collection as $model) {
+            $this->studio[$model->sheet]['customerId'] = $model->customerId;
+
             if ($model->customer_id !== $customerId) {
                 // 予約済みバイク
                 // $this->studio->setSheetStatus();
@@ -249,53 +265,6 @@ class SheetManager
                     $value['status'] = SheetStatus::RESERVED;
                 }
             }
-        }
-    }
-
-    /**
-     * 座席予約状態取得
-     *
-     * @param int $sheetNo 座席番号
-     * @param int $customerId 会員ID
-     * @return int
-     */
-    public function getSheetStatus(int $sheetNo, int $customerId, int $memberType) {
-        $model = OrderLesson::getReservedSheet($this->shiftId, $sheetNo);
-
-        if (!is_null($model)) {
-            // 座席が予約済み
-            if ($model->customer_id !== $customerId) {
-                // 予約済み
-                return SheetStatus::RESERVED;
-            } else {
-                // お客様の予約されたバイク
-                return SheetStatus::RESERVED_CUSTOMER;
-            }
-        } else {
-            // 座席が予約済みでない
-            $secureSheetList = $this->getSecureSheetList();
-
-            // TODO 会員種別を受け取って、ネット・トライアル会員を判別
-            if (true) { // $this->studio->getSheet($sheetNo)
-                if (!in_array(SpecialSheetType::TRIAL, $this->studio[$sheetNo]['special_area_info'], true)) {
-                    // 体験予約席でない場合は予約済み
-                    return SheetStatus::RESERVED;
-                }
-            }
-
-            // バイク枠確保済み座席番号、会員ID一覧取得
-            $sheetNoCustomerIdList = self::getReservedSheetNoCustomerIdList($secureSheetList);
-
-            foreach ($sheetNoCustomerIdList as $sheetNoCustomerId) {
-                // 指定された座席でログインユーザーが確保していない場合、予約済み
-                if ($sheetNoCustomerId['sheet_no'] === $sheetNo) {
-                    if ($sheetNoCustomerId['cid'] !==$customerId ) {
-                        return SheetStatus::RESERVED;
-                    }
-                }
-            }
-
-            return SheetStatus::RESERVABLE;
         }
     }
 
