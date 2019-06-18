@@ -3,6 +3,7 @@
 namespace App\Libraries\Logic\ReservationModal;
 
 use App\Models\Schedule;
+use App\Models\Constant\ReservationTablePrefix;
 
 /**
  * 予約で必要なRedis・DBのマスター情報
@@ -23,7 +24,7 @@ use App\Models\Schedule;
  * @var int gender 性別制限(0:制限なし、1:女性のみ、2:男性のみ)
  * @var int ls_menu レッスンID(lesson_master.lid)
  * @var time ls_et レッスン終了時間
- * @var int shift_tenpo_id 店舗ID(tenpo_master.tid)
+ * @var int shift_tenpoid 店舗ID(tenpo_master.tid)
  * @var int teacher インストラクターID(user_master.uid)
  * @var string instructor_name インストラクター名
  * @var string instructor_path_img インストラクター写真の画像パス
@@ -36,6 +37,7 @@ use App\Models\Schedule;
  * @var string lesson_class1_name レッスン分類1名
  * @var string lesson_class2_name レッスン分類2名
  * @var string lesson_class3_name レッスン分類3名
+ * @var string iname レッスン名
  *
  * @tenpo_master:ID
  * @var int tid 主キー
@@ -58,6 +60,13 @@ abstract class ReservationMasterResource {
     protected $futureMemberType;
     /** 未来の所属店舗 */
     protected $futureTenpos;
+
+    /** shift_masterのキャッシュキープレフィックス */
+    const SHIFT_MASTER_HASH_PREFIX = 'shift_master:';
+    /** lesson_masterのキャッシュキープレフィックス */
+    const LESSON_MASTER_HASH_PREFIX = 'lesson_master:';
+    /** tenpo_masterのキャッシュキープレフィックス */
+    const TENPO_MASTER_HASH_PREFIX = 'tenpo_master:';
 
     /**
      *
@@ -150,11 +159,120 @@ abstract class ReservationMasterResource {
      * @return string レッスン名
      */
     public function getLessonName() {
-        return
-           $this->lessonMaster['lesson_class1_name'] . ' '
-             . $this->lessonMaster['lesson_class2_name'] . ' '
-             . $this->lessonMaster['lesson_class3_name']
-        ;
+        return $this->lessonMaster['iname'];
+    }
+
+    /**
+     * shift_masterのキャッシュ生成
+     *
+     */
+    public function createShiftMasterCache() {
+        $hashKey = self::SHIFT_MASTER_HASH_PREFIX . $this->shiftIdHash;
+
+        RedisWrapper::hmSet($hashKey, $this->shiftMaster);
+        // ログ出力
+        logger()->debug("Create RedisCache {$hashKey} ");
+    }
+
+    /**
+     * lesson_masterのキャッシュ生成
+     *
+     */
+    public function createLessonMasterCache() {
+        $hashKey = self::LESSON_MASTER_HASH_PREFIX . $this->lessonMaster['lid'];
+
+        RedisWrapper::hmSet($hashKey, $this->lessonMaster);
+        // ログ出力
+        logger()->debug("Create RedisCache {$hashKey}");
+    }
+
+    /**
+     * tenpo_masterのキャッシュ生成
+     *
+     */
+    public function createTenpoMasterCache() {
+        $hashKey = self::TENPO_MASTER_HASH_PREFIX . $this->tenpoMaster['tid'];
+
+        RedisWrapper::hmSet($hashKey, $this->tenpoMaster);
+        // ログ出力
+        logger()->debug("Create RedisCache {$hashKey}");
+    }
+
+    /**
+     * Eloquentモデルを渡して、shift_masterのリソースにセット
+     * キャッシュに必要なすべてのカラムが必要
+     * Eloquentモデルのカラム名は、「ReservationTablePrefix::SM + カラム名」とする
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     */
+    public function setShiftMasterResourceByModel(\Illuminate\Database\Eloquent\Model $model) {
+        $this->shiftMaster = [];
+        $this->shiftMaster['shiftid'] = null;
+        $this->shiftMaster['flg'] = null;
+        $this->shiftMaster['open_datetime'] = null;
+        $this->shiftMaster['taiken_mess'] = null;
+        $this->shiftMaster['taiken_les_flg'] = null;
+        $this->shiftMaster['tlimit'] = null;
+        $this->shiftMaster['shift_date'] = null;
+        $this->shiftMaster['ls_st'] = null;
+        $this->shiftMaster['shift_capa'] = null;
+        $this->shiftMaster['taiken_capa'] = null;
+        $this->shiftMaster['gender'] = null;
+        $this->shiftMaster['ls_menu'] = null;
+        $this->shiftMaster['ls_et'] = null;
+        $this->shiftMaster['shift_tenpoid'] = null;
+        $this->shiftMaster['teacher'] = null;
+        $this->shiftMaster['instructor_name'] = null;
+        $this->shiftMaster['instructor_path_img'] = null;
+
+        foreach ($this->shiftMaster as $key => $value) {
+            $column = ReservationTablePrefix::SM . $key;
+            $this->shiftMaster[$key] = $model->$column;
+        }
+    }
+
+    /**
+     * Eloquentモデルを渡して、shift_masterのリソースにセット
+     * キャッシュに必要なすべてのカラムが必要
+     * Eloquentモデルのカラム名は、「ReservationTablePrefix::LM + カラム名」とする
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     */
+    public function setLessonMasterResourceByModel(\Illuminate\Database\Eloquent\Model $model) {
+        $this->lessonMaster = [];
+        $this->lessonMaster['lid'] = null;
+        $this->lessonMaster['lesson_class1'] = null;
+        $this->lessonMaster['lesson_class2'] = null;
+        $this->lessonMaster['lesson_class3'] = null;
+        $this->lessonMaster['lesson_class1_name'] = null;
+        $this->lessonMaster['lesson_class2_name'] = null;
+        $this->lessonMaster['lesson_class3_name'] = null;
+        $this->lessonMaster['iname'] = null;
+
+        foreach ($this->lessonMaster as $key => $value) {
+            $column = ReservationTablePrefix::LM . $key;
+            $this->lessonMaster[$key] = $model->$column;
+        }
+    }
+
+    /**
+     * Eloquentモデルを渡して、shift_masterのリソースにセット
+     * キャッシュに必要なすべてのカラムが必要
+     * Eloquentモデルのカラム名は、「ReservationTablePrefix::TM + カラム名」とする
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     */
+    public function setTenpoMasterResourceByModel(\Illuminate\Database\Eloquent\Model $model) {
+        $this->tenpoMaster = [];
+        $this->tenpoMaster['tid'] = null;
+        $this->tenpoMaster['tenpo_name'] = null;
+        $this->tenpoMaster['monthly_avail_tenpo'] = null;
+        $this->tenpoMaster['tenpo_memtype'] = null;
+
+        foreach ($this->tenpoMaster as $key => $value) {
+            $column = ReservationTablePrefix::TM . $key;
+            $this->tenpoMaster[$key] = $model->$column;
+        }
     }
 
     /**

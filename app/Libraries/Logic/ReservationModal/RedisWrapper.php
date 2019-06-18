@@ -32,4 +32,15 @@ class RedisWrapper
         return Redis::hdel($key, $childKey);
     }
 
+    /**
+     * 指定したキーのハッシュ生成
+     *
+     * @param string $key ハッシュのキー名
+     * @param array $hashArray ハッシュのキー・値の連想配列
+     * @return bool
+     */
+    public static function hmSet(string $key, array $hashArray) {
+        return Redis::hmset($key, $hashArray);
+    }
+
 }

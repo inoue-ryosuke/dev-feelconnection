@@ -37,7 +37,8 @@ class ShiftMaster extends Model
 
 
     /**
-     * 予約モーダルで必要なレッスン情報を取得
+     * 予約モーダルAPI等で必要なレッスン情報を取得
+     * shift_master, lesson_master, tenpo_masterのRedisキャッシュに対応するDBカラム
      *
      * @param string $shiftIdHash
      * @return \App\Models\ShiftMaster|null
@@ -68,6 +69,8 @@ class ShiftMaster extends Model
             "SM.ls_et AS " . ReservationTablePrefix::SM . "ls_et",
             "SM.shift_tenpoid AS " . ReservationTablePrefix::SM . "shift_tenpoid",
             "SM.teacher AS " . ReservationTablePrefix::SM . "teacher",
+            "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
+            //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
             "LM.lid AS " . ReservationTablePrefix::LM . "lid",
             "LM.lesson_class1 AS " . ReservationTablePrefix::LM . "lesson_class1",
             "LM.lesson_class2 AS " . ReservationTablePrefix::LM . "lesson_class2",
@@ -75,49 +78,19 @@ class ShiftMaster extends Model
             "LC1.name AS " . ReservationTablePrefix::LM . "lesson_class1_name",
             "LC2.name AS " . ReservationTablePrefix::LM . "lesson_class2_name",
             "LC3.name AS " . ReservationTablePrefix::LM . "lesson_class3_name",
+            "LM.iname AS " . ReservationTablePrefix::LM . "iname",
             "TM.tid AS " . ReservationTablePrefix::TM . "tid",
             "TM.tenpo_name AS " . ReservationTablePrefix::TM . "tenpo_name",
             "TM.monthly_avail_tenpo AS " . ReservationTablePrefix::TM . "monthly_avail_tenpo",
             "TM.tenpo_memtype AS " . ReservationTablePrefix::TM . "tenpo_memtype",
-            "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
-            //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
+
         ])
-        ->join(
-            "{$lessonMasterTableName} AS LM",
-            "SM.ls_menu",
-            '=',
-            'LM.lid'
-        )
-        ->join(
-            "{$tenpoMasterTableName} AS TM",
-            "SM.shift_tenpoid",
-            '=',
-            'TM.tid'
-        )
-        ->join(
-            "{$lessonClass1TableName} AS LC1",
-            "LM.lesson_class1",
-            '=',
-            'LC1.id'
-        )
-        ->join(
-            "{$lessonClass2TableName} AS LC2",
-            "LM.lesson_class2",
-            '=',
-            'LC2.id'
-        )
-        ->leftJoin(
-            "{$lessonClass3TableName} AS LC3",
-            "LM.lesson_class3",
-            '=',
-            'LC3.id'
-        )
-        ->join(
-            "{$userMasterTableName} AS UM",
-            "SM.teacher",
-            '=',
-            'UM.uid'
-        )
+        ->join("{$lessonMasterTableName} AS LM", "SM.ls_menu", '=', 'LM.lid')
+        ->join("{$tenpoMasterTableName} AS TM", "SM.shift_tenpoid", '=', 'TM.tid')
+        ->join("{$lessonClass1TableName} AS LC1", "LM.lesson_class1", '=', 'LC1.id')
+        ->join("{$lessonClass2TableName} AS LC2", "LM.lesson_class2", '=', 'LC2.id')
+        ->leftJoin("{$lessonClass3TableName} AS LC3", "LM.lesson_class3", '=', 'LC3.id')
+        ->join("{$userMasterTableName} AS UM", "SM.teacher", '=', 'UM.uid')
         ->where('SM.shiftid_hash', '=', $shiftIdHash);
 
         return $query->get()->first();
@@ -147,5 +120,85 @@ class ShiftMaster extends Model
         }
 
         return $query->exists();
+    }
+
+    /**
+     * バイク枠状態取得API等で必要なレッスン情報を取得
+     * shift_masterのRedisキャッシュに対応するDBカラム
+     *
+     * @param string $shiftIdHash
+     * @return \App\Models\ShiftMaster|null
+     */
+    public static function getShiftMasterResource(string $shiftIdHash) {
+        $shiftMasterTableName = (new ShiftMaster)->getTable();
+        $userMasterTableName = (new UserMaster)->getTable();
+
+        $query = self::from("{$shiftMasterTableName} AS SM")
+            ->select([
+                "SM.shiftid AS " . ReservationTablePrefix::SM . "shiftid",
+                "SM.flg AS " . ReservationTablePrefix::SM . "flg",
+                "SM.open_datetime AS " . ReservationTablePrefix::SM . "open_datetime",
+                "SM.taiken_mess AS " . ReservationTablePrefix::SM . "taiken_mess",
+                "SM.taiken_les_flg AS " . ReservationTablePrefix::SM . "taiken_les_flg",
+                "SM.tlimit AS " . ReservationTablePrefix::SM . "tlimit",
+                "SM.shift_date AS " . ReservationTablePrefix::SM . "shift_date",
+                "SM.ls_st AS " . ReservationTablePrefix::SM . "ls_st",
+                "SM.shift_capa AS " . ReservationTablePrefix::SM . "shift_capa",
+                "SM.taiken_capa AS " . ReservationTablePrefix::SM . "taiken_capa",
+                "SM.gender AS " . ReservationTablePrefix::SM . "gender",
+                "SM.ls_menu AS " . ReservationTablePrefix::SM . "ls_menu",
+                "SM.ls_et AS " . ReservationTablePrefix::SM . "ls_et",
+                "SM.shift_tenpoid AS " . ReservationTablePrefix::SM . "shift_tenpoid",
+                "SM.teacher AS " . ReservationTablePrefix::SM . "teacher",
+                "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
+                //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
+            ])
+            ->join("{$userMasterTableName} AS UM", "SM.teacher", '=', 'UM.uid')
+            ->where('SM.shiftid_hash', '=', $shiftIdHash);
+
+        return $query->get()->first();
+    }
+
+    /**
+     * バイク枠仮確保状態確認・更新API等で必要なレッスン情報を取得
+     * shift_master, tenpo_masterのRedisキャッシュに対応するDBカラム
+     *
+     * @param string $shiftIdHash
+     * @return \App\Models\ShiftMaster|null
+     */
+    public static function getShiftTenpoMasterResource(string $shiftIdHash) {
+        $shiftMasterTableName = (new ShiftMaster)->getTable();
+        $userMasterTableName = (new UserMaster)->getTable();
+        $tenpoMasterTableName = (new TenpoMaster)->getTable();
+
+        $query = self::from("{$shiftMasterTableName} AS SM")
+        ->select([
+            "SM.shiftid AS " . ReservationTablePrefix::SM . "shiftid",
+            "SM.flg AS " . ReservationTablePrefix::SM . "flg",
+            "SM.open_datetime AS " . ReservationTablePrefix::SM . "open_datetime",
+            "SM.taiken_mess AS " . ReservationTablePrefix::SM . "taiken_mess",
+            "SM.taiken_les_flg AS " . ReservationTablePrefix::SM . "taiken_les_flg",
+            "SM.tlimit AS " . ReservationTablePrefix::SM . "tlimit",
+            "SM.shift_date AS " . ReservationTablePrefix::SM . "shift_date",
+            "SM.ls_st AS " . ReservationTablePrefix::SM . "ls_st",
+            "SM.shift_capa AS " . ReservationTablePrefix::SM . "shift_capa",
+            "SM.taiken_capa AS " . ReservationTablePrefix::SM . "taiken_capa",
+            "SM.gender AS " . ReservationTablePrefix::SM . "gender",
+            "SM.ls_menu AS " . ReservationTablePrefix::SM . "ls_menu",
+            "SM.ls_et AS " . ReservationTablePrefix::SM . "ls_et",
+            "SM.shift_tenpoid AS " . ReservationTablePrefix::SM . "shift_tenpoid",
+            "SM.teacher AS " . ReservationTablePrefix::SM . "teacher",
+            "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
+            //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
+            "TM.tid AS " . ReservationTablePrefix::TM . "tid",
+            "TM.tenpo_name AS " . ReservationTablePrefix::TM . "tenpo_name",
+            "TM.monthly_avail_tenpo AS " . ReservationTablePrefix::TM . "monthly_avail_tenpo",
+            "TM.tenpo_memtype AS " . ReservationTablePrefix::TM . "tenpo_memtype",
+        ])
+        ->join("{$tenpoMasterTableName} AS TM", "SM.shift_tenpoid", '=', 'TM.tid')
+        ->join("{$userMasterTableName} AS UM", "SM.teacher", '=', 'UM.uid')
+        ->where('SM.shiftid_hash', '=', $shiftIdHash);
+
+        return $query->get()->first();
     }
 }
