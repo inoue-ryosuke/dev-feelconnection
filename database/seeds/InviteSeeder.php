@@ -27,7 +27,7 @@ class InviteSeeder extends BaseSeeder
         echo "\n" . "InviteSeeder Start" . "\n";
         DB::transaction(function() {
             // 登録単位ループ
-            $custList = Cust::get()->take(10);
+            $custList = Cust::take(10)->get();
             foreach ($custList as $record) {
                 $this->insertRecord($record);
             }

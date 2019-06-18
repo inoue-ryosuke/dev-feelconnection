@@ -2,8 +2,14 @@
 
 namespace App\Models;
 
-class UserMaster extends BaseModel
+use Illuminate\Contracts\Auth\Authenticatable;
+use App\Exceptions\IllegalParameterException;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
+
+class UserMaster extends BaseModel implements Authenticatable
 {
+    use AuthenticatableTrait;
     /**
      * @var string テーブル名
      */
