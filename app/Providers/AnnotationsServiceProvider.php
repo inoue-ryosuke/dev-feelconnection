@@ -46,7 +46,8 @@ class AnnotationsServiceProvider extends ServiceProvider
             'App\Http\Controllers\Api\ReservationModalController',
             'App\Http\Controllers\Api\MailCheckController',
             'App\Http\Controllers\Api\MailAuthController',
-            'App\Http\Controllers\Auth\LoginController'
+            'App\Http\Controllers\Auth\LoginController',
+            'App\Http\Controllers\Api\MemtypeChangeController'
         ]);
 
         // WEB

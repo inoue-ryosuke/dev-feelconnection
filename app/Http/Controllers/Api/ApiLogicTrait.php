@@ -80,4 +80,19 @@ trait ApiLogicTrait {
         return $this->getApiLogic(Loader::MailCheck, Loader::SELECT);
     }
 
+    /**
+     * MemtypeChangeのSelectロジックを取得する
+     * @return MemtypeChangeSelectLogic
+     */
+    public function getMemtypeChangeConfirmPageLogic() {
+        return $this->getApiLogic(Loader::MemtypeChange, Loader::SELECT);
+    }
+
+    /**
+     * MemtypeChangeのUpdateロジックを取得する
+     * @return MemtypeChangeUpdateLogic
+     */
+    public function getMemtypeUpdateLogic() {
+        return $this->getApiLogic(Loader::MemtypeChange, Loader::UPDATE);
+    }
 }
