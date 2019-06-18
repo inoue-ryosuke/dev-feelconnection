@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Exceptions\IllegalParameterException;
 use Carbon\Carbon;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 
-class LessonMaster extends BaseFormModel
+class LessonMaster extends BaseFormModel implements Authenticatable
 {
+    use AuthenticatableTrait;
     /** Salesforceのテーブルサフィックス(__c) */
     const SF = '';
 

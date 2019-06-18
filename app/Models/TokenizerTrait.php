@@ -15,6 +15,20 @@ trait TokenizerTrait {
      * @param int $length 長さ
      * @return トークン
      */
+    public static function makeInviteCode($length = 32) {
+        $count = 0;
+        do {
+            $token = Str::random($length);
+            $count++;
+        } while (self::where('invite_code', $token)->count() > 0 && $count < 10);
+        return $token;
+    }
+
+    /**
+     * トークンを作成する。
+     * @param int $length 長さ
+     * @return トークン
+     */
     public static function makeToken($length = 32) {
         $count = 0;
         do {

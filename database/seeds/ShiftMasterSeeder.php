@@ -28,7 +28,7 @@ class ShiftMasterSeeder extends BaseSeeder
     {
         // 削除
 //        DB::statement('TRUNCATE shift_master CASCADE');
-
+        // 本シーダー(ShiftMasterSeeder)は、tenpo_master、user_master、cust_master、Lesson_master、user_master_histにレコードがある前提で作成しています。
         echo "\n" . "ShiftMasterSeeder Start" . "\n";
         DB::transaction(function() {
             // 登録単位ループ
@@ -61,6 +61,8 @@ class ShiftMasterSeeder extends BaseSeeder
         $dao->shift_tenpoid = $tid;
         // 担当インストラクターのIDを設定
         $dao->teacher = $instructor->getAuthIdentifier();
+        // 担当インストラクターのIDを設定
+        $dao->ls_menu = $lessonMaster->getAuthIdentifier();
         // 予約会員 cust_master.cid ※カンマ区切りで複数
         $dao->cstid = $custIds;
         // 受講会員（消化含む）cust_master.cid ※カンマ区切りで複数。予約回数増加チケット使用時は、予約登録時点で登録

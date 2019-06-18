@@ -24,6 +24,9 @@ class InviteSeeder extends BaseSeeder
      */
     public function run()
     {
+        // 削除
+//        DB::statement('TRUNCATE user_master_hist CASCADE');
+        // 本シーダー(InviteSeeder)は、cust_masterにレコードがある前提で作成しています
         echo "\n" . "InviteSeeder Start" . "\n";
         DB::transaction(function() {
             // 登録単位ループ
@@ -40,7 +43,7 @@ class InviteSeeder extends BaseSeeder
             $record->lid = 1;
             $invite = new Invite;
             $invite->mergeRequest($record);
-            $invite->invite_code = $invite::makeToken();
+            $invite->invite_code = $invite::makeInviteCode();
             $invite->save();
 
     }

@@ -20,6 +20,17 @@ class DatabaseSeeder extends Seeder
             $this->call(CustMemTypeSeeder::class);
             $this->call(TenpoSeeder::class);
             $this->call(CustSeeder::class);
+            $this->call(LessonClassSeeder::class);
+            /**  LessonMasterSeederは、LessonClassSeederとCustMemTypeSeederが処理されている前提*/
+            $this->call(LessonMasterSeeder::class);
+            /** UserMasterSeederは、TenpoSeederが処理されている前提*/
+            $this->call(UserMasterSeeder::class);
+            /** UserMasterHistSeederは、UserMasterSeeder,TenpoSeederが処理されている前提*/
+            $this->call(UserMasterHistSeeder::class);
+            /** ShiftMasterSeederは、TenpoSeeder、UserMasterSeeder、CustSeeder、LessonMasterSeeder、UserMasterHistSeederが処理されている前提*/
+            $this->call(ShiftMasterSeeder::class);
+            /** InviteSeederは、CustSeederが処理されている前提*/
+            $this->call(InviteSeeder::class);
 
         });
     }

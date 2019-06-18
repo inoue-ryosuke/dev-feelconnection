@@ -24,6 +24,9 @@ class UserMasterHistSeeder extends BaseSeeder
      */
     public function run()
     {
+        // 削除
+//        DB::statement('TRUNCATE user_master_hist CASCADE');
+        // 本シーダー(UserMasterHistSeeder)は、user_master,tenpo_masterにレコードがある前提で作成しています
         echo "\n" . "UserMasterHistSeeder Start" . "\n";
         DB::transaction(function() {
             // 登録単位ループ
@@ -38,15 +41,16 @@ class UserMasterHistSeeder extends BaseSeeder
     protected function insertRecord($record = []) {
             // 設定する店舗情報を取得
             $tenpoList = TenpoMaster::take(10)->get()->random(2);
+        echo "\n" . "UserMasterHistSeeder insert Start" . "\n";
             foreach($tenpoList as $tenpo) {
-                $userMasterHist = new UserMasterHist;
+                $userMasterHist = new UserMasterHist();
                 $userMasterHist->uid = $record->getAuthIdentifier();
                 $userMasterHist->tid = $tenpo->getAuthIdentifier();
                 $userMasterHist->flg = UserMasterHist::VALID;
-                $userMasterHist->start__c = Carbon::now();
+                $userMasterHist->start = Carbon::now();
                 $userMasterHist->save();
             }
-
+        echo "\n" . "UserMasterHistSeeder insert End" . "\n";
 
     }
 
