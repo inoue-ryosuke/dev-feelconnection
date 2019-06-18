@@ -114,7 +114,8 @@ class ReservationModalController extends Controller
         // 座席情報取得
         $sheetManager = new SheetManager($shiftMaster['shiftid']);
         $sheetManager->initStudio();
-        $sheetManager->setSheetStatusAndModalType($custMaster['cid']);
+        $sheetManager->setSheetStatusAndModalTypeByOrderLesson($custMaster['cid']);
+        $sheetManager->setSheetStatusAndModalTypeBySheetLock($custMaster['cid']);
         $sheetManager->fillNotSpecialTrialSheet($custMaster['memtype']);
 
         return response()->json([
@@ -237,6 +238,7 @@ class ReservationModalController extends Controller
         }
 
         $shiftMaster = $resource->getShiftMasterResource();
+        $tenpoMaster = $resource->getTenpoMasterResource();
         $custMaster = $resource->getCustMasterResource();
 
         // ネット・トライアル会員が体験予約不可のレッスンを指定した場合エラー
@@ -284,7 +286,8 @@ class ReservationModalController extends Controller
         // 座席情報取得
         $sheetManager = new SheetManager($shiftMaster['shiftid']);
         $sheetManager->initStudio();
-        $sheetManager->setSheetStatusAndModalType($custMaster['cid']);
+        $sheetManager->setSheetStatusAndModalTypeByOrderLesson($custMaster['cid']);
+        $sheetManager->setSheetStatusAndModalTypeBySheetLock($custMaster['cid']);
         $sheetManager->fillNotSpecialTrialSheet($custMaster['memtype']);
 
         // TODO 座席番号は、スタジオの座席数を超えた数値はエラー

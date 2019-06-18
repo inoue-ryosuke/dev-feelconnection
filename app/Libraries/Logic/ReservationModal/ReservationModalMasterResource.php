@@ -29,7 +29,7 @@ class ReservationModalMasterResource extends ReservationMasterResource {
             return false;
         }
 
-        /*
+
         if (!$this->createRedisResourceByKey(
             'lesson_master:' . $this->shiftMaster['ls_menu'], $this->lessonMaster)) {
             // lesson_masterのRedisキャッシュ取得失敗
@@ -41,7 +41,7 @@ class ReservationModalMasterResource extends ReservationMasterResource {
             // tenpo_masterのRedisキャッシュ取得失敗
             return false;
         }
-        */
+
 
         // TODO 会員情報取得処理
         $this->custMaster['cid'] = 1;
@@ -58,40 +58,14 @@ class ReservationModalMasterResource extends ReservationMasterResource {
             // エラー、不正なIDハッシュ値
         }
 
-        $attributes = $model->attributesToArray();
+        $this->setShiftMasterResourceByModel($model);
+        $this->setLessonMasterResourceByModel($model);
+        $this->setTenpoMasterResourceByModel($model);
 
-        $this->shiftMaster = [];
-        $this->lessonMaster = [];
-        $this->lessonClass1 = [];
-        $this->lessonClass2 = [];
-        $this->lessonClass3 = [];
-        $this->custMaster = [];
-        $this->tenpoMaster = [];
-        $this->userMaster = [];
-
-        $smLength = strlen(ReservationTablePrefix::SM);
-        $lmLength = strlen(ReservationTablePrefix::LM);
-        $tmLength = strlen(ReservationTablePrefix::TM);
-
-        foreach ($attributes as $key => $value) {
-            if (strpos($key, ReservationTablePrefix::SM) !== FALSE) {
-                // shift_masterのカラム
-                $this->shiftMaster[substr($key, $smLength)] = $value;
-                continue;
-            }
-
-            if (strpos($key, ReservationTablePrefix::LM) !== FALSE) {
-                // lesson_masterのカラム
-                $this->lessonMaster[substr($key, $lmLength)] = $value;
-                continue;
-            }
-
-            if (strpos($key, ReservationTablePrefix::TM) !== FALSE) {
-                // tenpo_masterのカラム
-                $this->tenpoMaster[substr($key, $tmLength)] = $value;
-                continue;
-            }
-        }
+        // キャッシュ生成
+        $this->createShiftMasterCache();
+        $this->createLessonMasterCache();
+        $this->createTenpoMasterCache();
 
         // TODO 会員情報取得処理
         $this->custMaster['cid'] = 1;

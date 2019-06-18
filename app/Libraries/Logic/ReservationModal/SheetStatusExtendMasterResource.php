@@ -28,6 +28,12 @@ class SheetStatusExtendMasterResource extends ReservationMasterResource {
             return false;
         }
 
+        if (!$this->createRedisResourceByKey(
+            'tenpo_master:' . $this->shiftMaster['shift_tenpoid'], $this->tenpoMaster)) {
+            // tenpo_masterのRedisキャッシュ取得失敗
+            return false;
+        }
+
         // TODO 会員情報取得処理
         $this->custMaster['cid'] = 1;
         $this->custMaster['memtype'] = 3;
@@ -37,17 +43,14 @@ class SheetStatusExtendMasterResource extends ReservationMasterResource {
 
     /** DBのマスタデータ取得 */
     public function createDBResource() {
-        $model = ShiftMaster::where('shiftid_hash', '=', $this->shiftIdHash)->first();
-        $this->shiftMaster['shiftid'] = $model->shiftid;
-        $this->shiftMaster['open_datetime'] = $model->open_datetime;
-        $this->shiftMaster['taiken_mess'] = $model->taiken_mess;
-        $this->shiftMaster['taiken_les_flg'] = $model->taiken_les_flg;
-        $this->shiftMaster['tlimit'] = $model->tlimit;
-        $this->shiftMaster['shift_date'] = $model->shift_date;
-        $this->shiftMaster['ls_st'] = $model->ls_st;
-        $this->shiftMaster['ls_et'] = $model->ls_et;
-        $this->shiftMaster['shift_capa'] = $model->shift_capa;
-        $this->shiftMaster['taiken_capa'] = $model->taiken_capa;
+        $model = ShiftMaster::getShiftTenpoMasterResource($this->shiftIdHash);
+
+        $this->setShiftMasterResourceByModel($model);
+        $this->setTenpoMasterResourceByModel($model);
+
+        // キャッシュ生成
+        $this->createShiftMasterCache();
+        $this->createTenpoMasterCache();
 
         // TODO 会員情報取得処理
         $this->custMaster['cid'] = 1;
