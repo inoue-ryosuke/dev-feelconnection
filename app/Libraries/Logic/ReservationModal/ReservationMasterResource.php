@@ -54,6 +54,12 @@ abstract class ReservationMasterResource {
     protected $shiftMaster;
     protected $lessonMaster;
     protected $tenpoMaster;
+
+    /**
+     *
+     * @var int cid 会員ID
+     * @var int memtype 会員種別
+     */
     protected $custMaster;
 
     /** 未来の会員種別 */
@@ -88,7 +94,7 @@ abstract class ReservationMasterResource {
      * 各マスターのRedisキャッシュを取得
      * すべて成功=true、失敗=false
      *
-     * @return boolean Redisからキャッシュ取得成功したかどうか
+     * @return bool Redisからキャッシュ取得成功したかどうか
      */
     abstract public function createRedisResource();
 
@@ -139,6 +145,13 @@ abstract class ReservationMasterResource {
      */
     public function getCustMasterResource() {
         return $this->custMaster;
+    }
+
+    /**
+     * @return int 未来の会員種別
+     */
+    public function getFutureMemberType() {
+        return $this->futureMemberType;
     }
 
     /**

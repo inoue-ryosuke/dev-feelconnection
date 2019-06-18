@@ -49,11 +49,13 @@ class ReservationModalController extends Controller
             // Redisキャッシュの取得に失敗
             $resource->createDBResource();
         }
+        // 未来の会員種別・所属店舗登録
+        $resource->setFutureMemberTypeTenpos();
 
         $shiftMaster = $resource->getShiftMasterResource();
-        $lessonMaster = $resource->getLessonMasterResource();
         $tenpoMaster = $resource->getTenpoMasterResource();
         $custMaster = $resource->getCustMasterResource();
+        $futureMemberType = $resource->getFutureMemberType();
 
         // ネット予約公開日時が過去の日付かどうか
         if (!VaidationLogic::isOpenDateTimePassed($shiftMaster['open_datetime'])) {
@@ -80,6 +82,18 @@ class ReservationModalController extends Controller
                     array_merge($params, [ 'cust_master' => $custMaster, 'shift_master' => $shiftMaster ]))
             );
             //throw new BadRequestException('ネット・トライアル会員が体験予約不可のレッスンを指定しました。');
+        }
+
+        // ログインユーザーの会員種別が、予約可能会員種別(tenpo_master.tenpo_memtype)かどうか。
+        if (!VaidationLogic::isMemberTypeReservable($futureMemberType, $tenpoMaster['tenpo_memtype'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray(
+                    'Invalid lesson',
+                    'レッスンの店舗を予約可能な会員種別ではありません。',
+                    array_merge($params, [ 'future_memtype' => $futureMemberType, 'tenpo_master' => $tenpoMaster ]))
+            );
+            //throw new BadRequestException('レッスンの店舗を予約可能な会員種別ではありません。');
         }
 
         // 体験レッスン未受講状態のバリデーション
@@ -236,10 +250,13 @@ class ReservationModalController extends Controller
             // Redisキャッシュの取得に失敗
             $resource->createDBResource();
         }
+        // 未来の会員種別・所属店舗登録
+        $resource->setFutureMemberTypeTenpos();
 
         $shiftMaster = $resource->getShiftMasterResource();
         $tenpoMaster = $resource->getTenpoMasterResource();
         $custMaster = $resource->getCustMasterResource();
+        $futureMemberType = $resource->getFutureMemberType();
 
         // ネット・トライアル会員が体験予約不可のレッスンを指定した場合エラー
         if (!VaidationLogic::canReserveByNetTrialMember($custMaster['memtype'], $shiftMaster['taiken_les_flg'])) {
@@ -252,6 +269,18 @@ class ReservationModalController extends Controller
                     array_merge($params, [ 'cust_master' => $custMaster, 'shift_master' => $shiftMaster ]))
             );
             //throw new BadRequestException('ネット・トライアル会員が体験予約不可のレッスンを指定しました。');
+        }
+
+        // ログインユーザーの会員種別が、予約可能会員種別(tenpo_master.tenpo_memtype)かどうか。
+        if (!VaidationLogic::isMemberTypeReservable($futureMemberType, $tenpoMaster['tenpo_memtype'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray(
+                    'Invalid lesson',
+                    'レッスンの店舗を予約可能な会員種別ではありません。',
+                    array_merge($params, [ 'future_memtype' => $futureMemberType, 'tenpo_master' => $tenpoMaster ]))
+                );
+            //throw new BadRequestException('レッスンの店舗を予約可能な会員種別ではありません。');
         }
 
         // 体験レッスン未受講状態のバリデーション
@@ -287,7 +316,6 @@ class ReservationModalController extends Controller
         $sheetManager = new SheetManager($shiftMaster['shiftid']);
         $sheetManager->initStudio();
         $sheetManager->setSheetStatusAndModalTypeByOrderLesson($custMaster['cid']);
-        $sheetManager->setSheetStatusAndModalTypeBySheetLock($custMaster['cid']);
         $sheetManager->fillNotSpecialTrialSheet($custMaster['memtype']);
 
         // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
@@ -323,9 +351,20 @@ class ReservationModalController extends Controller
             //throw new ApplicationException('指定された座席は、他のユーザーによって、枠確保済みまたは予約済みです。', 409);
         }
 
+        // バイク枠延長
+        if (!$sheetManager->extendSheetLock($sheet_no, $custMaster['cid'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not extend sheet',
+                    'バイク枠を延長できません。',
+                    array_merge($params, ['sheet_no' => $sheet_no ], $custMaster))
+                );
+            //throw new ApplicationException('バイク枠を延長できません。', 409);
+        }
+
         return response()->json([
-            'response_code' => Response::HTTP_CREATED,
-            'all_resource' => $resource->getAllResource()
+            'response_code' => Response::HTTP_CREATED
         ])->setStatusCode(Response::HTTP_CREATED);
     }
 }
