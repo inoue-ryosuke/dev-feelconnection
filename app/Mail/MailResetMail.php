@@ -7,14 +7,14 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class RegistMail extends Mailable
+class MailResetMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     protected $mailaddress;
     protected $token;
     
-    const CONFIG_KEY = 'constant.mailCheck.regist';
+    const CONFIG_KEY = 'constant.mailCheck.mailReset';
     
     /**
      * Create a new message instance.
@@ -38,7 +38,7 @@ class RegistMail extends Mailable
         
         return $this->from(config(self::CONFIG_KEY.'.from', []))
                     ->subject(config(self::CONFIG_KEY.'.subject', []))
-                    ->view('mails.passwd_issue_mail')
+                    ->view('mails.mailreset_mail')
                     ->with(['authUrl' => $authUrl]);
     }
 }

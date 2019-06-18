@@ -64,8 +64,20 @@ return [
         ],
     ],
     'mailCheck' => [
-        'registMailSubject' => '登録認証メール',
-        'registMailFrom'    => 'toshifumi.kawai@xchange.jp',
-        'authExpireHours'   => '24',
+        'regist' => [
+            'subject'     => '登録認証メール',
+            'from'        => 'toshifumi.kawai@xchange.jp',
+            'expireHours' => '24',
+        ],
+        'passwdIssue' => [
+            'subject'     => 'パスワード再発行認証メール',
+            'from'        => 'toshifumi.kawai@xchange.jp',
+            'expireHours' => '24',
+        ],
+        'mailReset' => [
+            'subject'     => 'メールアドレス再設定認証メール',
+            'from'        => 'toshifumi.kawai@xchange.jp',
+            'expireHours' => '24',
+        ],
     ],
 ];
