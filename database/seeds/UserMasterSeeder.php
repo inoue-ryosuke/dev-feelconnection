@@ -24,11 +24,11 @@ class UserMasterSeeder extends BaseSeeder
     {
         // 削除
 //        DB::statement('TRUNCATE user_master CASCADE');
-
+        // 本シーダーは(UserMasterSeeder)は、tenpo_masterにレコードがある前提で作成しています。
         echo "\n" . "UserMasterSeeder Start" . "\n";
         DB::transaction(function() {
             // 登録単位ループ
-            foreach (config("seeder.user_master") as $record) {
+            foreach (config("seeder.develop.user_master") as $record) {
                 $this->insertRecord($record);
             }
         });

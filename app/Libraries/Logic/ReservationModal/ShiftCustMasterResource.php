@@ -6,10 +6,11 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ShiftMaster;
 
 /**
- * バイク予約状態取得APIで必要なRedis・DBのマスター情報
+ * バイク予約状態取得API等で必要なRedis・DBのマスター情報
+ * shift_master, cust_master に対応する
  *
  */
-class SheetStatusMasterResource extends ReservationMasterResource {
+class ShiftCustMasterResource extends ReservationMasterResource {
 
     public function __construct(string $shiftIdHash) {
         parent::__construct($shiftIdHash);

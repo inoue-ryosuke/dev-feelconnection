@@ -163,6 +163,8 @@ abstract class ReservationMasterResource {
             'lesson_master' => $this->getLessonMasterResource(),
             'cust_master' => $this->getCustMasterResource(),
             'tenpo_master' => $this->getTenpoMasterResource(),
+            'future_member_type' => $this->futureMemberType,
+            'future_tenpos' => $this->futureTenpos
         );
     }
 

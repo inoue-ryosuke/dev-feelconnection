@@ -19,7 +19,7 @@ class RedirectIfAuthenticated
     {
         if (Auth::guard($guard)->check()) {
             // 認証状態にあるときは各TOPへ飛ばす
-            $url = route('admin.top.get');
+            $url = route('top');
             return redirect($url);
         }
 

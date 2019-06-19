@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Exceptions\IllegalParameterException;
-use Carbon\Carbon;
+use \Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Constant\ReservationTablePrefix;
 
@@ -70,7 +70,7 @@ class ShiftMaster extends Model
             "SM.shift_tenpoid AS " . ReservationTablePrefix::SM . "shift_tenpoid",
             "SM.teacher AS " . ReservationTablePrefix::SM . "teacher",
             "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
-            //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
+            "UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
             "LM.lid AS " . ReservationTablePrefix::LM . "lid",
             "LM.lesson_class1 AS " . ReservationTablePrefix::LM . "lesson_class1",
             "LM.lesson_class2 AS " . ReservationTablePrefix::LM . "lesson_class2",
@@ -107,19 +107,38 @@ class ShiftMaster extends Model
         if(empty($lid) || is_null($lid)) {
             return false;
         }
-
+        // 現在時刻を取得
         $now = Carbon::now()->format('Y-m-d H:i:s');
-        $query = self::where(self::TABLE.'.ls_menu', $lid)
-            ->where(self::TABLE.'.flg', self::FLAG_VALID)
-            ->where(self::TABLE.'.ls_st',  '>=', $now)
-            ->where(self::TABLE.'.tlimit',  '>=', $now);
-
-        // 体験レッスンの条件を付加
-        if ($trial === LessonMaster::TRIAL) {
-            $query->where(self::TABLE.'.taiken_les_flg', self::VALID);
+        // lidでレコードを取得
+        $record = self::where(self::TABLE.'.ls_menu', $lid)->first();
+        // lidでレコードを取得できなかった場合
+        if (empty($record)) {
+            return false;
+        }
+        // 有効なレッスンか判定(Y： 有効 / N： 削除済み / C： 休講)
+        // 有効(Y)以外の場合
+        if ($record->flg !== self::FLAG_VALID) {
+            return false;
         }
 
-        return $query->exists();
+        // 体験予約判定(0： 不可 / 1： 可)
+        if ($trial === LessonMaster::TRIAL
+            && $record->taiken_les_flg !== self::VALID) {
+            return false;
+        }
+
+        // shift_dateとls_stを結合してレッスン日時を取得
+        $timeLimit = Carbon::parse($record->shift_date . ' ' . $record->ls_st)->format('Y/m/d H:i:s');
+        // ネット予約受付時間（～分前まで）の制限がある(値が0)じゃない場合
+        if ($record->tlimit !== 0) {
+            $timeLimit = $timeLimit->subMinute($record->tlimit);
+        }
+        // ネット予約受付時間外の場合
+        if ($timeLimit < $now) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -151,7 +170,7 @@ class ShiftMaster extends Model
                 "SM.shift_tenpoid AS " . ReservationTablePrefix::SM . "shift_tenpoid",
                 "SM.teacher AS " . ReservationTablePrefix::SM . "teacher",
                 "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
-                //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
+                "UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
             ])
             ->join("{$userMasterTableName} AS UM", "SM.teacher", '=', 'UM.uid')
             ->where('SM.shiftid_hash', '=', $shiftIdHash);
@@ -189,7 +208,7 @@ class ShiftMaster extends Model
             "SM.shift_tenpoid AS " . ReservationTablePrefix::SM . "shift_tenpoid",
             "SM.teacher AS " . ReservationTablePrefix::SM . "teacher",
             "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
-            //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
+            "UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
             "TM.tid AS " . ReservationTablePrefix::TM . "tid",
             "TM.tenpo_name AS " . ReservationTablePrefix::TM . "tenpo_name",
             "TM.monthly_avail_tenpo AS " . ReservationTablePrefix::TM . "monthly_avail_tenpo",
