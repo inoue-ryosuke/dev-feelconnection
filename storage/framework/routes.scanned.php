@@ -88,7 +88,7 @@ $router->get('api/sheet_status/{sid}/{sheet_no}', [
 	'domain' => NULL,
 ]);
 
-$router->post('api/sheet_status_extend/{sid}/{sheet_no}', [
+$router->post('api/sheet_status_extend', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusExtendApi',
 	'as' => 'api.sheet_status_extend.post',
 	'middleware' => [],
@@ -96,7 +96,7 @@ $router->post('api/sheet_status_extend/{sid}/{sheet_no}', [
 	'domain' => NULL,
 ]);
 
-$router->post('api/normal_reservation/{sid}/{sheet_no}', [
+$router->post('api/normal_reservation', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@normalReservationApi',
 	'as' => 'api.normal_reservation.post',
 	'middleware' => [],
