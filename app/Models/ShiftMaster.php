@@ -70,7 +70,7 @@ class ShiftMaster extends Model
             "SM.shift_tenpoid AS " . ReservationTablePrefix::SM . "shift_tenpoid",
             "SM.teacher AS " . ReservationTablePrefix::SM . "teacher",
             "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
-            //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
+            "UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
             "LM.lid AS " . ReservationTablePrefix::LM . "lid",
             "LM.lesson_class1 AS " . ReservationTablePrefix::LM . "lesson_class1",
             "LM.lesson_class2 AS " . ReservationTablePrefix::LM . "lesson_class2",
@@ -170,7 +170,7 @@ class ShiftMaster extends Model
                 "SM.shift_tenpoid AS " . ReservationTablePrefix::SM . "shift_tenpoid",
                 "SM.teacher AS " . ReservationTablePrefix::SM . "teacher",
                 "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
-                //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
+                "UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
             ])
             ->join("{$userMasterTableName} AS UM", "SM.teacher", '=', 'UM.uid')
             ->where('SM.shiftid_hash', '=', $shiftIdHash);
@@ -208,7 +208,7 @@ class ShiftMaster extends Model
             "SM.shift_tenpoid AS " . ReservationTablePrefix::SM . "shift_tenpoid",
             "SM.teacher AS " . ReservationTablePrefix::SM . "teacher",
             "UM.user_name AS " . ReservationTablePrefix::SM . "instructor_name",
-            //"UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
+            "UM.path_img AS " .  ReservationTablePrefix::SM . "instructor_path_img",
             "TM.tid AS " . ReservationTablePrefix::TM . "tid",
             "TM.tenpo_name AS " . ReservationTablePrefix::TM . "tenpo_name",
             "TM.monthly_avail_tenpo AS " . ReservationTablePrefix::TM . "monthly_avail_tenpo",

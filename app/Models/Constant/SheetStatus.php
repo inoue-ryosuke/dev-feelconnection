@@ -13,11 +13,14 @@ class SheetStatus
     const RESERVED = 2;
     /** お客様の予約されたバイク */
     const RESERVED_CUSTOMER = 3;
+    /** バイク枠確保状態の座席 */
+    const SHEET_LOCK = 4;
 
     protected static $data = [
         ['id' => self::RESERVABLE, 'name' => '予約可'],
         ['id' => self::RESERVED, 'name' => '予約済み'],
         ['id' => self::RESERVED_CUSTOMER, 'name' => 'お客様の予約されたバイク'],
+        ['id' => self::SHEET_LOCK, 'name' => 'バイク枠確保状態の座席'],
     ];
 
     /**

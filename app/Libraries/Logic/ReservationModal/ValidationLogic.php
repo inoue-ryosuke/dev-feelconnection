@@ -155,6 +155,7 @@ class VaidationLogic
                 }
             } else {
                 // 体験レッスン受講済みでないかつ予約済み
+                // TODO: マンスリー会員判別、体験レッスン予約時にマンスリー入会して通常予約できる状態
                 $shiftDateTime = $shiftMaster['shift_date'] . $shiftMaster['ls_et'];
                 if (!VaidationLogic::validateTrialReservationDate($custMaster['memtype'], $shiftDateTime, $trialLessonStatus[2])) {
                     // 予約済みの体験レッスンより前の日付のレッスンを指定

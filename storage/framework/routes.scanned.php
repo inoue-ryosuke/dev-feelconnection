@@ -88,17 +88,41 @@ $router->get('api/sheet_status/{sid}/{sheet_no}', [
 	'domain' => NULL,
 ]);
 
-$router->post('api/sheet_status_extend/{sid}/{sheet_no}', [
+$router->post('api/sheet_status_extend', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusExtendApi',
-	'as' => 'api.sheet_status_extend.get',
+	'as' => 'api.sheet_status_extend.post',
 	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
 ]);
 
-$router->post('api/mailcheck', [
-	'uses' => 'App\Http\Controllers\Api\MailCheckController@chkMail',
-	'as' => 'api.mailcheck.post',
+$router->post('api/normal_reservation', [
+	'uses' => 'App\Http\Controllers\Api\ReservationModalController@normalReservationApi',
+	'as' => 'api.normal_reservation.post',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/mailcheck/regist', [
+	'uses' => 'App\Http\Controllers\Api\MailCheckController@regist',
+	'as' => 'api.mailcheck.regist.post',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/mailcheck/passwdreset', [
+	'uses' => 'App\Http\Controllers\Api\MailCheckController@passwdReset',
+	'as' => 'api.mailcheck.passwdreset.post',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/mailcheck/mailreset', [
+	'uses' => 'App\Http\Controllers\Api\MailCheckController@mailReset',
+	'as' => 'api.mailcheck.mailreset.post',
 	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
@@ -116,6 +140,22 @@ $router->post('api/user/login', [
 	'uses' => 'App\Http\Controllers\Auth\LoginController@login',
 	'as' => 'api.user.login',
 	'middleware' => ['api', 'guest'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/memtype_change/confirm', [
+	'uses' => 'App\Http\Controllers\Api\MemtypeChangeController@getMemtypeChangeConfirmPage',
+	'as' => 'api.memtype_change.confirm',
+	'middleware' => [],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/memtype_change/update', [
+	'uses' => 'App\Http\Controllers\Api\MemtypeChangeController@updateMemtype',
+	'as' => 'api.memtype_change.update',
+	'middleware' => [],
 	'where' => [],
 	'domain' => NULL,
 ]);
