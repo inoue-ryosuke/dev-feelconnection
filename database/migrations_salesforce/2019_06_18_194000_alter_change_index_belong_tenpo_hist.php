@@ -14,7 +14,7 @@ class AlterChangeIndexBelongTenpoHist extends Migration {
 	{
 		Schema::table('belong_tenpo_hist__c', function(Blueprint $table)
 		{
-            $table->renameIndex('user_master_hist_pkey', 'belong_tenpo_hist_pkey');
+            $table->renameIndex('user_master_hist__c_pkey', 'belong_tenpo_hist_pkey');
 		});
 	}
 
@@ -28,7 +28,7 @@ class AlterChangeIndexBelongTenpoHist extends Migration {
 	{
         Schema::table('belong_tenpo_hist__c', function(Blueprint $table)
         {
-            $table->renameIndex('belong_tenpo_hist_pkey', 'user_master_hist_pkey');
+            $table->renameIndex('belong_tenpo_hist_pkey', 'user_master_hist__c_pkey');
         });
 	}
 
