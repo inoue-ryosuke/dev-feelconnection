@@ -144,6 +144,14 @@ $router->post('api/user/login', [
 	'domain' => NULL,
 ]);
 
+$router->post('api/zip_code', [
+	'uses' => 'App\Http\Controllers\Api\ZipCodeController@getAddressByZipCode',
+	'as' => 'api.zip_code.get',
+	'middleware' => ['api', 'guest'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->post('api/memtype_change/confirm', [
 	'uses' => 'App\Http\Controllers\Api\MemtypeChangeController@getMemtypeChangeConfirmPage',
 	'as' => 'api.memtype_change.confirm',

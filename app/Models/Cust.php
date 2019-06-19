@@ -23,10 +23,9 @@ class Cust extends BaseFormModel implements Authenticatable
      */
     protected $table = 'cust_master';
     protected $primaryKey = 'cid';
-    protected $loginKey = 'cid';
 //    protected $table = 'cust_master__c';
 //    protected $primaryKey = 'cid__c';
-//    protected $loginKey = 'cid__c';
+
     /**
      * The attributes that are mass assignable.
      *
