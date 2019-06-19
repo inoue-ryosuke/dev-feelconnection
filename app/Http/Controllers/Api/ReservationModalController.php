@@ -226,15 +226,13 @@ class ReservationModalController extends Controller
     /**
      * バイク枠仮確保状態確認・更新API
      *
-     * @POST("api/sheet_status_extend/{sid}/{sheet_no}", as="api.sheet_status_extend.post")
+     * @POST("api/sheet_status_extend", as="api.sheet_status_extend.post")
      * @param Request $request
-     * @param int $sid レッスンスケジュールIDハッシュ値(shift_master.shiftid_hash)
-     * @param int $sheet_no 座席番号
      * @return \Illuminate\Http\JsonResponse
      */
-    public function sheetStatusExtendApi(Request $request, $sid, $sheet_no)
+    public function sheetStatusExtendApi(Request $request)
     {
-        $params = array('sid' => $sid, 'sheet_no' => $sheet_no);
+        $params = $request->all();;
 
         // レッスンスケジュールIDハッシュ、座席番号のバリデーション
         if (!VaidationLogic::validateShiftIdHashAndSheetNo($params)) {
@@ -246,6 +244,9 @@ class ReservationModalController extends Controller
             );
             //throw new BadRequestException('レッスンスケジュールID、座席番号が不正です。');
         }
+
+        $sid = $params['sid'];
+        $sheet_no = $params['sheet_no'];
 
         // バイク枠仮確保状態確認・更新APIで必要なマスターデータ取得
         $resource = new ShiftTenpoCustMasterResource($sid);
@@ -375,15 +376,13 @@ class ReservationModalController extends Controller
     /**
      * 通常予約API
      *
-     * @POST("api/normal_reservation/{sid}/{sheet_no}", as="api.normal_reservation.post")
+     * @POST("api/normal_reservation", as="api.normal_reservation.post")
      * @param Request $request
-     * @param int $sid レッスンスケジュールIDハッシュ値(shift_master.shiftid_hash)
-     * @param int $sheet_no 座席番号
      * @return \Illuminate\Http\JsonResponse
      */
-    public function normalReservationApi(Request $request, $sid, $sheet_no)
+    public function normalReservationApi(Request $request)
     {
-        $params = array('sid' => $sid, 'sheet_no' => $sheet_no);
+        $params = $request->all();
 
         // レッスンスケジュールIDハッシュ、座席番号のバリデーション
         if (!VaidationLogic::validateShiftIdHashAndSheetNo($params)) {
@@ -395,6 +394,9 @@ class ReservationModalController extends Controller
             );
             //throw new BadRequestException('レッスンスケジュールID、座席番号が不正です。');
         }
+
+        $sid = $params['sid'];
+        $sheet_no = $params['sheet_no'];
 
         // 通常予約APIで必要なマスターデータ取得
         $resource = new ShiftTenpoCustMasterResource($sid);
