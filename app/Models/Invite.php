@@ -5,15 +5,20 @@ namespace App\Models;
 use App\Exceptions\IllegalParameterException;
 use Illuminate\Database\Eloquent\Model;
 
-class Invite extends BaseModel
+class Invite extends BaseFormModel
 {
+    use TokenizerTrait;
     //
     /**
      * @var string テーブル名
      */
     protected $table = 'invite';
-    protected $primaryKey = '';
+    protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'cid',
+        'lid'
+    ];
     /**
      * 紹介コードがレコードに存在するか確認
      * @param $inviteCode

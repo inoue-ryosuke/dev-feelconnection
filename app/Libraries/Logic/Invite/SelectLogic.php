@@ -32,16 +32,16 @@ class SelectLogic extends BaseLogic
         logger('inviteCode');
         logger($inviteCode);
         // スタブレスポンス
-        return $response = [
-            'result_code' => 0,
-            'lid' => 51,
-            'lesson_flag' => 1,
-            'friend_flag' => 0,
-        ];
+//        return $response = [
+//            'result_code' => 0,
+//            'lid' => 51,
+//            'lesson_flag' => 1,
+//            'friend_flag' => 0,
+//        ];
 
         // テーブルに存在しない紹介コードの場合
         if (!Invite::isExistsInviteCode($inviteCode)) {
-            throw new IllegalParameterException();
+            throw new IllegalParameterException('存在しない紹介コードです');
         }
 
         //レコードを取得
@@ -59,11 +59,20 @@ class SelectLogic extends BaseLogic
         // lesson_master/shift_masterテーブルを参照して予約が可能か確認
         if ($this->isReservableLesson($invite)) {
             logger('Invite SelectLogic validateInviteCode lesson');
+
             // 予約可能
             return $response = [
                 'result_code' => 0,
                 'lid' => $invite->lid,
                 'lesson_flag' => 1,
+                'friend_flag' => 0,
+            ];
+        } else {
+            // 予約不可
+            return $response = [
+                'result_code' => 0,
+                'lid' => $invite->lid,
+                'lesson_flag' => 0,
                 'friend_flag' => 0,
             ];
         }
@@ -77,7 +86,7 @@ class SelectLogic extends BaseLogic
      */
     private function isReservableLesson($invite): bool
     {
-        return LessonMaster::isReservableLesson($invite->lid, LessonMaster::TRIAL) && ShiftMaster::isReservableLesson($invite->lid, LessonMaster::TRIAL);
+        return ShiftMaster::isReservableLesson($invite->lid, LessonMaster::TRIAL) && LessonMaster::isReservableLesson($invite->lid, LessonMaster::TRIAL);
     }
 
 
