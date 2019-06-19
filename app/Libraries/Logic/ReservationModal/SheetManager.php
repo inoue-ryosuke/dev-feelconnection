@@ -357,4 +357,17 @@ class SheetManager
         }
     }
 
+    /**
+     * 指定されたバイク枠を確保
+     *
+     * @param int $sheetNo 座席番号
+     * @return bool 確保結果
+     */
+    public function addSheetLock(int $sheetNo) {
+        // ネット予約回数取得
+
+
+        return true;
+    }
+
 }
