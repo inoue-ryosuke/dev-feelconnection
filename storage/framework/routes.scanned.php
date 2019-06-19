@@ -75,7 +75,7 @@ $router->get('api/apple_music', [
 $router->get('api/reservation_modal/{sid}', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@reservationModalApi',
 	'as' => 'api.reservation_modal.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -83,7 +83,7 @@ $router->get('api/reservation_modal/{sid}', [
 $router->get('api/sheet_status/{sid}/{sheet_no}', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusApi',
 	'as' => 'api.sheet_status.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -91,7 +91,7 @@ $router->get('api/sheet_status/{sid}/{sheet_no}', [
 $router->post('api/sheet_status_extend', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusExtendApi',
 	'as' => 'api.sheet_status_extend.post',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -99,7 +99,7 @@ $router->post('api/sheet_status_extend', [
 $router->post('api/normal_reservation', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@normalReservationApi',
 	'as' => 'api.normal_reservation.post',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);

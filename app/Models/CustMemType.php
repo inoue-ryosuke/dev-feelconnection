@@ -44,12 +44,30 @@ class CustMemType extends BaseFormModel implements Authenticatable
 
    /**
     * 会員種別レコードを返却する
-    * 
+    *
     * @param unknown $mid 会員種別ID
     * @return unknown
     */
 	public static function getMemTypeById($mid) {
         $record = self::find($mid);
         return $record;
+    }
+
+    /**
+     * バイク枠確保で使用する、ネット予約回数(同時予約枠)を取得
+     * トライアル会員は0になっているため+1
+     *
+     * @param int $memberType 会員種別ID(cust_master.memtype)
+     * @return int
+     */
+    public static function getReservationCountForSheetLock(int $memberType) {
+        $count = self::where('mid', '=', $memberType)->value('rescnt_mem');
+
+        // TODO: 会員種別を渡してトライアル会員を判別
+        if (false) {
+            $count++;
+        }
+
+        return $count;
     }
 }
