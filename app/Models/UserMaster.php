@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use App\Exceptions\IllegalParameterException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
+use App\Models\BelongTenpoHist;
 
 class UserMaster extends BaseModel implements Authenticatable
 {
@@ -85,8 +86,8 @@ class UserMaster extends BaseModel implements Authenticatable
         // 退職済みでないかつ先生フラグが1
         $query = self::where('user_master.alive_flg', self::ALIVE_VALID)
             ->where('user_master.teacher', self::TEACHER_VALID);
-        $query->leftjoin('belong_tenpo_hist__c', 'user_master.uid', 'belong_tenpo_hist__c.uid__c')
-            ->leftjoin('tenpo_master', 'belong_tenpo_hist__c.tid__c', 'tenpo_master.tid');
+        $query->leftjoin(BelongTenpoHist::TABLE, 'user_master.uid', BelongTenpoHist::TABLE_UID)
+            ->leftjoin('tenpo_master', BelongTenpoHist::TABLE_TID, 'tenpo_master.tid');
         // 検索ワードがリクエストされている場合、スタッフ名と店舗名で検索
         if ($freeWord) {
             $query->where(function ($obj) use ($freeWord) {

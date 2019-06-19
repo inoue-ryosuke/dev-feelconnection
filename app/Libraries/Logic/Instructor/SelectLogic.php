@@ -3,6 +3,7 @@
 use App\Libraries\Logger;
 use App\Libraries\Logic\BaseLogic;
 use App\Models\TenpoMaster;
+use App\Models\BelongTenpoHist;
 use DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -70,7 +71,7 @@ class SelectLogic extends BaseLogic
         if ($type == UserMaster::SORT_TYPE_SHOP) {
             //所属店舗順(北から)の場合
             // 所属店舗情報を取得
-            $instructorIds = $instructorList->pluck('uid')->unique();
+            $instructorIds = $instructorList['record']->pluck('uid')->unique();
             $shopList = TenpoMaster::findInstructorsShops($instructorIds);
             // レスポンス用に整形
             $formatedShopList = [];
@@ -80,7 +81,7 @@ class SelectLogic extends BaseLogic
                 foreach($groupedShopList as $name => $shop) {
                     // コレクションからuidのキーバリューを抽出
                     $uidList = $shop->map(function ($item) {
-                        return [ 'uid' => $item['uid'] ];
+                        return [ 'uid' => $item[BelongTenpoHist::UID] ];
                     });
                     $formatedShopList[] = [
                         'name' => $name,
