@@ -180,4 +180,18 @@ class VaidationLogic
 
         return in_array($futureMemberType, $tenpos);
     }
+
+    /**
+     * バイク位置変更可能な会員種別かどうか
+     *
+     * @param int $memberType 会員種別(cust_memtype.mid)
+     * @return bool
+     */
+    public static function canSheetChange(int $memberType) {
+        // TODO:会員種別ID(cust_memtype.mid)を渡して、ネット・トライアル会員を判別
+        if (false) {
+        }
+
+        return true;
+    }
 }

@@ -104,6 +104,14 @@ $router->post('api/normal_reservation', [
 	'domain' => NULL,
 ]);
 
+$router->post('api/sheet_change', [
+	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetChangeApi',
+	'as' => 'api.sheet_change.post',
+	'middleware' => ['api', 'auth:customer'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->post('api/mailcheck/regist', [
 	'uses' => 'App\Http\Controllers\Api\MailCheckController@regist',
 	'as' => 'api.mailcheck.regist.post',
