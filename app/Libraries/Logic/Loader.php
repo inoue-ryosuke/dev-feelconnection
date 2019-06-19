@@ -20,6 +20,7 @@ class Loader
     const Auth          = "Authentication";
     const MailCheck     = "MailCheck";
     const MemtypeChange = "MemtypeChange";
+    const ZipCode     = "ZipCode";
 
     // 機能
     const SELECT = 'Select';

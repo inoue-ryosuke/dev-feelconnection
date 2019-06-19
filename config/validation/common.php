@@ -76,9 +76,9 @@ return [
         'row_max' => ':attributeは:max行以下で入力してください。',
         //カンマ区切り文字列をgetPayloadで配列化した際の判定用　TBD:日本語に置き換え
         'size' => [
-            'numeric' => 'The :attribute must be :size.',
-            'file' => 'The :attribute must be :size kilobytes.',
-            'string' => 'The :attribute must be :size characters.',
+            'numeric' => ':attributeには:sizeを指定してください。',
+            'file' => ':attributeには:size KBのファイルを指定してください。',
+            'string' => ':attributeには:size文字で指定してください。',
             'array' => ':attributeは:size項目のパラメータが必要です.',
         ],
         'zenkaku_max' => ':attributeは全角:max文字以内で入力してください。',
