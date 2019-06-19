@@ -52,23 +52,22 @@ if ( ! function_exists('isApiRequest'))
      * @return boolean True or False
      */
     function isApiRequest() {
+        logger('isApiRequest start');
         $currentUrl = url()->current();
+        logger('current url');
+        logger($currentUrl);
         $urlKey = "api.get";
-        $urlAdminKey = "api.admin.get";
         $headers = apache_request_headers();
         try {
-            if (strpos($currentUrl, route($urlAdminKey)) !== FALSE) {
-                // アプリはauth:apiで認証をかけているのでauth:webの認証をしない。
-                // 管理画面APIはすべてセッション認証の為、API判定はfalseで返す。
+            if (strpos($currentUrl, route($urlKey)) !== FALSE) {
                 return true;
-            } else if (strpos($currentUrl, route($urlKey)) !== FALSE) {
-                return true;
-            } else if(!is_null($headers) && isset($headers['X-Everegi-Version'])){
+            } else if(!is_null($headers) && isset($headers['X-FeelConnection-Version'])){
                 return true;
             }
         } catch (\InvalidArgumentException $e) {
             return false;
         }
+        logger('isApiRequest end');
         return false;
     }
 }
@@ -138,7 +137,7 @@ if (!function_exists('makeExportHeader')) {
             return;
         }
         $header = array_map(function ($v) use ($mapper) {
-            return array_get($mapper, $v.'.name', '-');
+            return data_get($mapper, $v.'.name', '-');
         }, array_keys($mapper));
         return implode($splitter, $header);
     }
@@ -163,9 +162,9 @@ if (!function_exists('outputExportRecord')) {
     {
         // レコード一覧から変換処理
         foreach ($mapper as $key => $rule) {
-            $value = array_get($record, $key);
+            $value = data_get($record, $key);
             if (!empty($rule['table'])) {
-                $value = array_get(array_get($form, $rule['table'], []), $value);
+                $value = data_get(data_get($form, $rule['table'], []), $value);
             }
             $value = preg_replace("/(\r\n|\r|\n)/", "\\n", $value);
             echo $value . $splitter;

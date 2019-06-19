@@ -51,6 +51,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        logger('Handler render');
         // ログの出力
         $debug_backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 20);
         logger()->error($debug_backtrace);
@@ -69,10 +70,7 @@ class Handler extends ExceptionHandler
         $userId = $request->headers->get('X-FeelConnection-GuardUID');
         $device = $request->headers->get('X-FeelConnection-Device');
         $version = $request->headers->get('X-FeelConnection-Version');
-//        $method = array_selector('REQUEST_METHOD', $_SERVER, '-');
-//        $uri = array_selector('REQUEST_URI', $_SERVER, '-');
-//        $method = array_get($_SERVER, 'REQUEST_METHOD', '-');
-//        $uri = array_get($_SERVER,'REQUEST_URI', '-');
+
         $method = data_get($_SERVER, 'REQUEST_METHOD', '-');
         $uri = data_get($_SERVER,'REQUEST_URI', '-');
         $ua = $request->headers->get('USER_AGENT');
@@ -101,6 +99,7 @@ class Handler extends ExceptionHandler
         }
         // API向けの出力
         if(isApiRequest()){
+            logger('isApiRequest');
             $response =  [
                 'result_code' => 1,
                 'error_id'    => $errorId,
@@ -111,10 +110,9 @@ class Handler extends ExceptionHandler
             $return_code = $this->getReturnCode($exception);
             return new JSONResponse($response,$return_code);
         }
+        logger('Handler render end');
         // その他例外の場合
         return redirect()->route('top');
-        // 描画
-        //return parent::render($request, $exception);
     }
 
     /**

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Exceptions\MalformedPayloadException;
 use App\Exceptions\IllegalParameterException;
 use App\Libraries\Logger;
-//use Debugbar;
 
 /**
  */
@@ -41,8 +40,15 @@ class ApiController extends Controller
         // $body = file_get_contents('php://input');
         $body = request()->getContent();
         $file = request()->files;
-        //logger($body);
-        $json =  json_decode($body, true);
+        $json = json_decode($body, true);
+        if (is_array($json)) {
+            foreach ($json as $key => $value) {
+                // カンマ区切り文字列を配列に変換して受け取る
+                if (!is_array($value) && is_string($value) && preg_match("#^(.+\,)+$#",$value)) {
+                    $json[$key] = explode(",",$value);
+                }
+            }
+        }
         if (!empty($body) && is_null($json)) {
             /** @throws APIリクエストペイロードのJSONが不正な場合 */
             $message = config('error.api.illFormedPayload');
@@ -71,27 +77,27 @@ class ApiController extends Controller
         }
 
         $rules = config('validation.'.$key.'.rules', []);
-        $mapper = config('validation.'.$key.'.mapper', []);
-
-        // バリデーションルールに validation.*.mapperのデータ組み込みロジックをもとに調整。
-        foreach ($mapper as $key => $record) {
-            $recordMapper = array_map(function ($v) use ($record) {
-                if (!isset($record->{$v})) {
-                    return "";
-                }
-                return $record->{$v};
-            }, $mapper);
-            $value = array_get($rules, $key);
-            $value = vsprintf($value, $recordMapper);
-            array_set($rules, $key, $value);
-        }
+//        $mapper = config('validation.'.$key.'.mapper', []);
+//
+//        // バリデーションルールに validation.*.mapperのデータ組み込みロジックをもとに調整。
+//        foreach ($mapper as $key => $record) {
+//            $recordMapper = array_map(function ($v) use ($record) {
+//                if (!isset($record->{$v})) {
+//                    return "";
+//                }
+//                return $record->{$v};
+//            }, $mapper);
+//            $value = data_get($rules, $key);
+//            $value = vsprintf($value, $recordMapper);
+//            data_set($rules, $key, $value);
+//        }
 
         $validator = validator(
             $payload,
             $rules,
             config('validation.common.errors'),
             config('validation.'.$key.'.attributes')
-            );
+        );
         if ($validator->fails()) {
             logger()->debug($validator->errors());
             $errors = json_encode($validator->errors(), JSON_UNESCAPED_UNICODE);
@@ -99,15 +105,5 @@ class ApiController extends Controller
         }
     }
 
-//    /**
-//     * レスポンス値をfieldsによって絞り込む対応
-//     * @param $response
-//     * @return array
-//     */
-//    protected function filterByFields($response) {
-//        if (!request()->has('fields') || empty(request()->get('fields'))) {
-//            return $response;
-//        }
-//        return array_filter_by_keys($response, explode(',', "error,".request()->get('fields')));
-//    }
+
 }

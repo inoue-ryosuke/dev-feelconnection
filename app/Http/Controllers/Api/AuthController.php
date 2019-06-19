@@ -3,18 +3,30 @@
 namespace App\Http\Controllers\Api;
 
 //use App\Libraries\Logic\Loader;  実開発の場合はロジック層にて実装
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Exceptions\IllegalParameterException;
+use App\Models\Cust;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Exceptions\ForbiddenException;
 
-
-///**
-// * 認証コントローラー
-//// * @Middleware({"logger", "ua", "append", "maintenance", "api"})
-// */
+/**
+ * 認証コントローラー
+ * @Middleware({"api", "auth:customer"})
+ */
 class AuthController extends ApiController
 {
 
     use ApiLogicTrait;
+    /**
+     * API インデックス (APIパスか判定するためのダミーAPI)
+     * @Get("api", as="api.get")
+     * @param $request
+     * @return Response
+     */
+    public function index(Request $request) {
+        return $this->getUrl($request);
+    }
 
     /**
      * API-01: 認証情報の取得
@@ -76,36 +88,89 @@ class AuthController extends ApiController
      * @param $request
      * @return Response
      */
-    public function getUserInfo(Request $request) {
+    public function getAuthInfo(Request $request) {
 
+        logger("getAuthUserInfo() Start");
+        // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
+        //$payload = $this->getPayload();
+        //logger('payload');
+        //logger($payload);
+        // ペイロードバリデーション
+        //$this->validateApiPayload('cust.auth', $payload);
+        
+        // TBD:認証情報からIDを特定する
+        $response = $this->getAuthSelectLogic()->getAuthInfo();
+        logger("getAuthUserInfo() End");
+        return response()->json($response);
+
+    }
+    /**
+     * API-02: 個人情報表示
+     * 
+     * @POST("api/auth/user", as="api.auth.user.get")
+     * @param $request
+     * @return Response
+     */
+    public function getUserInfo(Request $request) {
         logger("getUserInfo() Start");
 
-        // ▼実実装用
-        //$payload = $request->getContent();
-        //$payload = json_decode($payload, true);
-        //$this->validateApiPayload('admin.accountManagement.userInfo', $payload);
-        //$response = $this->getUserLogic()->getAdminUser($payload);
-        // ▼stub用
-        $response = [
-	        "result_code" => 0,
-	        "name" => "鈴木太郎",
-	        "kana" => "スズキタロウ",
-	        "pc_mail" => "you@feelcycle.com",
-	        "b_birthday" => "昭和55年1月1日",
-	        "b_year" => 1980,
-	        "b_month" => 1,
-	        "b_day" => 1,
- 	        "sex" => "1",
-            "h_zip" => "104-0061",
-            "h_pref" => "東京都",
-            "h_addr" => "中央区銀座 GINZA SIX 10F",
-            "h_tel" => "0363161005",
-	        "memtype_name" => "マンスリーメンバー",
-            "store_name" => "銀座（GNZ）、自由が丘（JYO）",
-            "dm_list" => "1,,,,",
-   	        "pc_conf" => 1,
-	        "gmo_credit" => "XXXXXXXXXXX",
-        ];
+        // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
+        $payload = $this->getPayload();
+        logger('payload');
+        logger($payload);
+        // ペイロードバリデーション
+        $this->validateApiPayload('cust.auth_user', $payload);
+        $cid = data_get($payload,"cid",null);
+
+        // TBD:認証情報からIDを特定する
+        $response = $this->getAuthSelectLogic()->getUserInfo($cid);
+        logger("getUserInfo() End");
+        return response()->json($response);
+    }
+    /**
+     * API-03: 受け取りメール設定表示更新
+     * 
+     * @POST("api/auth/user/dm_list/update", as="api.auth.user.dm_list.update")
+     * @param $request
+     * @return Response
+     */
+    public function updateUserDmList(Request $request) {
+
+        logger("updateUserDmList() Start");
+
+        // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
+        $payload = $this->getPayload();
+        logger('payload');
+        logger($payload);
+        // ペイロードバリデーション
+        $this->validateApiPayload('cust.dm_update', $payload);
+
+        // TBD:認証情報からIDを特定する
+        $response = $this->getAuthUpdateLogic()->setDmList($payload);
+        logger("getUserInfo() End");
+        return response()->json($response);
+
+    }
+    /**
+     * API-04: 認証会員情報更新
+     * 
+     * @POST("api/auth/user/update", as="api.auth.user.update")
+     * @param $request
+     * @return Response
+     */
+    public function updateUser(Request $request) {
+
+        logger("updateUserDmList() Start");
+
+        // TBD:認証はヘッダーパラメータ（Bearerトークン）でやる想定。ペイロード処理はなし
+        $payload = $this->getPayload();
+        logger('payload');
+        logger($payload);
+        // ペイロードバリデーション
+        $this->validateApiPayload('cust.dm_update', $payload);
+
+        // TBD:認証情報からIDを特定する
+        $response = $this->getAuthUpdateLogic()->updateUser($payload);
         logger("getUserInfo() End");
         return response()->json($response);
 

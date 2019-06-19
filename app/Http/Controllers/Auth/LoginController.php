@@ -2,9 +2,20 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Exceptions\IllegalParameterException;
 use App\Http\Controllers\Controller;
+use App\Models\Cust;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use App\Libraries\Logger;
 
+
+/**
+ * 認証コントローラー
+ * @Middleware({"guest", "api"})
+ */
 class LoginController extends Controller
 {
     /*
@@ -18,7 +29,7 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers, Authenticatable;
 
     /**
      * Where to redirect users after login.
@@ -34,6 +45,30 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+
     }
+
+    /**
+     *
+     * 仮ログイン(セッション認証を通すだけ) TODO ログインが実装されたあとは削除する
+     * @Post("/api/user/login", as="api.user.login")
+     * @param $request
+     * @return Response
+     */
+    public function login(Request $request)
+    {
+        logger('ログイン');
+        $payload = $this->getPayload();
+        $pcMail = data_get($payload, "pc_mail");
+
+        //ログインIDからユーザの情報を取得
+        $user = Cust::where('pc_mail', $pcMail)->first();
+
+        // ログイン認証(cust_master用)が通ったユーザーをセッションに登録
+        auth('customer')->login($user);
+        logger('ログイン完了');
+        return response()->json($user);
+
+    }
+
 }

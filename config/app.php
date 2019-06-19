@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Tokyo',
 
     /*
     |--------------------------------------------------------------------------
@@ -80,7 +80,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'ja',
 
     /*
     |--------------------------------------------------------------------------
@@ -93,7 +93,7 @@ return [
     |
     */
 
-    'fallback_locale' => 'en',
+    'fallback_locale' => 'ja',
 
     /*
     |--------------------------------------------------------------------------
@@ -169,16 +169,17 @@ return [
 //        Barryvdh\Debugbar\ServiceProvider::class,             // Debugbar
 //        Way\Generators\GeneratorsServiceProvider::class,
 //        Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
+        App\Providers\JpDateTimeServiceProvider::class,      // 和暦出力用（令和対応）
         /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
-        App\Providers\AuthServiceProvider::class,
+//        App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\HelperServiceProvider::class,           // ヘルパー関数
-
+        App\Providers\SessionServiceProvider::class,
     ],
 
     /*
@@ -229,7 +230,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'JpDateTime' => ’App\Libraries\Common\JpDateTime::class,
     ],
 
 ];

@@ -10,6 +10,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\MessageBag;
+use App\Libraries\Logger;
 
 class Controller extends BaseController
 {
@@ -45,7 +46,7 @@ class Controller extends BaseController
         if (is_null($key)) {
             return $this->data;
         }
-        return array_get($this->data, $key, null);
+        return data_get($this->data, $key, null);
     }
 
     /**
@@ -78,7 +79,7 @@ class Controller extends BaseController
      */
     protected function setupData($input, $record, $form, $key = "", $validator = null)
     {
-        $id = array_get($record, 'id', null);
+        $id = data_get($record, 'id', null);
         $errors = new MessageBag();
         if (!is_null($validator)) {
             $errors = $validator->getMessageBag();
@@ -160,7 +161,7 @@ class Controller extends BaseController
                 }
                 return $record->{$v};
             }, $mapper);
-            $value = array_get($rules, $key);
+            $value = data_get($rules, $key);
             $value = vsprintf($value, $recordMapper);
             array_set($rules, $key, $value);
         }

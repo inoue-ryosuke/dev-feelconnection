@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
- /**
- * TestＡＰＩコントローラー
-// * @Middleware({"logger", "ua",  "api.logger", "append", "maintenance"})
+/**
+ * @Middleware({"api", "guest"})
  */
-class InviteController extends Controller
+class InviteController extends ApiController
 {
     /**
      * API-xx: 紹介URL有効性確認API
@@ -47,12 +45,10 @@ class InviteController extends Controller
             logger($inviteCode);
             $inviteCode = 'asdf1321asfa3s21asf';
         }
-        $response = [
-            'result_code' => 0,
-            'lid' => 51,
-            'lesson_flag' => 1,
-            'friend_flag' => 0,
-        ];
+        // レスポンスを取得
+        $response = $this->getInviteSelectLogic()->validateInviteCode($inviteCode);
+        logger('response');
+        logger($response);
         logger('validateInviteCode end');
         return response()->json($response)->Cookie('_ic', $inviteCode);
 

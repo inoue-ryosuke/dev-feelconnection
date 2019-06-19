@@ -13,6 +13,11 @@ return [
         'limit'  => 100,
         'offset' => 0
     ],
+    'loginRedirect' => [
+        "customer" => 'top', // cust_master(会員マスタ)のログインルーティング
+        "user_master" => 'top',// user_master(スタッフ)のログインルーティング
+        "default" => 'top', // 会員でもスタッフでもない場合。会員のログインページへルーティング
+    ],
     'app' => [
         'limit' => 50,
         'topLimit' => 20,
@@ -56,6 +61,23 @@ return [
         ],
         'closureTags' => [
             'a',
+        ],
+    ],
+    'mailCheck' => [
+        'regist' => [
+            'subject'     => '登録認証メール',
+            'from'        => 'toshifumi.kawai@xchange.jp',
+            'expireHours' => '24',
+        ],
+        'passwdIssue' => [
+            'subject'     => 'パスワード再発行認証メール',
+            'from'        => 'toshifumi.kawai@xchange.jp',
+            'expireHours' => '24',
+        ],
+        'mailReset' => [
+            'subject'     => 'メールアドレス再設定認証メール',
+            'from'        => 'toshifumi.kawai@xchange.jp',
+            'expireHours' => '24',
         ],
     ],
 ];
