@@ -8,7 +8,7 @@ return [
      */
      'search' => [
          'rules' => [
-             'zip_code' => 'string|size:7',
+             'zip_code' => 'required|string|size:7',
          ],
          'attributes' => [
              'zip_code' => '郵便番号',
