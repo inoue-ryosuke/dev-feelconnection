@@ -47,7 +47,15 @@ class InviteSeeder extends BaseSeeder
             $record->lid = $lessonMater->getAuthIdentifier();
             $invite = new Invite;
             $invite->mergeRequest($record);
-            $invite->invite_code = $invite::makeInviteCode();
+
+            if (Invite::isExistsInviteCode('jIU0DztiPyr7yndZdYlC31Lkacc4Kgr2')) {
+                // ランダムで紹介コードを設定
+                $invite->invite_code = $invite::makeInviteCode();
+            } else {
+                // テスト用に仮で固定紹介コードを設定
+                $invite->invite_code = 'jIU0DztiPyr7yndZdYlC31Lkacc4Kgr2';
+            }
+
             $invite->save();
 
     }
