@@ -4,12 +4,13 @@ use Illuminate\Database\Seeder;
 use App\Models\BaseFormModel;
 use App\Http\Requests\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use app\Exceptions\InternalErrorException as InternalErrorException;
 
-use App\Models\Cust as Cust;
-use App\Models\CustMemType as CustMemType;
-use App\Models\TenpoMaster as TenpoMaster;
-use App\Models\CustTenpo as CustTenpo;
-
+//use App\Models\Cust as Cust;
+//use App\Models\CustMemType as CustMemType;
+use App\Models\CustMemType;
+//use App\Models\TenpoMaster as TenpoMaster;
+//use App\Models\CustTenpo as CustTenpo;
 
 class CustMemTypeSeeder extends BaseSeeder
 {
@@ -43,13 +44,14 @@ class CustMemTypeSeeder extends BaseSeeder
     protected function insertRecord($record = []) {
 
             $memdao = $tenpo = null;
-            $tempoModels = CustMemType::where("type_name",$record["type_name"])->first();
-            if (is_null($tempoModels)) {
-                $tempoModels = new CustMemType();
+            $custMemType = new CustMemType();
+            $tenpoModels = CustMemType::where($custMemType->convertKey("type_name"),$record["type_name"])->first();
+            if (is_null($tenpoModels)) {
+                $tenpoModels = new CustMemType();
             }
-            $tempoModels->mergeRequest($record);
-            $tempoModels->save();
-            echo "\n   ---> " . "CustMemType Insert End [".$tempoModels->type_name."]" . "\n";
+            $tenpoModels->mergeRequest($record);
+            $tenpoModels->save();
+            echo "\n   ---> " . "CustMemType Insert End [".$tenpoModels->type_name."]" . "\n";
     }
 
 }

@@ -6,37 +6,33 @@ use App\Exceptions\IllegalParameterException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 use Carbon\Carbon;
+
 use App\Libraries\Common\JpDateTime as JpDateTime;
 
 use App\Models\TenpoMaster as TenpoMaster;
 use App\Models\CustTenpo as CustTenpo;
 use App\Models\Schedule as Schedule;
 
-class Cust extends BaseFormModel implements Authenticatable
-//class Cust extends SalesBaseFormModel implements Authenticatable
-{
-//    use AuthenticatableTrait, ListingTrait, SoftDeletes, TokenizerTrait,UserTrait, UserStatusTrait;
-	use AuthenticatableTrait;
 
-	protected static $salesforceAccessor = [
-            'cid', 
-			'name',
-			'h_buil',
-			'dm_list',
-			'pc_conf'
-    ];
-    protected static $append = [
-	];
+//class Cust extends BaseFormModel implements Authenticatable
+class Cust extends SalesBaseFormModel implements Authenticatable
+{
+	use AuthenticatableTrait;
 
 	/**
      * @var string テーブル名
      */
-    protected $table = 'cust_master';
-    protected $primaryKey = 'cid';
-    protected $loginKey = 'cid';
-//    protected $table = 'cust_master__c';
-//    protected $primaryKey = 'cid__c';
-//    protected $loginKey = 'cid__c';
+//    protected $table = 'cust_master';
+//    protected $primaryKey = 'cid';
+//    protected $loginKey = 'cid';
+//    const CREATED_AT = 'edit_date';
+//    const UPDATED_AT = 'reedit_date';
+//    const DELETED_AT = 'del_date';
+    protected $table = 'cust_master__c';
+    protected $primaryKey = 'cid__c';
+    const CREATED_AT = 'edit_date__c';
+    const UPDATED_AT = 'reedit_date__c';
+    const DELETED_AT = 'del_date__c';
 
      /**
      * The attributes that are mass assignable.
@@ -173,9 +169,6 @@ class Cust extends BaseFormModel implements Authenticatable
 		"login_trial_count"
     ];
 
-    const CREATED_AT = 'edit_date';
-    const UPDATED_AT = 'reedit_date';
-    const DELETED_AT = 'del_date';
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -187,9 +180,12 @@ class Cust extends BaseFormModel implements Authenticatable
 
 	// モデル結合アクセサ（会員区分）
     public function joinAllMemType() {
-        return $this->hasOne(CustMemType::Class,"mid","memtype")->withDefault();
-//		return $this->hasOne(CustMemType::Class,"mid__c","memtype");
+		$newMemType = new CustMemType();
+		$memtype_col     = $this->convertKey("memtype");
+        //return $this->hasOne(CustMemType::Class,$memtype_primary,$memtype_col);
+        return CustMemType::where($newMemType->convertKey("mid"),$this->memtype)->get();
 	}
+	/*
     public function hasOneMemType() {
 		if (!$this->joinAllMemType) {
 			return null;
@@ -202,60 +198,79 @@ class Cust extends BaseFormModel implements Authenticatable
 		}
 		return $this->joinAllMemType->get();
 	}
-	
-	// モデル結合アクセサ（所属店舗：複数対応）
-    public function joinAllStoreTenpo() {
-		//$query = $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,"cid","tenpo_id")->toSql();
-		//echo $query; exit;
-		return $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,"cid","tenpo_id");
+	*/
+    public function hasOneMemType() {
+		if (!$this->joinAllMemType()->count()) {
+			return null;
+		}
+		return $this->joinAllMemType()->first();
 	}
+    public function hasManyMemType() {
+		if (!$this->joinAllMemType()->count()) {
+			return null;
+		}
+		return $this->joinAllMemType();
+	}	
+	// モデル結合アクセサ（ではなく単なるモデル抽出）（所属店舗：複数対応）
+    public function joinAllStoreTenpo() {
+//		return $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,$this->primaryKey,"tenpo_id");
+		$ids = CustTenpo::where((new CustTenpo)->convertKey("cid"),$this->cid)
+						->where((new CustTenpo)->convertKey("flg"),1)->get()
+						->pluck((new CustTenpo)->convertKey("tenpo_id"))->unique();
+		return TenpoMaster::whereIn((new TenpoMaster)->convertKey("tid"),$ids)->get();
+    }
     public function hasOneStoreTenpo() {
-		if (!$this->joinAllStoreTenpo->count()) {
+		var_dump($this->joinAllStoreTenpo()); exit;
+		if (!$this->joinAllStoreTenpo()->count()) {
 			return null;
 		}
 		return $this->joinAllStoreTenpo()->first();
 	}
     public function hasManyStoreTenpo() {
-		if (!$this->joinAllStoreTenpo->count()) {
+		if (!$this->joinAllStoreTenpo()->count()) {
 			return null;
 		}
 //		print "<pre>"; print_r($this->joinAllStoreTenpo()->get()); print "</pre>"; exit;
-		return $this->joinAllStoreTenpo()->get();
+//		return $this->joinAllStoreTenpo()->get();
+		return $this->joinAllStoreTenpo();
 	}
-	// モデル結合アクセサ（登録店舗）
+	// モデル結合アクセサ（ではなく単なるモデル抽出）（登録店舗）
     public function joinAllLastTenpo() {
-		return $this->hasOne(TenpoMaster::Class,"tid","last_tenpo");
+		//return $this->hasOne(TenpoMaster::Class,(new TenpoMaster)->convertKey("tid"),$this->convertKey("last_tenpo"));
+		return TenpoMaster::where((new TenpoMaster)->convertKey("tid"),$this->last_tenpo)->get();
 	}
     public function hasOneLastTenpo() {
-		if (!$this->joinAllLastTenpo) {
+		if (!$this->joinAllLastTenpo()->count()) {
 			return null;
 		}
-		return $this->joinAllLastTenpo->first();
+		return $this->joinAllLastTenpo()->first();
 	}
     public function hasManyLastTenpo() {
-		if (!$this->joinAllLastTenpo) {
+		if (!$this->joinAllLastTenpo()->count()) {
 			return null;
 		}
-		return $this->joinAllLastTenpo->get();
+		return $this->joinAllLastTenpo();
 	}
 	// 全店舗情報（所属店舗＋登録店舗）
     public function hasManyAllTenpo() {
 		return $this->hasManyStoreTenpo() ?? collect([]);
 	}
-	// モデル結合アクセサ（）
+	// モデル結合アクセサ（ではなく単なるモデル抽出）
 	// 1.ログインユーザーの会員ID、契約変更履歴の会員IDからレコード抽出。
     public function joinSchedule() {
-		return $this->hasMany(Schedule::Class,"sc_cid","cid");
+//		return $this->hasMany(Schedule::Class,(new Schedule)->convertKey("sc_cid"),$this->convertKey("cid"));
+		return Schedule::where((new Schedule)->convertKey("sc_cid"),$this->cid)->get();
 	}
     public function getChangeSchedule() {
-		if (!$this->joinSchedule) {
+		if (!$this->joinSchedule()->count()) {
 			return null;
 		}
 		// 所属店舗ID一覧を取得する
 		$allTenpo   = $this->hasManyAllTenpo();
 		$allTenpoId = $allTenpo->implode("tid",",");
 		// 
-		return $this->joinSchedule->where("sc_flg",1); 
+//		return $this->joinSchedule->where("sc_flg",1); 
+		return $this->joinSchedule()->where((new Schedule)->convertKey("sc_flg"),1);
 	}
 
 	/**
@@ -308,7 +323,7 @@ class Cust extends BaseFormModel implements Authenticatable
 	 */
 	public function getMemTypeName() {
 		$memtype = $append = "";
-        // 会員種別情報取得
+		// 会員種別情報取得
 		$memtype = $this->hasOneMemType();
         // 変更スケジュール情報取得
 		$changeSchedule = $this->getChangeSchedule() ?? collect([]);
@@ -324,7 +339,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		// 前提：変更scheduleデータがある場合
 	    if ($changeSchedule->count()) {
             foreach ($changeSchedule as $schedule) {
-				$okTenpoIds = $allTenpo->pluck("tid")->unique();
+				$okTenpoIds = $allTenpo->pluck($this->convertKey("tid"))->unique();
 				// 店舗の変更履歴ではなく（所属店舗ID配列内に変更履歴の店舗IDがある）、会員種別変更時（現在の種別IDと違う）
 			    if ($schedule->sc_memtype != $memtype->mid && in_array($schedule->sc_tenpo,$okTenpoIds->toArray())) {
 					$append = "（変更登録あり）";
@@ -352,7 +367,7 @@ class Cust extends BaseFormModel implements Authenticatable
 			return "";
 		}
         $memtype = $this->hasOneMemType();		
-		$okTenpoIds = $all->pluck("tid")->unique();
+		$okTenpoIds = $all->pluck($this->convertKey("tid"))->unique();
 
 		// 変更スケジュール情報を取得
 		$changeSchedule = $this->getChangeSchedule() ?? collect([]);

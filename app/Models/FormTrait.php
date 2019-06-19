@@ -28,14 +28,25 @@ trait FormTrait
      */
     public function mergeRequest($request)
     {
+        //var_dump("mergeRequest [".$this->getTable()."]");
         if (is_array($request)) {
             $request = collect($request);
         }
         foreach ($this->getFillable() as $key) {
-            if (isset($request[$key])) {
-                $this->{$key} = $request[$key];
-            } else if (array_key_exists($key, $request->all())) {
-                $this->{$key} = data_get($key, $request->all());
+            // テーブル名が__c付きの場合、salesforce用としてカラム名変換マージしてシーダーを流し込む
+            if (preg_match("#^(.+)__c$#",$this->getTable())) {
+                $sfkey = $key."__c";
+                if (isset($request[$key])) {
+                    $this->{$sfkey} = $request[$key];
+                } else if (array_key_exists($key, $request->all())) {
+                    $this->{$sfkey} = data_get($key, $request->all());
+                }
+            } else {
+                if (isset($request[$key])) {
+                    $this->{$key} = $request[$key];
+                } else if (array_key_exists($key, $request->all())) {
+                    $this->{$key} = data_get($key, $request->all());
+                }
             }
         }
     }

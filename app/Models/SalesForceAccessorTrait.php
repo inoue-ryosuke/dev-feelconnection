@@ -19,6 +19,7 @@ trait SalesForceAccessorTrait
     {
         parent::boot();
         $tablename = (new static)->getTable();
+        var_dump($tablename);
         $primary   = (new static)->primaryKey;
         $accessorList = static::$salesforceAccessor;
         // モデルのテーブル名が__c付きになってない場合、後続処理はさせない
@@ -35,7 +36,20 @@ trait SalesForceAccessorTrait
             // テーブルの全てのカラム実体は「__c付き」なので、__cなしでアクセスした場合__c付きでアクセスしたものと同一にする
             //   「__c無し」でも「__c付き」を参照可能にする：__c無しのアクセサ準備
             //   「__c無し」でも「__c付き」へ保存可能にする：__c無しのアクセサ準備
-            throw new InternalErrorException("Salesforce用のカラム一覧が定義されていません");
+//            $attributes = (new static)->fillable;
+            $newMdl = (new static);
+            var_dump($newMdl); exit;
+            if (empty($attributes)) {
+                throw new InternalErrorException("Salesforce用の登録許可カラム一覧が定義されていません");
+            }
+            // migrationは__c付きで登録されているはずなので、指定キーから__cを取り除き、__cなしキーをアクセサ作成対象にする
+            foreach ($attributes as $key) {
+                if (preg_match("#^(.+)__c$#",$key)) {
+                    static::$salesforceAccessor[] = preg_replace("#^(.+)__c$#","$1",$key);
+                } else {
+                    static::$salesforceAccessor[] = $key;
+                }
+            }
         }
         // アクセサ・ミューテタ定義
         foreach (static::$salesforceAccessor as $target) {

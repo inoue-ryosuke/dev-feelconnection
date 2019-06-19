@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use App\Exceptions\IllegalParameterException;
+use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Database\Eloquent\Model;
 
-class TenpoKubun extends BaseModel
+class TenpoKubun extends BaseFormModel implements Authenticatable
 {
+    use AuthenticatableTrait;
     //
     /**
      * @var string テーブル名

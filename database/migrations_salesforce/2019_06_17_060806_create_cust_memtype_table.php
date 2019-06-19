@@ -15,17 +15,17 @@ class CreateCustMemtypeTable extends Migration {
 		Schema::create('cust_memtype__c', function(Blueprint $table)
 		{
 			$table->integer('mid__c', true);
-			$table->text('type_name');
-			$table->text('status');
-			$table->char('flg', 1)->default('Y');
-			$table->text('iname')->nullable();
-			$table->text('itxtcol')->nullable();
-			$table->text('ibgcol')->nullable();
-			$table->integer('rescnt_mem');
-			$table->integer('resspan');
-			$table->smallInteger('attend_count')->default(0);
-			$table->integer('seq')->default(0);
-			$table->integer('mem_prod')->default(0);
+			$table->text('type_name__c');
+			$table->text('status__c');
+			$table->char('flg__c', 1)->default('Y');
+			$table->text('iname__c')->nullable();
+			$table->text('itxtcol__c')->nullable();
+			$table->text('ibgcol__c')->nullable();
+			$table->integer('rescnt_mem__c');
+			$table->integer('resspan__c');
+			$table->smallInteger('attend_count__c')->default(0);
+			$table->integer('seq__c')->default(0);
+			$table->integer('mem_prod__c')->default(0);
 		});
 	}
 

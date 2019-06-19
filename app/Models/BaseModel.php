@@ -21,12 +21,12 @@ class BaseModel extends Model implements IEditable {
     public static function getTableName() {
         return (new static)->getTable();
     }
-    // 各モデルで定義するSalesForce用項目
+    // salesforce用
     protected static $salesforceAccessor = [
-//            'cid', 
-//			'name',
-//			'h_buil'
     ];
+    // アクセサ用
+    protected static $append = [
+	];
 
     /**
      * フォーム値から値を取得する。
@@ -38,6 +38,16 @@ class BaseModel extends Model implements IEditable {
             return $this->{$formKey};
         }
         return null;
+    }
+    /**
+     * SalesForceテーブル名になっていたら、カラム名も__c付き返却
+     */
+    public function convertKey($key) {
+//        if (preg_match("#^(.+)__c$#",(new static)->getTable())) {
+        if (preg_match("#^(.+)__c$#",$this->table)) {
+            return $key."__c";
+        }
+        return $key;
     }
 
     /**

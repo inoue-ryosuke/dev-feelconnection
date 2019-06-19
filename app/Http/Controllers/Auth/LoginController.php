@@ -62,7 +62,8 @@ class LoginController extends Controller
         $pcMail = data_get($payload, "pc_mail");
 
         //ログインIDからユーザの情報を取得
-        $user = Cust::where('pc_mail', $pcMail)->first();
+        $pc_mail_key = (new Cust())->convertKey('pc_mail');
+        $user = Cust::where($pc_mail_key, $pcMail)->first();
 
         // ログイン認証(cust_master用)が通ったユーザーをセッションに登録
         auth('customer')->login($user);

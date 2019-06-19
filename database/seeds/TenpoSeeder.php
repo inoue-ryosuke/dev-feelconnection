@@ -12,10 +12,6 @@ use App\Models\TenpoKubun as TenpoKubun;
 class TenpoSeeder extends BaseSeeder
 {
 
-    public function __construct()
-    {
-    }
-
     /**
      * Run the database seeds.
      *
@@ -40,6 +36,7 @@ class TenpoSeeder extends BaseSeeder
      */
     protected function insertRecord($record = []) {
 
+            $tenpoMdl = new TenpoMaster();
             // メインModel用の関連情報を取り除く
             if (isset($record["assign"])) {
                 $assign = $record["assign"];
@@ -47,9 +44,10 @@ class TenpoSeeder extends BaseSeeder
             }
             // 関連情報に店舗名がある場合、店舗エリア情報もセットで登録
             if (isset($assign["tenpo_area_name"])) {
-                $area = TenpoAreaMaster::where("name",$assign["tenpo_area_name"])->first();
+                $tenpoAreaMdl = new TenpoAreaMaster();
+                $area = TenpoAreaMaster::where($tenpoAreaMdl->convertKey("name"),$assign["tenpo_area_name"])->first();
                 if (!$area) {
-                    $area = new TenpoAreaMaster();
+                    $area = $tenpoAreaMdl;
                 }
                 $mergeParam = [
                     "name" => $assign["tenpo_area_name"],
@@ -61,11 +59,11 @@ class TenpoSeeder extends BaseSeeder
             }
             // 関連情報に店舗区分名がある場合、店舗区分情報もセットで登録
             if (isset($assign["tenpo_kubun_name"])) {
-                $kbn = TenpoKubun::where("tk_name",$assign["tenpo_kubun_name"])->first();
+                $tenpoKbnMdl = new TenpoKubun();
+                $kbn = TenpoKubun::where($tenpoKbnMdl->convertKey("tk_name"),$assign["tenpo_kubun_name"])->first();
                 if (!$kbn) {
-                    $kbn = new TenpoKubun();
+                    $kbn = $tenpoKbnMdl;
                 }
-                $kbn = new TenpoKubun();
                 $mergeParam = [
                     "tk_name" => $assign["tenpo_kubun_name"],
                 ];
@@ -76,12 +74,13 @@ class TenpoSeeder extends BaseSeeder
             }
 
             //echo "\n   ---> " . "Cust Insert Start" . "\n";
-            $dao = TenpoMaster::where("tenpo_name",$record["tenpo_name"])->first();
+            $dao = TenpoMaster::where($tenpoMdl->convertKey("tenpo_name"),$record["tenpo_name"])->first();
             if (is_null($dao)) {
-                $dao = new TenpoMaster();
+                $dao = $tenpoMdl;
             }
             $dao->mergeRequest($record);
             $dao->save();
+            var_dump($dao->tenpo_name);
             echo "\n   ---> " . "Tenpo Insert End [".$dao->tenpo_name."]" . "\n";
 
     }

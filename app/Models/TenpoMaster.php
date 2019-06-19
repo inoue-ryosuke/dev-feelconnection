@@ -9,18 +9,18 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\TenpoAreaMaster;
 use App\Models\TenpoKubun;
 
-class TenpoMaster extends BaseFormModel implements Authenticatable
-//class TenpoMaster extends SalesBaseFormModel implements Authenticatable
+//class TenpoMaster extends BaseFormModel implements Authenticatable
+class TenpoMaster extends SalesBaseFormModel implements Authenticatable
 {
     use AuthenticatableTrait;
     //
     /**
      * @var string テーブル名
      */
-    protected $table = 'tenpo_master';
-    protected $primaryKey = 'tid';
-//    protected $table = 'tenpo_master__c';
-//    protected $primaryKey = 'tid__c';
+//    protected $table = 'tenpo_master';
+//    protected $primaryKey = 'tid';
+    protected $table = 'tenpo_master__c';
+    protected $primaryKey = 'tid__c';
 
     // 有効/無効フラグ
     const VALID = 1;
@@ -65,6 +65,7 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
     ];
 
     // モデル結合アクセサ（店舗エリア）
+    /*
     public function joinAllTenpoArea() {
 		return $this->hasOne(TenpoAreaMaster::Class,"id","tenpo_area_id");
 	}
@@ -83,7 +84,7 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
 	}
     public function hasManyTenpoKubun() {
 		return $this->joinAllTenpoKubun->get();
-    }
+    }*/
     
     /**
      * インストラクターが所属する店舗一覧取得
