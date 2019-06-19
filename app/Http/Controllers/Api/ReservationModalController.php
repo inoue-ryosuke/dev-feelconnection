@@ -322,7 +322,18 @@ class ReservationModalController extends Controller
             );
         }
 
-        // 指定されたバイクが、枠確保済み・予約済みかどうか
+        // ログインユーザーがバイクを予約済みかどうか
+        if ($sheetManager->isCustomerReserved()) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not reserve sheet',
+                    'すでに予約済みのレッスンです。',
+                    array_merge($params, [ 'cust_master' => $custMaster ]))
+            );
+        }
+
+        // 指定されたバイクが、他のユーザーによって、枠確保済み・予約済みかどうか
         if ($sheetManager->isSheetReserved($sheet_no)) {
             return CommonLogic::getErrorJsonResponse(
                 Response::HTTP_CONFLICT,
@@ -461,13 +472,33 @@ class ReservationModalController extends Controller
             );
         }
 
-        // 指定されたバイクが、枠確保済み・予約済みかどうか
+        // ログインユーザーがバイクを予約済みかどうか
+        if ($sheetManager->isCustomerReserved()) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not reserve sheet',
+                    'すでに予約済みのレッスンです。',
+                    array_merge($params, [ 'cust_master' => $custMaster ]))
+                );
+        }
+
+        // 指定されたバイクが、他のユーザーによって、枠確保済み・予約済みかどうか
         if ($sheetManager->isSheetReserved($sheet_no)) {
-            // 予約済みのため、バイク枠確保できない
             return response()->json([
                 'response_code' => Response::HTTP_RESET_CONTENT,
                 'modal_type' => NormalReservationTransitionType::EXPLANATION_MODAL,
-                'modal_text' => '指定された座席は予約できません。'
+                'modal_text' => '指定された座席は、他のユーザーによって、枠確保済みまたは予約済みです。'
+            ])->setStatusCode(Response::HTTP_RESET_CONTENT);
+        }
+
+        // バイク枠確保
+        if (!$sheetManager->addSheetLock($sheet_no)) {
+            // バイク枠確保失敗
+            return response()->json([
+                'response_code' => Response::HTTP_RESET_CONTENT,
+                'modal_type' => NormalReservationTransitionType::EXPLANATION_MODAL,
+                'modal_text' => 'バイク枠確保に失敗しました。'
             ])->setStatusCode(Response::HTTP_RESET_CONTENT);
         }
 

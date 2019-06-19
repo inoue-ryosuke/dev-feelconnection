@@ -2,7 +2,6 @@
 
 namespace App\Libraries\Logic\ReservationModal;
 
-use Illuminate\Support\Facades\Auth;
 use App\Models\ShiftMaster;
 
 /**

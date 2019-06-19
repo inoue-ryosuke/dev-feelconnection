@@ -2,9 +2,7 @@
 
 namespace App\Libraries\Logic\ReservationModal;
 
-use Illuminate\Support\Facades\Auth;
 use App\Models\ShiftMaster;
-use App\Models\Constant\ReservationTablePrefix;
 
 /**
  * 予約モーダルAPI等で必要なRedis・DBのマスター情報
