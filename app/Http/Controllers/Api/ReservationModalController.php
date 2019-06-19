@@ -126,11 +126,12 @@ class ReservationModalController extends Controller
         }
 
         // 座席情報取得
-        $sheetManager = new SheetManager($shiftMaster['shiftid']);
+        $sheetManager = new SheetManager($shiftMaster['shiftid'], $custMaster['cid'], $custMaster['memtype']);
         $sheetManager->initStudio();
-        $sheetManager->setSheetStatusAndModalTypeByOrderLesson($custMaster['cid']);
-        $sheetManager->setSheetStatusAndModalTypeBySheetLock($custMaster['cid']);
-        $sheetManager->fillNotSpecialTrialSheet($custMaster['memtype']);
+        $sheetManager->setSheetStatusByOrderLesson();
+        $sheetManager->setSheetStatusBySheetLock();
+        $sheetManager->fillNotSpecialTrialSheet();
+        $sheetManager->setModalType();
 
         return response()->json([
             'response_code' => Response::HTTP_OK,
@@ -199,11 +200,11 @@ class ReservationModalController extends Controller
         }
 
         // 座席情報取得
-        $sheetManager = new SheetManager($shiftMaster['shiftid']);
+        $sheetManager = new SheetManager($shiftMaster['shiftid'], $custMaster['cid'], $custMaster['memtype']);
         $sheetManager->initStudio();
-        $sheetManager->setSheetStatusAndModalTypeByOrderLesson($custMaster['cid']);
-        $sheetManager->setSheetStatusAndModalTypeBySheetLock($custMaster['cid']);
-        $sheetManager->fillNotSpecialTrialSheet($custMaster['memtype']);
+        $sheetManager->setSheetStatusByOrderLesson();
+        $sheetManager->setSheetStatusBySheetLock();
+        $sheetManager->fillNotSpecialTrialSheet();
 
         // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
         if (!$sheetManager->isSheetNoValid($sheet_no)) {
@@ -330,10 +331,11 @@ class ReservationModalController extends Controller
         }
 
         // 座席情報取得
-        $sheetManager = new SheetManager($shiftMaster['shiftid']);
+        $sheetManager = new SheetManager($shiftMaster['shiftid'], $custMaster['cid'], $custMaster['memtype']);
         $sheetManager->initStudio();
-        $sheetManager->setSheetStatusAndModalTypeByOrderLesson($custMaster['cid']);
-        $sheetManager->fillNotSpecialTrialSheet($custMaster['memtype']);
+        $sheetManager->setSheetStatusByOrderLesson();
+        $sheetManager->setSheetStatusBySheetLock();
+        $sheetManager->fillNotSpecialTrialSheet();
 
         // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
         if (!$sheetManager->isSheetNoValid($sheet_no)) {
@@ -357,7 +359,7 @@ class ReservationModalController extends Controller
         }
 
         // バイク枠延長
-        if (!$sheetManager->extendSheetLock($sheet_no, $custMaster['cid'])) {
+        if (!$sheetManager->extendSheetLock($sheet_no)) {
             return CommonLogic::getErrorJsonResponse(
                 Response::HTTP_CONFLICT,
                 CommonLogic::getErrorArray(
@@ -467,11 +469,11 @@ class ReservationModalController extends Controller
         }
 
         // 座席情報取得
-        $sheetManager = new SheetManager($shiftMaster['shiftid']);
+        $sheetManager = new SheetManager($shiftMaster['shiftid'], $custMaster['cid'], $custMaster['memtype']);
         $sheetManager->initStudio();
-        $sheetManager->setSheetStatusAndModalTypeByOrderLesson($custMaster['cid']);
-        $sheetManager->setSheetStatusAndModalTypeBySheetLock($custMaster['cid']);
-        $sheetManager->fillNotSpecialTrialSheet($custMaster['memtype']);
+        $sheetManager->setSheetStatusByOrderLesson();
+        $sheetManager->setSheetStatusBySheetLock();
+        $sheetManager->fillNotSpecialTrialSheet();
 
         // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
         if (!$sheetManager->isSheetNoValid($sheet_no)) {
