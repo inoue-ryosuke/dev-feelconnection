@@ -43,6 +43,17 @@ class Schedule extends BaseFormModel implements Authenticatable
 				"sc_tenpo",
 				"sc_regdate",
     ];
+    /*
+    protected $fillable = [
+				"sc_soid__c",
+				"sc_flg__c",
+				"appli_flg__c",
+				"sc_cid__c",
+				"sc_date__c",
+				"sc_memtype__c",
+				"sc_tenpo__c",
+				"sc_regdate__c",
+    ];*/
     /**
      * The attributes that should be hidden for arrays.
      *

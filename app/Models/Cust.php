@@ -6,6 +6,7 @@ use App\Exceptions\IllegalParameterException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 use Carbon\Carbon;
+
 use App\Libraries\Common\JpDateTime as JpDateTime;
 
 use App\Models\TenpoMaster as TenpoMaster;
@@ -15,23 +16,25 @@ use App\Models\Schedule as Schedule;
 class Cust extends BaseFormModel implements Authenticatable
 //class Cust extends SalesBaseFormModel implements Authenticatable
 {
-//    use AuthenticatableTrait, ListingTrait, SoftDeletes, TokenizerTrait,UserTrait, UserStatusTrait;
-    use AuthenticatableTrait;
+	use AuthenticatableTrait;
 
-    /**
+	/**
      * @var string テーブル名
      */
     protected $table = 'cust_master';
     protected $primaryKey = 'cid';
 //    protected $table = 'cust_master__c';
 //    protected $primaryKey = 'cid__c';
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
+    const DELETED_AT = null;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
+	protected $fillable = [
 		"flg",
 		"webmem",
 		"login_pass",
@@ -159,11 +162,138 @@ class Cust extends BaseFormModel implements Authenticatable
 		"salt",
 		"password_change_datetime",
 		"login_trial_count"
-    ];
-
-    const CREATED_AT = 'edit_date';
-    const UPDATED_AT = 'reedit_date';
-    const DELETED_AT = 'del_date';
+	];
+	/*
+	protected $fillable = [
+		"flg__c",
+		"webmem__c",
+		"login_pass__c",
+		"res_permit_cnt__c",
+		"gmo_credit__c",
+		"memberid__c",
+		"memberid2__c",
+		"reason_admit__c",
+		"admit_date__c",
+		"admit_onday__c",
+		"reason_rest__c",
+		"rest_date__c",
+		"quit__c",
+		"quit_date__c",
+		"readmit_date__c",
+		"resumption__c",
+		"recess__c",
+		"idm__c",
+		"rank__c",
+		"memtype__c",
+		"experience_flg__c",
+		"store_id__c",
+		"last_tenpo__c",
+		"sex__c",
+		"kana__c",
+		"name__c",
+		"nickname__c",
+		"caution__c",
+		"b_code__c",
+		"b_name__c",
+		"br_code__c",
+		"br_name__c",
+		"c_code__c",
+		"c_name__c",
+		"a_name__c",
+		"a_number__c",
+		"y_code__c",
+		"y_number__c",
+		"ya_name__c",
+		"bank_type__c",
+		"transfer_date__c",
+		"b_year__c",
+		"b_month__c",
+		"b_day__c",
+		"kubun1_id__c",
+		"kubun2_id__c",
+		"kubun3_id__c",
+		"kubun4_id__c",
+		"kubun5__c",
+		"kubun6__c",
+		"kubun7__c",
+		"kubun8__c",
+		"hw__c",
+		"h_zip__c",
+		"h_addr1__c",
+		"h_addr2__c",
+		"h_buil__c",
+		"ng_h_hagaki__c",
+		"h_tel1__c",
+		"h_tel2__c",
+		"h_tel3__c",
+		"cellph1__c",
+		"cellph2__c",
+		"cellph3__c",
+		"fax1__c",
+		"fax2__c",
+		"fax3__c",
+		"c_mail__c",
+		"c_conf__c",
+		"ng_c_mail__c",
+		"pc_mail__c",
+		"pc_conf__c",
+		"ng_pc_mail__c",
+		"job_id__c",
+		"jobkind_id__c",
+		"syoujo_sub1__c",
+		"syoujo_sub2__c",
+		"t_change__c",
+		"t_comment__c",
+		"kana_g__c",
+		"name_g__c",
+		"fam_relation__c",
+		"h_zip_g__c",
+		"h_addr1_g__c",
+		"h_addr2_g__c",
+		"h_buil_g__c",
+		"ng_h_hagaki_g__c",
+		"h_tel1_g__c",
+		"h_tel2_g__c",
+		"h_tel3_g__c",
+		"cellph1_g__c",
+		"cellph2_g__c",
+		"cellph3_g__c",
+		"fax1_g__c",
+		"fax2_g__c",
+		"fax3_g__c",
+		"c_mail_g__c",
+		"pc_mail_g__c",
+		"memberflg__c",
+		"type_edit_date__c",
+		"dm_list__c",
+		"w_report__c",
+		"m_pub__c",
+		"wpatern__c",
+		"week_id__c",
+		"first_buy__c",
+		"first_lesson__c",
+		"last_lesson__c",
+		"eraser_name__c",
+		"reg_user__c",
+		"edit_tenpoid__c",
+		"edit_date__c",
+		"edit_time__c",
+		"del_date__c",
+		"del_time__c",
+		"raiten__c",
+		"reedit_date__c",
+		"unpay_total__c",
+		"mov_id__c",
+		"mov_id_all__c",
+		"info_boad__c",
+		"mail_delivery__c",
+		"no_mess__c",
+		"reserve_lock__c",
+		"salt__c",
+		"password_change_datetime__c",
+		"login_trial_count__c"
+	];*/
+	
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -175,9 +305,12 @@ class Cust extends BaseFormModel implements Authenticatable
 
 	// モデル結合アクセサ（会員区分）
     public function joinAllMemType() {
-        return $this->hasOne(CustMemType::Class,"mid","memtype");
-//		return $this->hasOne(CustMemType::Class,"mid__c","memtype");
+		$newMemType  = new CustMemType();
+		$memtype_col = $this->cKey("memtype");
+        //return $this->hasOne(CustMemType::Class,$memtype_primary,$memtype_col);
+        return CustMemType::where($newMemType->cKey("mid"),$this->memtype)->get();
 	}
+	/*
     public function hasOneMemType() {
 		if (!$this->joinAllMemType) {
 			return null;
@@ -190,60 +323,79 @@ class Cust extends BaseFormModel implements Authenticatable
 		}
 		return $this->joinAllMemType->get();
 	}
-	
-	// モデル結合アクセサ（所属店舗：複数対応）
-    public function joinAllStoreTenpo() {
-		//$query = $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,"cid","tenpo_id")->toSql();
-		//echo $query; exit;
-		return $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,"cid","tenpo_id");
+	*/
+    public function hasOneMemType() {
+		if (!$this->joinAllMemType()->count()) {
+			return null;
+		}
+		return $this->joinAllMemType()->first();
 	}
+    public function hasManyMemType() {
+		if (!$this->joinAllMemType()->count()) {
+			return null;
+		}
+		return $this->joinAllMemType();
+	}	
+	// モデル結合アクセサ（ではなく単なるモデル抽出）（所属店舗：複数対応）
+    public function joinAllStoreTenpo() {
+//		return $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,$this->primaryKey,"tenpo_id");
+		$ids = CustTenpo::where((new CustTenpo)->cKey("cid"),$this->cid)
+						->where((new CustTenpo)->cKey("flg"),1)->get()
+						->pluck((new CustTenpo)->cKey("tenpo_id"))->unique();
+		return TenpoMaster::whereIn((new TenpoMaster)->cKey("tid"),$ids)->get();
+    }
     public function hasOneStoreTenpo() {
-		if (!$this->joinAllStoreTenpo->count()) {
+		var_dump($this->joinAllStoreTenpo()); exit;
+		if (!$this->joinAllStoreTenpo()->count()) {
 			return null;
 		}
 		return $this->joinAllStoreTenpo()->first();
 	}
     public function hasManyStoreTenpo() {
-		if (!$this->joinAllStoreTenpo->count()) {
+		if (!$this->joinAllStoreTenpo()->count()) {
 			return null;
 		}
 //		print "<pre>"; print_r($this->joinAllStoreTenpo()->get()); print "</pre>"; exit;
-		return $this->joinAllStoreTenpo()->get();
+//		return $this->joinAllStoreTenpo()->get();
+		return $this->joinAllStoreTenpo();
 	}
-	// モデル結合アクセサ（登録店舗）
+	// モデル結合アクセサ（ではなく単なるモデル抽出）（登録店舗）
     public function joinAllLastTenpo() {
-		return $this->hasOne(TenpoMaster::Class,"tid","last_tenpo");
+		//return $this->hasOne(TenpoMaster::Class,(new TenpoMaster)->cKey("tid"),$this->cKey("last_tenpo"));
+		return TenpoMaster::where((new TenpoMaster)->cKey("tid"),$this->last_tenpo)->get();
 	}
     public function hasOneLastTenpo() {
-		if (!$this->joinAllLastTenpo) {
+		if (!$this->joinAllLastTenpo()->count()) {
 			return null;
 		}
-		return $this->joinAllLastTenpo->first();
+		return $this->joinAllLastTenpo()->first();
 	}
     public function hasManyLastTenpo() {
-		if (!$this->joinAllLastTenpo) {
+		if (!$this->joinAllLastTenpo()->count()) {
 			return null;
 		}
-		return $this->joinAllLastTenpo->get();
+		return $this->joinAllLastTenpo();
 	}
 	// 全店舗情報（所属店舗＋登録店舗）
     public function hasManyAllTenpo() {
 		return $this->hasManyStoreTenpo() ?? collect([]);
 	}
-	// モデル結合アクセサ（）
+	// モデル結合アクセサ（ではなく単なるモデル抽出）
 	// 1.ログインユーザーの会員ID、契約変更履歴の会員IDからレコード抽出。
     public function joinSchedule() {
-		return $this->hasMany(Schedule::Class,"sc_cid","cid");
+//		return $this->hasMany(Schedule::Class,(new Schedule)->cKey("sc_cid"),$this->cKey("cid"));
+		return Schedule::where((new Schedule)->cKey("sc_cid"),$this->cid)->get();
 	}
     public function getChangeSchedule() {
-		if (!$this->joinSchedule) {
+		if (!$this->joinSchedule()->count()) {
 			return null;
 		}
 		// 所属店舗ID一覧を取得する
 		$allTenpo   = $this->hasManyAllTenpo();
 		$allTenpoId = $allTenpo->implode("tid",",");
 		// 
-		return $this->joinSchedule->where("sc_flg",1); 
+//		return $this->joinSchedule->where("sc_flg",1); 
+		return $this->joinSchedule()->where((new Schedule)->cKey("sc_flg"),1);
 	}
 
 	/**
@@ -286,37 +438,40 @@ class Cust extends BaseFormModel implements Authenticatable
 	 * 電話番号文字列を返却する
 	 */
 	public function getTelNo($separater="") {
-		if (!$this->h_tel1 || !$this->h_tel2 || !$this->h_tel3) {
+		if (!$this->{$this->cKey("h_tel1")} || !$this->{$this->cKey("h_tel2")} || !$this->{$this->cKey("h_tel3")}) {
 			return "";
 		}
-		return $this->h_tel1.$separater.$this->h_tel2.$separater.$this->h_tel3;
+		return $this->{$this->cKey("h_tel1")}.$separater.$this->{$this->cKey("h_tel2")}.$separater.$this->{$this->cKey("h_tel3")};
 	}
 	/**
 	 * 会員種別を返却する
 	 */
 	public function getMemTypeName() {
 		$memtype = $append = "";
-        // 会員種別情報取得
+		// 会員種別情報取得
 		$memtype = $this->hasOneMemType();
         // 変更スケジュール情報取得
 		$changeSchedule = $this->getChangeSchedule() ?? collect([]);
 		$allTenpo = $this->hasManyAllTenpo();
 		// スケジュールがない場合、会員種別名をそのまま返却
 	    if ($changeSchedule->isEmpty()) {
-			if (!isset($memtype->type_name)) {
+			if (!isset($memtype->{$memtype->cKey("type_name")})) {
 			    return "";
 			}
-			return $memtype->type_name;
+			return $memtype->{$memtype->cKey("type_name")};
 		}
 		// 会員種別変更があった場合、会員名に変更文言を付加
 		// 前提：変更scheduleデータがある場合
 	    if ($changeSchedule->count()) {
             foreach ($changeSchedule as $schedule) {
-				$okTenpoIds = $allTenpo->pluck("tid")->unique();
+				$okTenpoIds = $allTenpo->pluck($this->cKey("tid"))->unique();
 				// 店舗の変更履歴ではなく（所属店舗ID配列内に変更履歴の店舗IDがある）、会員種別変更時（現在の種別IDと違う）
-			    if ($schedule->sc_memtype != $memtype->mid && in_array($schedule->sc_tenpo,$okTenpoIds->toArray())) {
+				if (
+					$schedule->{$schedule->cKey("sc_memtype")} != $memtype->{$schedule->cKey("mid")} && 
+					in_array($schedule->{$schedule->cKey("sc_tenpo")},$okTenpoIds->toArray())
+				) {
 					$append = "（変更登録あり）";
-					$memtype = $memtype->type_name;
+					$memtype = $memtype->{$memtype->cKey('type_name')};
 					break;
 			    }
 			}
@@ -327,7 +482,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		if (is_null($memtype)) {
 			return "";
 		}
-		return $memtype->type_name ?? "";
+		return $memtype->{$memtype->cKey('type_name')} ?? "";
 	}
 	/**
 	 * 所属店舗を返却する（TBD:他箇所で取得する処理があればそれを用いる）
@@ -340,14 +495,17 @@ class Cust extends BaseFormModel implements Authenticatable
 			return "";
 		}
         $memtype = $this->hasOneMemType();		
-		$okTenpoIds = $all->pluck("tid")->unique();
+		$okTenpoIds = $all->pluck($this->cKey("tid"))->unique();
 
 		// 変更スケジュール情報を取得
 		$changeSchedule = $this->getChangeSchedule() ?? collect([]);
 	    if ($changeSchedule->count()) {
             foreach ($changeSchedule as $schedule) {
 				// 会員種別が現在と同一かつ、所属店舗ID配列内に変更履歴の店舗IDがない場合
-			    if ($schedule->sc_memtype == $memtype->mid && !in_array($schedule->sc_tenpo,$okTenpoIds->toArray())) {
+				if (
+					$schedule->{$schedule->cKey("sc_memtype")} == $memtype->{$schedule->cKey("mid")} && 
+					!in_array($schedule->{$schedule->cKey("sc_tenpo")},$okTenpoIds->toArray())
+				) {
 					$append = "（変更登録あり）";
 					break;
 			    }
@@ -355,7 +513,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		}
 		// 銀座（GNZ）という文字列を作る
 		$tenpostr = $all->map(function($tenpo) {
-		    return ["tenpo_str" => $tenpo->tenpo_name];
+		    return ["tenpo_str" => $tenpo->{$this->cKey("tenpo_name")}];
 		});
 		return $tenpostr->implode("tenpo_str","、").$append;
 	}
@@ -364,19 +522,19 @@ class Cust extends BaseFormModel implements Authenticatable
 	 */
 	public function getDmLists() {
 		//"1,,,,",
-		return $this->dm_list ?? ",,,,5";
+		return $this->{$this->cKey("dm_list")} ?? ",,,,5";
 	}
 	/**
 	 * PCメールアドレス予約確認メール設定を返却する
 	 */
 	public function getPcConf() {
-		return $this->pc_conf ?? 0;
+		return $this->{$this->cKey("pc_conf")} ?? 0;
 	}
 	/**
 	 * GMO会員IDを返却する
 	 */
 	public function getGmoId() {
-		return $this->gmo_credit ?? null;
+		return $this->{$this->cKey("gmo_credit")} ?? null;
 	}
 	/**
 	 * キャンペーン一覧を取得返却する

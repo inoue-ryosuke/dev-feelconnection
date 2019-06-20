@@ -39,8 +39,8 @@ class UpdateLogic
              $dmlist = data_get($payload,'dm_list');
              $pcconf = data_get($payload,'pc_conf');
              $custinfo = Cust::getUserInfoById($cid,true);
-             $custinfo->dm_list = implode(",",$dmlist);
-             $custinfo->pc_conf = $pcconf;
+             $custinfo->{$custinfo->cKey("dm_list")} = implode(",",$dmlist);
+             $custinfo->{$custinfo->cKey("pc_conf")} = $pcconf;
              $custinfo->save();
              return ["result_code" => 0];
         });

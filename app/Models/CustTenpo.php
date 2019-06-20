@@ -37,6 +37,12 @@ class CustTenpo extends BaseFormModel implements Authenticatable
         "tenpo_id",
         "flg"
     ];
+    /*
+    protected $fillable = [
+        "cid__c",
+        "tenpo_id__c",
+        "flg__c"
+    ];*/
     /**
      * The attributes that should be hidden for arrays.
      *

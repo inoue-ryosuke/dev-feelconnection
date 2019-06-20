@@ -64,26 +64,66 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
 				"mtenpo_explain",
 				"tenpo_memtype",
     ];
+    /*
+    protected $fillable = [
+				"tenpo_name__c",
+				"iname__c",
+				"itxtcol__c",
+				"ibgcol__c",
+				"tenpo_code__c",
+				"tenpo_area_id__c",
+				"honbu_prev__c",
+				"tenpo_kubun__c",
+				"zip__c",
+				"tenpo_addr__c",
+				"tenpo_tel__c",
+				"res_tel__c",
+				"tenpo_mail__c",
+				"tenpo_url__c",
+				"point__c",
+				"header__c",
+				"max_del_times__c",
+				"del_times__c",
+				"del_count_date__c",
+				"rescount__c",
+				"rescount_day__c",
+				"nolimit__c",
+				"flg__c",
+				"seq__c",
+				"m_price__c",
+				"monthly_avail_all__c",
+				"monthly_avail_tenpo__c",
+				"monthly_free_exp__c",
+				"monthly_fname__c",
+				"mtenpo_explain__c",
+				"tenpo_memtype__c",
+    ];*/
 
     // モデル結合アクセサ（店舗エリア）
     public function joinAllTenpoArea() {
-		return $this->hasOne(TenpoAreaMaster::Class,"id","tenpo_area_id");
+//		return $this->hasOne(TenpoAreaMaster::Class,"id","tenpo_area_id");
+		return TenpoAreaMaster::where((new TenpoAreaMaster)->cKey("id"),$this->cKey("tenpo_area_id"))->get();
 	}
     public function hasOneTenpoArea() {
-		return $this->joinAllTenpoArea->first();
+//		return $this->joinAllTenpoArea->first();
+		return $this->joinAllTenpoArea()->first();
 	}
     public function hasManyTenpoArea() {
-		return $this->joinAllTenpoArea->get();
+//		return $this->joinAllTenpoArea->get();
+		return $this->joinAllTenpoArea();
 	}
     // モデル結合アクセサ（店舗区分）
     public function joinAllTenpoKubun() {
-		return $this->hasOne(TenpoKubun::Class,"tkid","tenpo_kubun");
+//		return $this->hasOne(TenpoKubun::Class,"tkid","tenpo_kubun");
+		return TenpoKubun::where((new TenpoKubun)->cKey("tkid"),$this->cKey("tenpo_kubun"));
 	}
     public function hasOneTenpoKubun() {
-		return $this->joinAllTenpoKubun->first();
+//		return $this->joinAllTenpoKubun->first();
+		return $this->joinAllTenpoKubun()->first();
 	}
     public function hasManyTenpoKubun() {
-		return $this->joinAllTenpoKubun->get();
+//		return $this->joinAllTenpoKubun->get();
+		return $this->joinAllTenpoKubun();
     }
     
     /**

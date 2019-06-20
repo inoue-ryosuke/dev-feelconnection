@@ -139,32 +139,32 @@ class VaidationLogic
         // 体験レッスン受講済み状態、体験レッスン予約済み状態取得
         $trialLessonStatus = OrderLesson::getTrialLessonStatus($custMaster['cid']);
 
-        if (!$trialLessonStatus[0]) {
+        if (!$trialLessonStatus['trial_status']) {
             // 体験レッスン受講済みでない
 
             // 体験制限非表示かどうか
             if ($shiftMaster['taiken_mess'] === TaikenMess::NO_DISPLAY) {
-                return [ 'result' => false, 'error_message' => '体験制限のレッスンです。', 'trial_flag' => $trialLessonStatus[0] ];
+                return [ 'result' => false, 'error_message' => '体験制限のレッスンです。', 'trial_flag' => $trialLessonStatus['trial_status'] ];
             }
 
-            if (!$trialLessonStatus[1]) {
+            if (!$trialLessonStatus['reserved_status']) {
                 // 体験レッスン受講済みでないかつ予約済みでない
                 if (!VaidationLogic::canTrialReservation($shiftMaster['taiken_les_flg'])) {
                     // 体験予約不可のレッスンを指定
-                    return [ 'result' => false, 'error_message' => '体験予約不可のレッスンが指定されました。', 'trial_flag' => $trialLessonStatus[0] ];
+                    return [ 'result' => false, 'error_message' => '体験予約不可のレッスンが指定されました。', 'trial_flag' => $trialLessonStatus['trial_status'] ];
                 }
             } else {
                 // 体験レッスン受講済みでないかつ予約済み
                 // TODO: マンスリー会員判別、体験レッスン予約時にマンスリー入会して通常予約できる状態
                 $shiftDateTime = $shiftMaster['shift_date'] . $shiftMaster['ls_et'];
-                if (!VaidationLogic::validateTrialReservationDate($custMaster['memtype'], $shiftDateTime, $trialLessonStatus[2])) {
+                if (!VaidationLogic::validateTrialReservationDate($custMaster['memtype'], $shiftDateTime, $trialLessonStatus['reserved_shift_date'])) {
                     // 予約済みの体験レッスンより前の日付のレッスンを指定
-                    return [ 'result' => false, 'error_message' => '予約済みの体験レッスンより後の日付を指定してください。', 'trial_flag' => $trialLessonStatus[0] ];
+                    return [ 'result' => false, 'error_message' => '予約済みの体験レッスンより後の日付を指定してください。', 'trial_flag' => $trialLessonStatus['trial_status'] ];
                 }
             }
         }
 
-        return [ 'result' => true, 'error_message' => '', 'trial_flag' => $trialLessonStatus[0] ];
+        return [ 'result' => true, 'error_message' => '', 'trial_flag' => $trialLessonStatus['trial_status'] ];
     }
 
     /**
@@ -179,5 +179,19 @@ class VaidationLogic
         $tenpos = explode(",", $availableTenpos);
 
         return in_array($futureMemberType, $tenpos);
+    }
+
+    /**
+     * バイク位置変更可能な会員種別かどうか
+     *
+     * @param int $memberType 会員種別(cust_memtype.mid)
+     * @return bool
+     */
+    public static function canSheetChange(int $memberType) {
+        // TODO:会員種別ID(cust_memtype.mid)を渡して、ネット・トライアル会員を判別
+        if (false) {
+        }
+
+        return true;
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Constant\ReservationModalType;
 use App\Models\Constant\OrderLessonSbFlg;
 use App\Models\Constant\RedisKeyLimit;
 use App\Models\Constant\SpecialSheetType;
+use App\Models\CustMemType;
 
 /**
  * 座席情報、バイク枠確保の管理
@@ -135,7 +136,20 @@ class SheetManager
     }
 
     /**
-     * 指定されたバイクが、ログインユーザー or 他のユーザーによって枠確保済み・予約済みかどうか
+     * ログインユーザーがバイクを予約済みかどうか
+     *
+     * @return bool
+     */
+    public function isCustomerReserved() {
+        $filtered = array_filter($this->studio, function ($sheet) {
+            return $sheet['status'] === SheetStatus::RESERVED_CUSTOMER;
+        });
+
+        return count($filtered) > 0;
+    }
+
+    /**
+     * 指定されたバイクが、他のユーザーによって枠確保済み・予約済みかどうか
      * 体験レッスンで指定した座席が体験バイクでない場合は、予約済みとなりバリデーションで弾かれる
      *
      * @param int $sheetNo 座席番号
@@ -144,7 +158,6 @@ class SheetManager
     public function isSheetReserved(int $sheetNo) {
         // return $this->studio->isSheetReserved();
         return $this->studio[$sheetNo]['status'] === SheetStatus::RESERVED
-        || $this->studio[$sheetNo]['status'] === SheetStatus::RESERVED_CUSTOMER
         || $this->studio[$sheetNo]['status'] === SheetStatus::SHEET_LOCK;
     }
 
@@ -185,15 +198,26 @@ class SheetManager
 
     /**
      * バイク枠確保している座席情報一覧を取得
+     * 会員ID毎
      *
      * @return array バイク枠確保している座席一覧(Redis)
      */
-    private function getSecureSheetList() {
+    private function getSecureSheetListBycustomerId() {
+        return RedisWrapper::hGetAll(self::SHEET_LOCK_CID_PREFIX . $this->customerId);
+    }
+
+    /**
+     * バイク枠確保している座席情報一覧を取得
+     * レッスンスケジュールID毎
+     *
+     * @return array バイク枠確保している座席一覧(Redis)
+     */
+    private function getSecureSheetListByShiftId() {
         return RedisWrapper::hGetAll(self::SHEET_LOCK_SHIFTID_PREFIX . $this->shiftId);
     }
 
     /**
-     * バイクの予約状態をスタジオ情報に登録、予約モーダル種別を登録
+     * バイクの予約状態をスタジオ情報に登録
      * DB(order_lesson)の値のみ反映
      *
      */
@@ -217,21 +241,69 @@ class SheetManager
     }
 
     /**
-     * バイクの予約状態をスタジオ情報に登録、予約モーダル種別を登録
+     * Redisにバイク枠確保レコードを登録・更新
+     *
+     */
+    private function updateSheetLockRedis(int $sheetNo) {
+        $currentDateTime = new \DateTime();
+
+        // sheet_lock_shiftid:レッスンスケジュールID 更新
+        RedisWrapper::hSet(
+            self::SHEET_LOCK_SHIFTID_PREFIX . $this->shiftId,
+            $this->customerId,
+            $sheetNo . ' ' . $currentDateTime->format('Y/m/d H:i:s')
+        );
+
+        // sheet_lock_cid:会員ID 更新
+        RedisWrapper::hSet(
+            self::SHEET_LOCK_CID_PREFIX . $this->customerId,
+            $this->shiftId,
+            $sheetNo . ' ' . $currentDateTime->format('Y/m/d H:i:s')
+        );
+    }
+
+    /**
+     * モーダル種別登録
+     *
+     */
+    public function setModalType() {
+        // return $this->studio->getModalType();
+
+        // すべて満席の場合、予約モーダル3(キャンセル待ち登録)
+        $this->modalType = ReservationModalType::MODAL_3;
+
+        foreach ($this->studio as $sheet) {
+            if ($sheet['status'] === SheetStatus::RESERVABLE) {
+                // 空き座席がある場合、予約モーダル1(通常予約)
+                $this->modalType = ReservationModalType::MODAL_1;
+                break;
+            } else if ($sheet['status'] === SheetStatus::RESERVED_CUSTOMER) {
+                // 会員の予約バイクがある場合、予約モーダル2(バイク変更、キャンセル)
+                $this->modalType = ReservationModalType::MODAL_2;
+                break;
+            } else if ($sheet['status'] === SheetStatus::SHEET_LOCK) {
+                // バイク枠確保された座席がありかつ満席の場合、予約モーダル2(バイク変更、キャンセル)
+                $this->modalType = ReservationModalType::MODAL_2;
+            }
+        }
+    }
+
+    /**
+     * バイクの予約状態をスタジオ情報に登録
      * バイク枠確保情報(Redis)の値のみ反映
      *
      */
     public function setSheetStatusBySheetLock() {
-        $secureSheetList = $this->getSecureSheetList();
+        $secureSheetList = $this->getSecureSheetListByShiftId();
 
-        // バイク枠確保済み座席番号、会員ID一覧取得
+        // 予約しようとしているレッスンの、バイク枠確保済み座席番号、会員ID一覧取得
         $sheetNoCustomerIdList = self::getReservedSheetNoCustomerIdList($secureSheetList);
-        foreach ($sheetNoCustomerIdList as $sheetNoCustomerId) {
+        foreach ($sheetNoCustomerIdList as $sheetNo => $customerId) {
             // 会員がバイク枠確保していない場合は、予約済みに変更
-            if ($this->studio[$sheetNoCustomerId['sheet_no']]['status'] === SheetStatus::RESERVABLE
-                && $sheetNoCustomerId['cid'] !== $this->customerId) {
-                $this->studio[$sheetNoCustomerId['sheet_no']]['status'] = SheetStatus::SHEET_LOCK;
-                $this->studio[$sheetNoCustomerId['sheet_no']]['customerId'] = $sheetNoCustomerId['cid'];
+            if ($this->studio[$sheetNo]['status'] === SheetStatus::RESERVABLE
+                && $customerId !== $this->customerId) {
+                    $this->studio[$sheetNo]['status'] = SheetStatus::SHEET_LOCK;
+                    $this->studio[$sheetNo]['customerId'] = $customerId;
             }
         }
     }
@@ -240,7 +312,7 @@ class SheetManager
      * バイク枠確保済み座席番号、会員ID一覧取得
      * 時間切れのバイク枠確保情報を削除
      *
-     * @return array [ [ 'sheet_no' => 座席番号, 'customer_id' => 会員ID ] ]
+     * @return array [ 座席番号 => 会員ID ]
      */
     private function getReservedSheetNoCustomerIdList(array $secureSheetList) {
         $keyLimt = RedisKeyLimit::SHEET_LOCK;
@@ -264,7 +336,7 @@ class SheetManager
                 continue;
             }
 
-            $results[] = array('sheet_no' => $sheetNoDateTime['sheet_no'], 'cid' => $customerIdkey);
+            $results[$sheetNoDateTime['sheet_no']] = $customerIdkey;
         }
 
         return $results;
@@ -312,62 +384,65 @@ class SheetManager
         }
 
         // バイク枠確保延長
-        $currentDateTime = new \DateTime();
-
-        // sheet_lock_shiftid:ID 更新
-        RedisWrapper::hSet(
-            self::SHEET_LOCK_SHIFTID_PREFIX . $this->shiftId,
-            $this->customerId,
-            $sheetNo . ' ' . $currentDateTime->format('Y/m/d H:i:s')
-        );
-
-        // sheet_lock_cid:ID 更新
-        RedisWrapper::hSet(
-            self::SHEET_LOCK_CID_PREFIX . $this->customerId,
-            $this->shiftId,
-            $sheetNo . ' ' . $currentDateTime->format('Y/m/d H:i:s')
-        );
+        $this->updateSheetLockRedis($sheetNo);
 
         return true;
     }
 
     /**
-     * モーダル種別登録
-     *
-     */
-    public function setModalType() {
-        // return $this->studio->getModalType();
-
-        // すべて満席の場合、予約モーダル3(キャンセル待ち登録)
-        $this->modalType = ReservationModalType::MODAL_3;
-
-        foreach ($this->studio as $sheet) {
-            if ($sheet['status'] === SheetStatus::RESERVABLE) {
-                // 空き座席がある場合、予約モーダル1(通常予約)
-                $this->modalType = ReservationModalType::MODAL_1;
-                break;
-            } else if ($sheet['status'] === SheetStatus::RESERVED_CUSTOMER) {
-                // 会員の予約バイクがある場合、予約モーダル2(バイク変更、キャンセル)
-                $this->modalType = ReservationModalType::MODAL_2;
-                break;
-            } else if ($sheet['status'] === SheetStatus::SHEET_LOCK) {
-                // バイク枠確保された座席がありかつ満席の場合、予約モーダル2(バイク変更、キャンセル)
-                $this->modalType = ReservationModalType::MODAL_2;
-            }
-        }
-    }
-
-    /**
-     * 指定されたバイク枠を確保
+     * 指定されたバイク枠を新規確保、すでに確保済みの場合は延長
      *
      * @param int $sheetNo 座席番号
      * @return bool 確保結果
      */
     public function addSheetLock(int $sheetNo) {
+        // 予約しようとしているレッスンの、バイク枠確保済み座席番号、会員ID一覧取得
+        $secureSheetList = $this->getSecureSheetListByShiftId();
+        $sheetNoCustomerIdList = self::getReservedSheetNoCustomerIdList($secureSheetList);
+
+        // 指定した座席がバイク枠確保されているか
+        if (isset($sheetNoCustomerIdList[$sheetNo])) {
+            if ($sheetNoCustomerIdList[$sheetNo] !== $this->customerId) {
+                // 他の会員によってバイク枠確保済み
+                return false;
+            } else {
+                // 枠確保済みのため延長
+                $this->updateSheetLockRedis($sheetNo);
+
+                return true;
+            }
+        }
+
+        //-------------------------- バイク枠新規確保 --------------------------//
         // ネット予約回数取得
+        $reservationCount = CustMemType::getReservationCountForSheetLock($this->memberType);
+        // 同時予約数取得
+        $simultaneousReservationCount = OrderLesson::getSimultaneousReservationCount($this->customerId);
 
+        if ($simultaneousReservationCount >= $reservationCount) {
+            // 「同時予約数 >= ネット予約回数」の場合は枠確保できない
+            return false;
+        }
 
-        return true;
+        // バイク枠確保している座席一覧取得(会員IDごと)
+        $hash = self::getSecureSheetListBycustomerId();
+
+        if (isset($hash[$this->shiftId])) {
+            // すでに該当レッスンでバイク枠確保済みのため、削除して新規確保
+
+            // sheet_lock_shiftid:レッスンスケジュールID 会員ID 削除
+            RedisWrapper::hDel(self::SHEET_LOCK_SHIFTID_PREFIX . $this->shiftId, $this->customerId);
+
+            // 新規確保
+            $this->updateSheetLockRedis($sheetNo);
+
+            return true;
+        } else {
+            // 新規確保
+            $this->updateSheetLockRedis($sheetNo);
+
+            return true;
+        }
     }
 
 }

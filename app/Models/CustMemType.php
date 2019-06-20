@@ -37,7 +37,21 @@ class CustMemType extends BaseFormModel implements Authenticatable
 		"attend_count",
 		"seq",
 		"mem_prod",
-	];
+    ];
+    /*
+    protected $fillable = [
+		"type_name__c",
+		"status__c",
+		"flg__c",
+		"iname__c",
+		"itxtcol__c",
+		"ibgcol__c",
+		"rescnt_mem__c",
+		"resspan__c",
+		"attend_count__c",
+		"seq__c",
+		"mem_prod__c",
+	];*/
     const CREATED_AT = null;
     const UPDATED_AT = null;
 	const DELETED_AT = null;

@@ -11,6 +11,7 @@ use App\Libraries\Logic\ReservationModal\ReservationModalMasterResource;
 use App\Libraries\Logic\ReservationModal\ShiftCustMasterResource;
 use App\Libraries\Logic\ReservationModal\ShiftTenpoCustMasterResource;
 use App\Libraries\Logic\ReservationModal\SheetManager;
+use App\Libraries\Logic\ReservationModal\ReservationLogic;
 use App\Models\Constant\NormalReservationTransitionType;
 
 /**
@@ -322,7 +323,18 @@ class ReservationModalController extends Controller
             );
         }
 
-        // 指定されたバイクが、枠確保済み・予約済みかどうか
+        // ログインユーザーがバイクを予約済みかどうか
+        if ($sheetManager->isCustomerReserved()) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not reserve sheet',
+                    'すでに予約済みのレッスンです。',
+                    array_merge($params, [ 'cust_master' => $custMaster ]))
+            );
+        }
+
+        // 指定されたバイクが、他のユーザーによって、枠確保済み・予約済みかどうか
         if ($sheetManager->isSheetReserved($sheet_no)) {
             return CommonLogic::getErrorJsonResponse(
                 Response::HTTP_CONFLICT,
@@ -461,19 +473,145 @@ class ReservationModalController extends Controller
             );
         }
 
-        // 指定されたバイクが、枠確保済み・予約済みかどうか
+        // ログインユーザーがバイクを予約済みかどうか
+        if ($sheetManager->isCustomerReserved()) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not reserve sheet',
+                    'すでに予約済みのレッスンです。',
+                    array_merge($params, [ 'cust_master' => $custMaster ]))
+                );
+        }
+
+        // 指定されたバイクが、他のユーザーによって、枠確保済み・予約済みかどうか
         if ($sheetManager->isSheetReserved($sheet_no)) {
-            // 予約済みのため、バイク枠確保できない
             return response()->json([
                 'response_code' => Response::HTTP_RESET_CONTENT,
                 'modal_type' => NormalReservationTransitionType::EXPLANATION_MODAL,
-                'modal_text' => '指定された座席は予約できません。'
+                'modal_text' => '指定された座席は、他のユーザーによって、枠確保済みまたは予約済みです。'
+            ])->setStatusCode(Response::HTTP_RESET_CONTENT);
+        }
+
+        // バイク枠確保
+        if (!$sheetManager->addSheetLock($sheet_no)) {
+            // バイク枠確保失敗
+            return response()->json([
+                'response_code' => Response::HTTP_RESET_CONTENT,
+                'modal_type' => NormalReservationTransitionType::EXPLANATION_MODAL,
+                'modal_text' => 'バイク枠確保に失敗しました。'
             ])->setStatusCode(Response::HTTP_RESET_CONTENT);
         }
 
         return response()->json([
             'response_code' => Response::HTTP_CREATED,
             'all_resource' => $resource->getAllResource()
+        ])->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    /**
+     * バイク位置変更API
+     *
+     * @POST("api/sheet_change", as="api.sheet_change.post")
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sheetChangeApi(Request $request) {
+        $params = $request->all();
+
+        // レッスンスケジュールIDハッシュ、座席番号のバリデーション
+        if (!VaidationLogic::validateShiftIdHashAndSheetNo($params)) {
+            // エラー
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray('Invalid sid', '無効なレッスンスケジュールIDです', $params),
+                CommonLogic::getErrorArray('Invalid sheet_no', '無効な座席番号です', $params)
+            );
+        }
+
+        $sid = $params['sid'];
+        $sheet_no = $params['sheet_no'];
+
+        // バイク位置変更APIで必要なマスターデータ取得
+        $resource = new ShiftCustMasterResource($sid);
+        if(!$resource->createRedisResource()) {
+            // Redisキャッシュの取得に失敗
+            $resource->createDBResource();
+        }
+
+        $shiftMaster = $resource->getShiftMasterResource();
+        $custMaster = $resource->getCustMasterResource();
+
+        // ログインユーザーがバイク位置変更可能か
+        if (!VaidationLogic::canSheetChange($custMaster['memtype'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray(
+                    'Can not change sheet',
+                    'バイク変更できません。',
+                    array_merge($params, [ 'cust_master' => $custMaster ]))
+            );
+        }
+
+        // 予約受付時間内かどうか
+        if (!VaidationLogic::validateTimeLimit($shiftMaster['shift_date'], $shiftMaster['ls_st'], $shiftMaster['tlimit'])) {
+            // 予約受付時間外
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not change sheet',
+                    '予約受付時間外です。',
+                    array_merge($params, [ 'shift_master' => $shiftMaster ]))
+            );
+        }
+
+        // 座席情報取得
+        $sheetManager = new SheetManager($shiftMaster['shiftid'], $custMaster['cid'], $custMaster['memtype']);
+        $sheetManager->initStudio();
+        $sheetManager->setSheetStatusByOrderLesson();
+        $sheetManager->setSheetStatusBySheetLock();
+        $sheetManager->fillNotSpecialTrialSheet();
+
+        // TODO 座席番号は、スタジオの座席数を超えた数値はエラー
+        if (!$sheetManager->isSheetNoValid($sheet_no)) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray('Invalid sheet_no', '無効な座席番号です、', $params)
+            );
+        }
+
+        // ログインユーザーがバイクを予約済みかどうか
+        if (!$sheetManager->isCustomerReserved()) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray(
+                    'Invalid lesson',
+                    '予約済みでないレッスンです。',
+                    array_merge($params, [ 'cust_master' => $custMaster ]))
+            );
+        }
+
+        // 指定されたバイクが、他のユーザーによって、枠確保済み・予約済みかどうか
+        if ($sheetManager->isSheetReserved($sheet_no)) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not change sheet',
+                    '他のユーザーによって、枠確保済みまたは予約済みです。',
+                    array_merge($params))
+            );
+        }
+
+        // バイク位置変更
+        if (!ReservationLogic::changeSheetNo($shiftMaster['shiftid'], $sheet_no, $custMaster['cid'])) {
+            // throw new InternalErrorException();
+            return response()->json([
+                'response_code' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            'response_code' => Response::HTTP_CREATED
         ])->setStatusCode(Response::HTTP_CREATED);
     }
 }
