@@ -44,6 +44,27 @@ class CommonLogic
     }
 
     /**
+     * カンマ区切り文字列の指定した値を削除
+     * 値が存在しない場合は、元の文字列を返す
+     *
+     * @param string $commaText カンマ区切り文字列
+     * @param string $deleteText 削除文字列
+     * @return string
+     */
+    public static function deleteValueFromCommaText(string $commaText, string $deleteText) {
+        $commaTextArray = explode(',', $commaText);
+
+        $result = array_search($deleteText, $commaTextArray);
+
+        if ($result !== FALSE) {
+            unset($commaTextArray[$result]);
+            return implode(',', $commaTextArray);
+        } else {
+            return $commaText;
+        }
+    }
+
+    /**
      * エラー配列取得
      *
      * @param string $code

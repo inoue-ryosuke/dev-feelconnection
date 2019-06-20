@@ -33,7 +33,9 @@ class ShiftMaster extends Model
         'wmid'
     ];
 
-    public $timestamps = false;
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
+    const DELETED_AT = null;
 
 
     /**

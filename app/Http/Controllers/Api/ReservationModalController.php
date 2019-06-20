@@ -699,7 +699,12 @@ class ReservationModalController extends Controller
         }
 
         // 予約キャンセル
-
+        if (!ReservationLogic::cancelLesson($orderLesson['oid'])) {
+            // throw new InternalErrorException();
+            return response()->json([
+                'response_code' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         return response()->json([
             'response_code' => Response::HTTP_CREATED,
