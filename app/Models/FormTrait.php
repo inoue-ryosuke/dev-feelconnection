@@ -31,11 +31,17 @@ trait FormTrait
         if (is_array($request)) {
             $request = collect($request);
         }
+        // salesforce用にテーブル名が変わっても、リクエストのキー名は__c無しのまま
         foreach ($this->getFillable() as $key) {
-            if (isset($request[$key])) {
-                $this->{$key} = $request[$key];
-            } else if (array_key_exists($key, $request->all())) {
-                $this->{$key} = data_get($key, $request->all());
+            // fillableはモデル側情報なので、__c付きになる恐れがある、そのため、keyから__cを外す
+            $sfkey = $key; //__c付きのキー
+            $fckey = preg_replace("#^(.+)(__c)$?","$1",$key);  // feelconnectionキー（__cなし)
+
+            // __cなしキー名でリクエストに該当した場合、モデルのテーブル名が__c付きなら__cつきカラムへ
+            if (isset($request[$fckey])) {
+                $this->{$this->cKey($fckey)} = $request[$fckey];   
+            } else if (array_key_exists($fckey, $request->all())) {
+                $this->{$this->cKey($fckey)} = data_get($fckey, $request->all());
             }
         }
     }

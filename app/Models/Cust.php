@@ -25,6 +25,9 @@ class Cust extends BaseFormModel implements Authenticatable
     protected $primaryKey = 'cid';
 //    protected $table = 'cust_master__c';
 //    protected $primaryKey = 'cid__c';
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
+    const DELETED_AT = null;
 
     /**
      * The attributes that are mass assignable.
@@ -305,10 +308,10 @@ class Cust extends BaseFormModel implements Authenticatable
 	 * 電話番号文字列を返却する
 	 */
 	public function getTelNo($separater="") {
-		if (!$this->h_tel1 || !$this->h_tel2 || !$this->h_tel3) {
+		if (!$this->{$this->cKey("h_tel1")} || !$this->{$this->cKey("h_tel2")} || !$this->{$this->cKey("h_tel3")}) {
 			return "";
 		}
-		return $this->h_tel1.$separater.$this->h_tel2.$separater.$this->h_tel3;
+		return $this->{$this->cKey("h_tel1")}.$separater.$this->{$this->cKey("h_tel2")}.$separater.$this->{$this->cKey("h_tel3")};
 	}
 	/**
 	 * 会員種別を返却する
@@ -322,10 +325,10 @@ class Cust extends BaseFormModel implements Authenticatable
 		$allTenpo = $this->hasManyAllTenpo();
 		// スケジュールがない場合、会員種別名をそのまま返却
 	    if ($changeSchedule->isEmpty()) {
-			if (!isset($memtype->type_name)) {
+			if (!isset($memtype->{$memtype->cKey("type_name")})) {
 			    return "";
 			}
-			return $memtype->type_name;
+			return $memtype->{$memtype->cKey("type_name")};
 		}
 		// 会員種別変更があった場合、会員名に変更文言を付加
 		// 前提：変更scheduleデータがある場合
@@ -333,9 +336,12 @@ class Cust extends BaseFormModel implements Authenticatable
             foreach ($changeSchedule as $schedule) {
 				$okTenpoIds = $allTenpo->pluck($this->cKey("tid"))->unique();
 				// 店舗の変更履歴ではなく（所属店舗ID配列内に変更履歴の店舗IDがある）、会員種別変更時（現在の種別IDと違う）
-			    if ($schedule->sc_memtype != $memtype->mid && in_array($schedule->sc_tenpo,$okTenpoIds->toArray())) {
+				if (
+					$schedule->{$schedule->cKey("sc_memtype")} != $memtype->{$schedule->cKey("mid")} && 
+					in_array($schedule->{$schedule->cKey("sc_tenpo")},$okTenpoIds->toArray())
+				) {
 					$append = "（変更登録あり）";
-					$memtype = $memtype->type_name;
+					$memtype = $memtype->{$memtype->cKey('type_name')};
 					break;
 			    }
 			}
@@ -346,7 +352,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		if (is_null($memtype)) {
 			return "";
 		}
-		return $memtype->type_name ?? "";
+		return $memtype->{$memtype->cKey('type_name')} ?? "";
 	}
 	/**
 	 * 所属店舗を返却する（TBD:他箇所で取得する処理があればそれを用いる）
@@ -366,7 +372,10 @@ class Cust extends BaseFormModel implements Authenticatable
 	    if ($changeSchedule->count()) {
             foreach ($changeSchedule as $schedule) {
 				// 会員種別が現在と同一かつ、所属店舗ID配列内に変更履歴の店舗IDがない場合
-			    if ($schedule->sc_memtype == $memtype->mid && !in_array($schedule->sc_tenpo,$okTenpoIds->toArray())) {
+				if (
+					$schedule->{$schedule->cKey("sc_memtype")} == $memtype->{$schedule->cKey("mid")} && 
+					!in_array($schedule->{$schedule->cKey("sc_tenpo")},$okTenpoIds->toArray())
+				) {
 					$append = "（変更登録あり）";
 					break;
 			    }
@@ -374,7 +383,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		}
 		// 銀座（GNZ）という文字列を作る
 		$tenpostr = $all->map(function($tenpo) {
-		    return ["tenpo_str" => $tenpo->tenpo_name];
+		    return ["tenpo_str" => $tenpo->{$this->cKey("tenpo_name")}];
 		});
 		return $tenpostr->implode("tenpo_str","、").$append;
 	}
@@ -383,19 +392,19 @@ class Cust extends BaseFormModel implements Authenticatable
 	 */
 	public function getDmLists() {
 		//"1,,,,",
-		return $this->dm_list ?? ",,,,5";
+		return $this->{$this->cKey("dm_list")} ?? ",,,,5";
 	}
 	/**
 	 * PCメールアドレス予約確認メール設定を返却する
 	 */
 	public function getPcConf() {
-		return $this->pc_conf ?? 0;
+		return $this->{$this->cKey("pc_conf")} ?? 0;
 	}
 	/**
 	 * GMO会員IDを返却する
 	 */
 	public function getGmoId() {
-		return $this->gmo_credit ?? null;
+		return $this->{$this->cKey("gmo_credit")} ?? null;
 	}
 	/**
 	 * キャンペーン一覧を取得返却する
