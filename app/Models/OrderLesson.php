@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Constant\OrderLessonFlg;
 use App\Models\Constant\OrderLessonTrialFlg;
+use App\Models\Constant\OrderLessonSbFlg;
 
 class OrderLesson extends Model
 {
@@ -43,6 +44,7 @@ class OrderLesson extends Model
             ->join("{$shiftMasterTableName} AS SM", "OL.sid", '=', "SM.shiftid")
             ->where('OL.customer_id', '=', $customerId)
             ->where('OL.trial_flg', '=', OrderLessonTrialFlg::TRIAL_LESSON)
+            ->where('OL.sb_flg', '=', OrderLessonSbFlg::NORMAL)
             ->whereIn('OL.flg', [ OrderLessonFlg::RESERVED, OrderLessonFlg::ATTENDED ])
             ->get();
 
@@ -64,7 +66,7 @@ class OrderLesson extends Model
     }
 
     /**
-     * 予約済み座席一覧取得
+     * 予約済み座席一覧取得(通常予約)
      *
      * @param int $shiftId レッスンスケジュールID
      * @return \Illuminate\Database\Eloquent\Collection
@@ -72,6 +74,7 @@ class OrderLesson extends Model
     public static function getReservedSheetList(int $shiftId) {
         return self::where('sid', '=', $shiftId)
             ->where('flg', '=', OrderLessonFlg::RESERVED)
+            ->where('sb_flg', '=', OrderLessonSbFlg::NORMAL)
             ->get();
     }
 
@@ -88,5 +91,19 @@ class OrderLesson extends Model
             ->where('flg', '=', OrderLessonFlg::RESERVED)
             ->where('order_date', '>=', $currentDateTime->format('Y-m-d'))
             ->count();
+    }
+
+    /**
+     * 予約済みレッスンを取得
+     *
+     * @param int $shiftId レッスンスケジュールID
+     * @param int $customerId 会員ID
+     * @return \App\Models\OrderLesson|null
+     */
+    public static function getReservedOrderLesson(int $shiftId, int $customerId) {
+        return self::where('sid', '=', $shiftId)
+            ->where('customer_id', '=', $customerId)
+            ->where('flg', '=', OrderLessonFlg::RESERVED)
+            ->first();
     }
 }

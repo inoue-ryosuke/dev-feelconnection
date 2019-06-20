@@ -418,9 +418,11 @@ class SheetManager
         $reservationCount = CustMemType::getReservationCountForSheetLock($this->memberType);
         // 同時予約数取得
         $simultaneousReservationCount = OrderLesson::getSimultaneousReservationCount($this->customerId);
+        // 同時予約残数
+        $currentCount = $reservationCount - $simultaneousReservationCount;
 
-        if ($simultaneousReservationCount >= $reservationCount) {
-            // 「同時予約数 >= ネット予約回数」の場合は枠確保できない
+        if ($currentCount <= 0) {
+            // 同時予約残数が残っていない
             return false;
         }
 
@@ -438,6 +440,11 @@ class SheetManager
 
             return true;
         } else {
+            // 新規確保のため、バイク枠確保済み数が同時予約残数以上か確認
+            if (count($hash) >= $currentCount) {
+                return false;
+            }
+
             // 新規確保
             $this->updateSheetLockRedis($sheetNo);
 

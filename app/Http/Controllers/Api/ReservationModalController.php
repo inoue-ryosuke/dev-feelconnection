@@ -64,7 +64,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     '未公開のレッスンです。',
-                    array_merge($params, [ 'shift_master' => $shiftMaster ]))
+                    array_merge($params))
             );
         }
 
@@ -76,7 +76,8 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Can not reserve sheet',
                     '予約受付時間外です。',
-                    array_merge($params, [ 'shift_master' => $shiftMaster ]))
+                    array_merge($params,
+                        [ 'shift_date' => $shiftMaster['shift_date'], 'start_time' => $shiftMaster['ls_st'], 'time_limit' => $shiftMaster['tlimit'] ]))
                 );
         }
 
@@ -88,7 +89,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     'ネット・トライアル会員が体験予約不可のレッスンを指定しました。',
-                    array_merge($params, [ 'cust_master' => $custMaster, 'shift_master' => $shiftMaster ]))
+                    array_merge($params, [ 'memtype' => $custMaster['memtype'], 'taiken_les_flg' => $shiftMaster['taiken_les_flg'] ]))
             );
         }
 
@@ -99,7 +100,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     'レッスンの店舗を予約可能な会員種別ではありません。',
-                    array_merge($params, [ 'future_memtype' => $futureMemberType, 'tenpo_master' => $tenpoMaster ]))
+                    array_merge($params, [ 'memtype' => $futureMemberType ]))
             );
         }
 
@@ -111,7 +112,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     $taikenResults['error_message'],
-                    array_merge($params, [ 'cust_master' => $custMaster, 'shift_master' => $shiftMaster]))
+                    array_merge($params))
             );
         }
 
@@ -183,7 +184,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     '未公開のレッスンです。',
-                    array_merge($params, [ 'shift_master' => $shiftMaster ]))
+                    array_merge($params))
             );
         }
 
@@ -257,7 +258,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     '未公開のレッスンです。',
-                    array_merge($params, [ 'shift_master' => $shiftMaster ]))
+                    array_merge($params))
             );
         }
 
@@ -269,8 +270,9 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Can not reserve sheet',
                     '予約受付時間外です。',
-                    array_merge($params, [ 'shift_master' => $shiftMaster ]))
-            );
+                    array_merge($params,
+                        [ 'shift_date' => $shiftMaster['shift_date'], 'start_time' => $shiftMaster['ls_st'], 'time_limit' => $shiftMaster['tlimit'] ]))
+                );
         }
 
         // ネット・トライアル会員が体験予約不可のレッスンを指定した場合エラー
@@ -281,7 +283,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     'ネット・トライアル会員が体験予約不可のレッスンを指定しました。',
-                    array_merge($params, [ 'cust_master' => $custMaster, 'shift_master' => $shiftMaster ]))
+                    array_merge($params, [ 'memtype' => $custMaster['memtype'], 'taiken_les_flg' => $shiftMaster['taiken_les_flg'] ]))
             );
         }
 
@@ -292,7 +294,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     'レッスンの店舗を予約可能な会員種別ではありません。',
-                    array_merge($params, [ 'future_memtype' => $futureMemberType, 'tenpo_master' => $tenpoMaster ]))
+                    array_merge($params, [ 'memtype' => $futureMemberType ]))
             );
         }
 
@@ -304,7 +306,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     $taikenResults['error_message'],
-                    array_merge($params, [ 'cust_master' => $custMaster, 'shift_master' => $shiftMaster]))
+                    array_merge($params))
             );
         }
 
@@ -330,7 +332,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Can not reserve sheet',
                     'すでに予約済みのレッスンです。',
-                    array_merge($params, [ 'cust_master' => $custMaster ]))
+                    array_merge($params))
             );
         }
 
@@ -352,7 +354,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Can not extend sheet',
                     'バイク枠を延長できません。',
-                    array_merge($params, ['sheet_no' => $sheet_no ], $custMaster))
+                    array_merge($params))
             );
         }
 
@@ -407,7 +409,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     '未公開のレッスンです。',
-                    array_merge($params, [ 'shift_master' => $shiftMaster ]))
+                    array_merge($params))
             );
         }
 
@@ -419,7 +421,8 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Can not reserve sheet',
                     '予約受付時間外です。',
-                    array_merge($params, [ 'shift_master' => $shiftMaster ]))
+                    array_merge($params,
+                        [ 'shift_date' => $shiftMaster['shift_date'], 'start_time' => $shiftMaster['ls_st'], 'time_limit' => $shiftMaster['tlimit'] ]))
                 );
         }
 
@@ -431,7 +434,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     'ネット・トライアル会員が体験予約不可のレッスンを指定しました。',
-                    array_merge($params, [ 'cust_master' => $custMaster, 'shift_master' => $shiftMaster ]))
+                    array_merge($params, [ 'memtype' => $custMaster['memtype'], 'taiken_les_flg' => $shiftMaster['taiken_les_flg'] ]))
             );
         }
 
@@ -442,7 +445,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     'レッスンの店舗を予約可能な会員種別ではありません。',
-                    array_merge($params, [ 'future_memtype' => $futureMemberType, 'tenpo_master' => $tenpoMaster ]))
+                    array_merge($params, [ 'memtype' => $futureMemberType ]))
             );
         }
 
@@ -454,7 +457,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     $taikenResults['error_message'],
-                    array_merge($params, [ 'cust_master' => $custMaster, 'shift_master' => $shiftMaster]))
+                    array_merge($params))
             );
         }
 
@@ -480,7 +483,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Can not reserve sheet',
                     'すでに予約済みのレッスンです。',
-                    array_merge($params, [ 'cust_master' => $custMaster ]))
+                    array_merge($params))
                 );
         }
 
@@ -549,7 +552,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Can not change sheet',
                     'バイク変更できません。',
-                    array_merge($params, [ 'cust_master' => $custMaster ]))
+                    array_merge($params, [ 'memtype' => $custMaster['memtype'] ]))
             );
         }
 
@@ -561,7 +564,8 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Can not change sheet',
                     '予約受付時間外です。',
-                    array_merge($params, [ 'shift_master' => $shiftMaster ]))
+                    array_merge($params,
+                        [ 'shift_date' => $shiftMaster['shift_date'], 'start_time' => $shiftMaster['ls_st'], 'time_limit' => $shiftMaster['tlimit'] ]))
             );
         }
 
@@ -587,7 +591,7 @@ class ReservationModalController extends Controller
                 CommonLogic::getErrorArray(
                     'Invalid lesson',
                     '予約済みでないレッスンです。',
-                    array_merge($params, [ 'cust_master' => $custMaster ]))
+                    array_merge($params))
             );
         }
 
@@ -612,6 +616,94 @@ class ReservationModalController extends Controller
 
         return response()->json([
             'response_code' => Response::HTTP_CREATED
+        ])->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    /**
+     * レッスン予約キャンセルAPI
+     *
+     * @POST("api/reservation_cancel", as="api.reservation_cancel.post")
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function reservationCancelApi(Request $request) {
+        $params = $request->all();
+
+        // レッスンスケジュールIDハッシュのバリデーション
+        if (!VaidationLogic::validateShiftIdHash($params)) {
+            // エラー
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray('Invalid sid', '無効なレッスンスケジュールIDです、', $params)
+            );
+        }
+
+        $sid = $params['sid'];
+
+        // レッスン予約キャンセルAPIで必要なマスターデータ取得
+        $resource = new ShiftCustMasterResource($sid);
+        if(!$resource->createRedisResource()) {
+            // Redisキャッシュの取得に失敗
+            $resource->createDBResource();
+        }
+
+        $shiftMaster = $resource->getShiftMasterResource();
+        $custMaster = $resource->getCustMasterResource();
+
+        // ログインユーザーがレッスン予約キャンセル可能か
+        if (!VaidationLogic::canReservationCancel($custMaster['memtype'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray(
+                    'Can not cancel lesson',
+                    'レッスンをキャンセルできません。',
+                    array_merge($params))
+                );
+        }
+
+        // キャンセル受付時間内かどうか
+        if (!VaidationLogic::validateTimeLimit($shiftMaster['shift_date'], $shiftMaster['ls_st'], $shiftMaster['tlimit_cancel'])) {
+            // キャンセル受付時間外
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not reserve sheet',
+                    '予約受付時間外です。',
+                    array_merge($params,
+                        [ 'shift_date' => $shiftMaster['shift_date'], 'start_time' => $shiftMaster['ls_st'], 'time_limit_cancel' => $shiftMaster['tlimit_cancel'] ]))
+                );
+        }
+
+        // 予約済みレッスン情報取得
+        $orderLesson = ReservationLogic::getReservedLesson($shiftMaster['shiftid'], $custMaster['cid']);
+        if (is_null($orderLesson)) {
+            // 予約済みでない
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray(
+                    'Invalid lesson',
+                    '予約済みでないレッスンです。',
+                    array_merge($params))
+                );
+        }
+
+        // キャンセル可能なレッスン予約(order_lesson)かどうか
+        if (!VaidationLogic::isCancelProhibit($orderLesson['cancel_prohibit'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                CommonLogic::getErrorArray(
+                    'Invalid lesson',
+                    'キャンセルできないレッスンです。',
+                    array_merge($params))
+                );
+        }
+
+        // 予約キャンセル
+
+
+        return response()->json([
+            'response_code' => Response::HTTP_CREATED,
+            'all_resource' => $resource->getAllResource()
         ])->setStatusCode(Response::HTTP_CREATED);
     }
 }
