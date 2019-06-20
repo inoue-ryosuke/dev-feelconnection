@@ -35,7 +35,7 @@ trait FormTrait
         foreach ($this->getFillable() as $key) {
             // fillableはモデル側情報なので、__c付きになる恐れがある、そのため、keyから__cを外す
             $sfkey = $key; //__c付きのキー
-            $fckey = preg_replace("#^(.+)(__c)$?","$1",$key);  // feelconnectionキー（__cなし)
+            $fckey = preg_replace("#^(.+)(__c)?$#","$1",$key);  // feelconnectionキー（__cなし)
 
             // __cなしキー名でリクエストに該当した場合、モデルのテーブル名が__c付きなら__cつきカラムへ
             if (isset($request[$fckey])) {
