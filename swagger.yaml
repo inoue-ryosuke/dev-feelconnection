@@ -44,9 +44,9 @@ paths:
     post:
       tags:
         - Auth
-      summary: 'API-01: 認証情報の取得'
+      summary: 'API-001: 認証情報の取得'
       description: 認証されている会員情報を取得
-      operationId: 'App\Http\Controllers\Api\AuthController::getUserInfo'
+      operationId: 'App\Http\Controllers\Api\AuthController::getAuthInfo'
       responses:
         '200':
           description: OK
@@ -96,6 +96,48 @@ paths:
                   error_code: { description: サーバ返却エラーコード, type: string }
                   message: { description: サーバ返却エラーメッセージ, type: string }
                 type: object
+  /api/instructors:
+    post:
+      tags:
+        - UserMaster
+      summary: 'API-xx: インストラクター紹介一覧取得API'
+      description: インストラクター紹介画面に表示するインストラクターの一覧を取得する
+      operationId: 'App\Http\Controllers\Api\InstructorController::getInstructors'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              properties:
+                freeword:
+                  description: 検索ワード(インストラクター名、店舗名を入力して検索)
+                  type: string
+                limit:
+                  description: 取得上限数(データ取得数を指定)
+                  type: integer
+                offset:
+                  description: オフセット数(取得オフセット数を指定)
+                  type: integer
+                type:
+                  description: 'ソート対象項目(ソート対象項目を指定(1：所属店舗順(北から) / 2：デビュー年順(古い在籍順) / 3：名前順(ABC順)))'
+                  type: integer
+              type: object
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  result_code: { description: '結果コード(0:正常 1:エラー)', type: integer }
+                  instructors: { description: インストラクター一覧リスト, type: array, items: { properties: { uid: { description: スタッフID(インストラクターID。インストラクター詳細情報取得用。), type: integer }, name: { description: スタッフ名(インストラクター名), type: string }, assigned_at: { description: インストラクターのデビュー年月日, type: date }, comment: { description: インストラクターの自己紹介文, type: string }, image_path: { description: インストラクターの表示画像パス(画像URL), type: string } }, type: object } }
+                  sort_results: { description: ソート店舗リスト, type: array, items: { properties: { name: { description: 店舗名, type: string }, instructors: { description: 店舗所属インストラクターリスト, type: array, items: { properties: { uid: { description: スタッフID(インストラクターID), type: integer } }, type: object } } }, type: object } }
+                  total_count: { description: データ全件数, type: integer }
+                  list_count: { description: 取得したリストのデータ件数, type: integer }
+                  limit: { description: 取得上限数(リクエストで指定された取得数), type: integer }
+                  offset: { description: オフセット数(リクエストで指定された取得オフセット数), type: integer }
+                  type: { description: ソート対象項目(リクエストで指定されたソート対象), type: integer }
+                type: object
   '/api/invite/{invite_code}':
     get:
       tags:
@@ -136,47 +178,40 @@ paths:
               schema:
                 properties:
                   result_code: { description: '結果コード(0:正常 1:エラー)', type: integer }
-                  list: { description: 音楽プログラムリスト, type: array, items: { properties: { '{category_name}': { description: 'BBC HIT,BB1 COMP等カテゴリー毎にグルーピングされたリスト', type: array, items: { properties: { name: { description: "プレイリスト名(表示プレイリスト名　＝　プログラム名 ＋ 音楽ジャンル名 ＋ バージョン\r\n    ex) BB2 HIT 16  = BB2 + HIT + 16)", type: string }, path: { description: 'プレイリストパス(URL)(AppleMusicのプレイリスト詳細へのURL )', type: string }, image_path: { description: プレイリスト画像パス(URL)(AppleMusicのプレイリスト画像パス(URL), type: string } }, type: object } } }, type: object } }
+                  list: { description: 音楽プログラムリスト, type: array, items: { properties: { '{category_name}': { description: 'BBC HIT,BB1 COMP等カテゴリー毎にグルーピングされたリスト', type: array, items: { properties: { name: { description: "プレイリスト名(表示プレイリスト名　＝　プログラム名 ＋ 音楽ジャンル名 ＋ バージョン\n    ex) BB2 HIT 16  = BB2 + HIT + 16)", type: string }, path: { description: 'プレイリストパス(URL)(AppleMusicのプレイリスト詳細へのURL )', type: string }, image_path: { description: プレイリスト画像パス(URL)(AppleMusicのプレイリスト画像パス(URL), type: string } }, type: object } } }, type: object } }
                 type: object
-  /api/instructors:
+  /api/zip_code:
     post:
       tags:
-        - UserMaster
-      summary: 'API-xx: インストラクター紹介一覧取得API'
-      description: インストラクター紹介画面に表示するインストラクターの一覧を取得する
-      operationId: 'App\Http\Controllers\Api\UserMasterController::getInstructors'
+        - ZipCode
+      summary: 'API-xx: 郵便番号住所取得API'
+      description: リクエストされた郵便番号から対応する住所を取得する
+      operationId: 'App\Http\Controllers\Api\ZipCodeController::getAddressByZipCode'
       requestBody:
         required: false
         content:
           application/json:
             schema:
               properties:
-                freeword:
-                  description: 検索ワード(インストラクター名、店舗名を入力して検索)
+                zip_code:
+                  description: 郵便番号(7桁)
                   type: string
-                limit:
-                  description: 取得上限数(データ取得数を指定)
-                  type: integer
-                offset:
-                  description: オフセット数(取得オフセット数を指定)
-                  type: integer
-                type:
-                  description: 'ソート対象項目(ソート対象項目を指定(1：所属店舗順(北から) / 2：デビュー年順(古い在籍順) / 3：名前順(ABC順)))'
-                  type: integer
               type: object
       responses:
         '200':
           description: OK
+          headers:
+            X-FeelConnection-Required-Ver:
+              description: 対応バージョン
+              required: true
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 properties:
                   result_code: { description: '結果コード(0:正常 1:エラー)', type: integer }
-                  instructors: { description: インストラクター一覧リスト, type: array, items: { properties: { uid: { description: スタッフID(インストラクターID。インストラクター詳細情報取得用。), type: integer }, name: { description: スタッフ名(インストラクター名), type: string }, assigned_at: { description: インストラクターのデビュー年月日, type: date }, comment: { description: インストラクターの自己紹介文, type: string }, image_path: { description: インストラクターの表示画像パス(画像URL), type: string } }, type: object } }
-                  sort_results: { description: ソート店舗リスト, type: array, items: { properties: { name: { description: 店舗名, type: string }, instructors: { description: 店舗所属インストラクターリスト, type: array, items: { properties: { uid: { description: スタッフID(インストラクターID), type: integer } }, type: object } } }, type: object } }
-                  total_count: { description: データ全件数, type: integer }
-                  list_count: { description: 取得したリストのデータ件数, type: integer }
-                  limit: { description: 取得上限数(リクエストで指定された取得数), type: integer }
-                  offset: { description: オフセット数(リクエストで指定された取得オフセット数), type: integer }
-                  type: { description: ソート対象項目(リクエストで指定されたソート対象), type: integer }
+                  zip_code: { description: 郵便番号, type: string }
+                  prefecture: { description: 都道府県名, type: string }
+                  address: { description: 住所, type: string }
                 type: object

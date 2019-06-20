@@ -12,15 +12,16 @@ use Log;
 class Loader
 {
     // 種別
-    const API           = "Api";
+    const API           = "Api";            
     const URL           = 'Url';
-    const Instructor   = 'Instructor';
-    const Invite        = 'Invite';
-    const Music        = 'Music';
-    const Auth          = "Authentication";
+    const Instructor    = 'Instructor';       // API-201 - API-299
+    const Invite        = 'Invite';           // API-301 - API-399
+    const Music         = 'Music';            // API-401 - API-499 
+    const Auth          = "Authentication";   // API-001 - API-099
     const MailCheck     = "MailCheck";
     const MemtypeChange = "MemtypeChange";
-    const ZipCode     = "ZipCode";
+    const ZipCode       = "ZipCode";          // API-501 - API-599
+    const Tenpo         = "Tenpo";            // API-101 - API-199
 
     // 機能
     const SELECT = 'Select';

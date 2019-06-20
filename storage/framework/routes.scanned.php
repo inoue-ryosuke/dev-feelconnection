@@ -175,3 +175,11 @@ $router->post('api/memtype_change/update', [
 	'where' => [],
 	'domain' => NULL,
 ]);
+
+$router->post('api/studio', [
+	'uses' => 'App\Http\Controllers\Api\TenpoController@getTenpoInfo',
+	'as' => 'api.studio.get',
+	'middleware' => ['api', 'auth:customer'],
+	'where' => [],
+	'domain' => NULL,
+]);
