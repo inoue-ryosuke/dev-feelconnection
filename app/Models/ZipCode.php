@@ -18,7 +18,7 @@ class ZipCode extends BaseFormModel implements Authenticatable
     protected $table = 'zip_code' . self::SF;
 
     /** 主キー */
-//    protected $primaryKey = '';
+    protected $primaryKey = 'code';
 
     protected $fillable = [
         'code',
@@ -26,6 +26,8 @@ class ZipCode extends BaseFormModel implements Authenticatable
         'address2',
         'address3',
     ];
+    // created_at, updated_atは存在しないテーブル
+    public $timestamps = false;
 
     /**
      * 郵便番号がレコードに存在するか確認
