@@ -95,18 +95,4 @@ class OrderLesson extends Model
             ->where('order_date', '>=', $currentDateTime->format('Y-m-d'))
             ->count();
     }
-
-    /**
-     * 予約済みレッスンを取得
-     *
-     * @param int $shiftId レッスンスケジュールID
-     * @param int $customerId 会員ID
-     * @return \App\Models\OrderLesson|null
-     */
-    public static function getReservedOrderLesson(int $shiftId, int $customerId) {
-        return self::where('sid', '=', $shiftId)
-            ->where('customer_id', '=', $customerId)
-            ->where('flg', '=', OrderLessonFlg::RESERVED)
-            ->first();
-    }
 }
