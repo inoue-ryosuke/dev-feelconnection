@@ -68,6 +68,17 @@ class ReservationModalController extends Controller
             );
         }
 
+        // レッスン予約・キャンセル排他ロック(同時予約・キャンセルを防ぐ)
+        if (VaidationLogic::isReserveLock($custMaster['reserve_lock'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not reserve lesson',
+                    'レッスンを予約できません。',
+                    array_merge($params))
+                );
+        }
+
         // 予約受付時間内かどうか
         if (!VaidationLogic::validateTimeLimit($shiftMaster['shift_date'], $shiftMaster['ls_st'], $shiftMaster['tlimit'])) {
             // 予約受付時間外
@@ -506,6 +517,8 @@ class ReservationModalController extends Controller
             ])->setStatusCode(Response::HTTP_RESET_CONTENT);
         }
 
+        // 遷移先取得
+        $transitionType = ReservationLogic::getReservationTransitionType($shiftMaster, $custMaster, $tenpoMaster);
 
 
         return response()->json([
@@ -663,13 +676,24 @@ class ReservationModalController extends Controller
                 );
         }
 
+        // レッスン予約・キャンセル排他ロック(同時予約・キャンセルを防ぐ)
+        if (VaidationLogic::isReserveLock($custMaster['reserve_lock'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not cancel lesson',
+                    'レッスンをキャンセルできません。',
+                    array_merge($params))
+                );
+        }
+
         // キャンセル受付時間内かどうか
         if (!VaidationLogic::validateTimeLimit($shiftMaster['shift_date'], $shiftMaster['ls_st'], $shiftMaster['tlimit_cancel'])) {
             // キャンセル受付時間外
             return CommonLogic::getErrorJsonResponse(
                 Response::HTTP_CONFLICT,
                 CommonLogic::getErrorArray(
-                    'Can not reserve sheet',
+                    'Can not cancel lesson',
                     '予約受付時間外です。',
                     array_merge($params,
                         [ 'shift_date' => $shiftMaster['shift_date'], 'start_time' => $shiftMaster['ls_st'], 'time_limit_cancel' => $shiftMaster['tlimit_cancel'] ]))

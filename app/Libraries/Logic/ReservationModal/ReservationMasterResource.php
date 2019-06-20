@@ -60,6 +60,7 @@ abstract class ReservationMasterResource {
      *
      * @var int cid 会員ID
      * @var int memtype 会員種別
+     * @var string reserve_lock レッスン予約・キャンセル排他ロック
      */
     protected $custMaster;
 

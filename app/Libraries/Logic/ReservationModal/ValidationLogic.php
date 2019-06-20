@@ -7,6 +7,7 @@ use App\Models\Constant\TaikenMess;
 use App\Models\Constant\TaikenLesFlg;
 use App\Models\Constant\ShiftMasterFlg;
 use App\Models\Constant\OrderLessonCancelProhibit;
+use App\Models\Constant\ReserveLock;
 
 use App\Models\OrderLesson;
 
@@ -218,5 +219,15 @@ class VaidationLogic
      */
     public static function isCancelProhibit(int $cancelProhibit) {
         return $cancelProhibit === OrderLessonCancelProhibit::POSSIBLE;
+    }
+
+    /**
+     * レッスン予約・キャンセル排他ロック
+     *
+     * @param string $reserve_lock レッスン予約・キャンセル排他ロック
+     * @return bool
+     */
+    public static function isReserveLock(string $reserve_lock) {
+        return $reserve_lock === ReserveLock::LOCK;
     }
 }

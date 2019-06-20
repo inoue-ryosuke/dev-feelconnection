@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\DB;
 use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
+use App\Models\Constant\ClubFeeFlg;
 
 class ClubFee extends BaseFormModel implements Authenticatable
 {
@@ -33,5 +35,28 @@ class ClubFee extends BaseFormModel implements Authenticatable
     const UPDATED_AT = null;
     const DELETED_AT = null;
 
+    /**
+     * 月間予約枠があるか確認
+     * TODO: 要現行仕様確認
+     *
+     * @param int $customerId 会員ID
+     * @return bool
+     */
+    public static function hasMonthlyReservationCount(int $customerId) {
+        $currentDateTime = new \DateTime();
+        $currentDateText = $currentDateTime->format('Y-m-d');
+
+        $count = self::where('customer_id', '=', $customerId)
+            ->where('flg', '=', ClubFeeFlg::VALID)
+            ->where('tcount', '<', DB::raw('tcount_max'))
+            ->where('start_date', '>=', $currentDateText)
+            ->where(function($query) use ($currentDateText){
+                $query->whereNull('expire')
+                    ->orWhere('expire', '>', $currentDateText);
+            })
+            ->count();
+
+         return $count > 0;
+    }
 
 }

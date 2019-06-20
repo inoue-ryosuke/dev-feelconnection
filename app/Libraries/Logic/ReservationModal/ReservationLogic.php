@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Constant\OrderLessonFlg;
 use App\Models\Constant\OrderLessonSbFlg;
 use App\Models\Constant\TicketMasterFlg;
+use App\Models\Constant\ReserveLock;
 use App\Models\ClubFee;
+use App\Models\Cust;
 
 /**
  * 予約登録、バイク位置変更、予約キャンセル ロジック
@@ -77,6 +79,11 @@ class ReservationLogic
     public static function cancelLesson(int $shiftId, int $customerId) {
         try {
             DB::transaction(function () use ($shiftId, $customerId) {
+                // レッスン予約・キャンセル排他ロック、予約・キャンセルの同時実行を防ぐ
+                $custMaster = Cust::find($customerId);
+                $custMaster->fill([ 'reserve_lock' => ReserveLock::LOCK ]);
+                $custMaster->save();
+
                 // 予約済みレッスン取得
                 $orderLesson = OrderLesson::where('sid', '=', $shiftId)
                     ->where('customer_id', '=', $customerId)
@@ -166,6 +173,10 @@ class ReservationLogic
                     'lid' => $orderLesson->lid,
                     'reg_uid' => 0 // キャンセル実行スタッフID、0:ユーザーキャンセル
                 ]);
+
+                // レッスン予約・キャンセル排他ロック、予約・キャンセルの同時実行を防ぐ
+                $custMaster->fill([ 'reserve_lock' => ReserveLock::UNLOCK ]);
+                $custMaster->save();
             });
         } catch (\Exception $e) {
             Logger::writeErrorLog($e->getMessage());
