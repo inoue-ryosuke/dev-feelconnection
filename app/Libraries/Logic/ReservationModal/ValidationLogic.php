@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Constant\TaikenMess;
 use App\Models\Constant\TaikenLesFlg;
 use App\Models\Constant\ShiftMasterFlg;
+use App\Models\Constant\OrderLessonCancelProhibit;
 
 use App\Models\OrderLesson;
 
@@ -193,5 +194,29 @@ class VaidationLogic
         }
 
         return true;
+    }
+
+    /**
+     * レッスンキャンセル可能な会員種別かどうか
+     *
+     * @param int $memberType 会員種別(cust_memtype.mid)
+     * @return bool
+     */
+    public static function canReservationCancel(int $memberType) {
+        // TODO:会員種別ID(cust_memtype.mid)を渡して、ネット・トライアル会員を判別
+        if (false) {
+        }
+
+        return true;
+    }
+
+    /**
+     * キャンセル可能なレッスン予約(order_lesson)かどうか
+     *
+     * @param int $cancelProhibit 予約キャンセルフラグ(order_lesson.cancel_prohibit)
+     * @return bool
+     */
+    public static function isCancelProhibit(int $cancelProhibit) {
+        return $cancelProhibit === OrderLessonCancelProhibit::POSSIBLE;
     }
 }
