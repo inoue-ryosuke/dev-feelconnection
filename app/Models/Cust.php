@@ -22,19 +22,12 @@ class Cust extends SalesBaseFormModel implements Authenticatable
 	/**
      * @var string テーブル名
      */
-//    protected $table = 'cust_master';
-//    protected $primaryKey = 'cid';
-//    protected $loginKey = 'cid';
-//    const CREATED_AT = 'edit_date';
-//    const UPDATED_AT = 'reedit_date';
-//    const DELETED_AT = 'del_date';
-    protected $table = 'cust_master__c';
-    protected $primaryKey = 'cid__c';
-    const CREATED_AT = 'edit_date__c';
-    const UPDATED_AT = 'reedit_date__c';
-    const DELETED_AT = 'del_date__c';
+    protected $table = 'cust_master';
+    protected $primaryKey = 'cid';
+//    protected $table = 'cust_master__c';
+//    protected $primaryKey = 'cid__c';
 
-     /**
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

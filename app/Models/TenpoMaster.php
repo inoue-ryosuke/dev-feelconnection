@@ -8,6 +8,7 @@ use App\Libraries\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TenpoAreaMaster;
 use App\Models\TenpoKubun;
+use App\Models\BelongTenpoHist;
 
 //class TenpoMaster extends BaseFormModel implements Authenticatable
 class TenpoMaster extends SalesBaseFormModel implements Authenticatable
@@ -96,16 +97,16 @@ class TenpoMaster extends SalesBaseFormModel implements Authenticatable
             return [];
         }
         //user_master_histテーブルと結合
-        $query = self::leftjoin('user_master_hist', 'tenpo_master.tid', 'user_master_hist.tid');
+        $query = self::leftjoin(BelongTenpoHist::TABLE, 'tenpo_master.tid', BelongTenpoHist::TABLE_TID);
 
-        $query->whereIn('user_master_hist.uid', $instructorIds)
-            ->where('user_master_hist.flg', self::VALID);
+        $query->whereIn(BelongTenpoHist::TABLE_UID, $instructorIds)
+            ->where(BelongTenpoHist::TABLE_FLAG, self::VALID);
 
         $query->select(
             'tenpo_master.*',
-            'user_master_hist.uid'
+            BelongTenpoHist::TABLE_UID
         );
-        return $query->orderBy('tid', 'ASC')->get();
+        return $query->orderBy('tenpo_master.tid', 'ASC')->get();
 //        return $query->orderBy('prefecture_code', 'ASC')->get();
     }
 

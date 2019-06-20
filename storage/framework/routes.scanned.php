@@ -75,7 +75,7 @@ $router->get('api/apple_music', [
 $router->get('api/reservation_modal/{sid}', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@reservationModalApi',
 	'as' => 'api.reservation_modal.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -83,7 +83,7 @@ $router->get('api/reservation_modal/{sid}', [
 $router->get('api/sheet_status/{sid}/{sheet_no}', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusApi',
 	'as' => 'api.sheet_status.get',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -91,7 +91,7 @@ $router->get('api/sheet_status/{sid}/{sheet_no}', [
 $router->post('api/sheet_status_extend', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetStatusExtendApi',
 	'as' => 'api.sheet_status_extend.post',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -99,7 +99,15 @@ $router->post('api/sheet_status_extend', [
 $router->post('api/normal_reservation', [
 	'uses' => 'App\Http\Controllers\Api\ReservationModalController@normalReservationApi',
 	'as' => 'api.normal_reservation.post',
-	'middleware' => [],
+	'middleware' => ['api', 'auth:customer'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/sheet_change', [
+	'uses' => 'App\Http\Controllers\Api\ReservationModalController@sheetChangeApi',
+	'as' => 'api.sheet_change.post',
+	'middleware' => ['api', 'auth:customer'],
 	'where' => [],
 	'domain' => NULL,
 ]);
@@ -139,6 +147,14 @@ $router->get('api/mailauth/{token}', [
 $router->post('api/user/login', [
 	'uses' => 'App\Http\Controllers\Auth\LoginController@login',
 	'as' => 'api.user.login',
+	'middleware' => ['guest', 'api'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/zip_code', [
+	'uses' => 'App\Http\Controllers\Api\ZipCodeController@getAddressByZipCode',
+	'as' => 'api.zip_code.get',
 	'middleware' => ['api', 'guest'],
 	'where' => [],
 	'domain' => NULL,

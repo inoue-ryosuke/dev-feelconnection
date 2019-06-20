@@ -2,7 +2,6 @@
 
 namespace App\Libraries\Logic\ReservationModal;
 
-use Illuminate\Support\Facades\Auth;
 use App\Models\ShiftMaster;
 
 /**
@@ -35,9 +34,10 @@ class ShiftTenpoCustMasterResource extends ReservationMasterResource {
             return false;
         }
 
-        // TODO 会員情報取得処理
-        $this->custMaster['cid'] = 1;
-        $this->custMaster['memtype'] = 3;
+        // 会員情報取得
+        $user = auth('customer')->user();
+        $this->custMaster['cid'] = $user->cid;
+        $this->custMaster['memtype'] = $user->memtype;
 
         return true;
     }
@@ -46,6 +46,11 @@ class ShiftTenpoCustMasterResource extends ReservationMasterResource {
     public function createDBResource() {
         $model = ShiftMaster::getShiftTenpoMasterResource($this->shiftIdHash);
 
+        if (is_null($model)) {
+            // エラー、不正なIDハッシュ値
+            // throw new InternalErrorException();
+        }
+
         $this->setShiftMasterResourceByModel($model);
         $this->setTenpoMasterResourceByModel($model);
 
@@ -53,9 +58,10 @@ class ShiftTenpoCustMasterResource extends ReservationMasterResource {
         $this->createShiftMasterCache();
         $this->createTenpoMasterCache();
 
-        // TODO 会員情報取得処理
-        $this->custMaster['cid'] = 1;
-        $this->custMaster['memtype'] = 3;
+        // 会員情報取得
+        $user = auth('customer')->user();
+        $this->custMaster['cid'] = $user->cid;
+        $this->custMaster['memtype'] = $user->memtype;
     }
 
 }

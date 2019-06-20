@@ -2,9 +2,7 @@
 
 namespace App\Libraries\Logic\ReservationModal;
 
-use Illuminate\Support\Facades\Auth;
 use App\Models\ShiftMaster;
-use App\Models\Constant\ReservationTablePrefix;
 
 /**
  * 予約モーダルAPI等で必要なRedis・DBのマスター情報
@@ -43,10 +41,10 @@ class ReservationModalMasterResource extends ReservationMasterResource {
             return false;
         }
 
-
-        // TODO 会員情報取得処理
-        $this->custMaster['cid'] = 1;
-        $this->custMaster['memtype'] = 3;
+        // 会員情報取得
+        $user = auth('customer')->user();
+        $this->custMaster['cid'] = $user->cid;
+        $this->custMaster['memtype'] = $user->memtype;
 
         return true;
     }
@@ -57,6 +55,7 @@ class ReservationModalMasterResource extends ReservationMasterResource {
 
         if (is_null($model)) {
             // エラー、不正なIDハッシュ値
+            // throw new InternalErrorException();
         }
 
         $this->setShiftMasterResourceByModel($model);
@@ -68,9 +67,10 @@ class ReservationModalMasterResource extends ReservationMasterResource {
         $this->createLessonMasterCache();
         $this->createTenpoMasterCache();
 
-        // TODO 会員情報取得処理
-        $this->custMaster['cid'] = 1;
-        $this->custMaster['memtype'] = 3;
+        // 会員情報取得
+        $user = auth('customer')->user();
+        $this->custMaster['cid'] = $user->cid;
+        $this->custMaster['memtype'] = $user->memtype;
     }
 
 }
