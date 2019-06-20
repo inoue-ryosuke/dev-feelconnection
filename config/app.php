@@ -170,6 +170,7 @@ return [
 //        Way\Generators\GeneratorsServiceProvider::class,
 //        Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
         App\Providers\JpDateTimeServiceProvider::class,      // 和暦出力用（令和対応）
+        App\Providers\SftpServiceProvider::class,            // Storage経由sftpアクセス
         /*
          * Application Service Providers...
          */

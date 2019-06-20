@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\TenpoAreaMaster;
 use App\Models\TenpoKubun;
 use App\Models\BelongTenpoHist;
+use Illuminate\Support\Facades\Storage;
 
 class TenpoMaster extends BaseFormModel implements Authenticatable
 //class TenpoMaster extends SalesBaseFormModel implements Authenticatable
@@ -26,6 +27,8 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
     // 有効/無効フラグ
     const VALID = 1;
     const INVALID = 0;
+    const IMAGE_DIR = "tenpo";
+    const IMAGE_OPTION_DIR = "tenpo_options";
 
     const CREATED_AT = null;
     const UPDATED_AT = null;
@@ -63,6 +66,11 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
 				"monthly_fname",
 				"mtenpo_explain",
 				"tenpo_memtype",
+				"address",
+				"station",
+				"lat",
+				"lng",
+				"timetable",
     ];
     /*
     protected $fillable = [
@@ -97,8 +105,32 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
 				"monthly_fname__c",
 				"mtenpo_explain__c",
 				"tenpo_memtype__c",
+				"address__c",
+				"station__c",
+				"lat__c",
+				"lng__c",
+				"timetable__c",
     ];*/
 
+	/**
+	 * IDで店舗情報を取得する
+	 */
+	public static function getTenpoInfoById($tid,$lock=false) {
+		if (empty($tid)) {
+			return null;
+		}
+		if ($lock) {
+            $tenpo = self::getShopById($tid);
+		    $tenpo->lockForUpdate();
+		} else {
+		    $tenpo = self::getShopById($tid);
+		}
+        if (is_null($tenpo)) {
+			return null;
+		}
+		return $tenpo;
+	}
+    
     // モデル結合アクセサ（店舗エリア）
     public function joinAllTenpoArea() {
 //		return $this->hasOne(TenpoAreaMaster::Class,"id","tenpo_area_id");
@@ -132,26 +164,64 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
         return $this->{$this->cKey("station")} ?? "";
     }
     /**
+     * ストレージ接続オブジェクト取得
+     */
+    public function getStorage() {
+        return Storage::disk(config("filesystems.default"));
+    }
+    /**
      * 店舗画像一覧取得
      */
+    public function getStorageFileList($mode="") {
+        $lists = [];
+        $storage = $this->getStorage();
+        if ($mode=="image") {
+            $lists = Storage::files(self::IMAGE_DIR."/".$this->{$this->cKey("tid")});
+        } elseif ($mode=="option") {
+            $lists = Storage::files(self::IMAGE_OPTION_DIR."/".$this->{$this->cKey("tid")});
+        } else {
+            $lists = Storage::files();
+        }
+        //var_dump($lists);
+        return $lists;
+    }
     public function getTenpoImageFileInfo() {
-        // TBD:Storage経由のファイル一覧取得と返却
-        return [
-            "filename" => "http://xxx.xxx.xxx.xxx/image/".$this->{$this->cKey("tid")}."/hogehoge.jpg",
-            "seq" => 1,
-            "tid" => $this->{$this->cKey("tid")},
-        ];
+        // ストレージ内のファイル一覧を取得する
+        $response = [];
+        $lists = $this->getStorageFileList("image");
+        if (empty($lists)) {
+            return $response;
+        }
+        // MEMO:sftpドライバだと Storage::disk($driver)->url($path) が使えない
+        foreach ($lists as $num => $filepath) {
+            $response[] = [
+                "filename" => $filepath,
+                "seq" => $num,
+                "tid" => $this->{$this->cKey("tid")},
+            ];
+        }
+        return $response;
     }
     /**
      * 店舗オプション画像一覧取得
      */
     public function getTenpoOptionImageFileInfo() {
-        // TBD:Storage経由のファイル一覧取得と返却
-        return [
-            "filename" => "http://xxx.xxx.xxx.xxx/image_option/".$this->{$this->cKey("tid")}."/testtest.jpg",
-            "seq" => 1,
-            "tid" => $this->{$this->cKey("tid")},
-        ];
+        // ストレージ内のファイル一覧を取得する
+        // ストレージ内のファイル一覧を取得する
+        $response = [];
+        $lists = $this->getStorageFileList("option");
+        if (empty($lists)) {
+            return $response;
+        }
+        // MEMO:sftpドライバだと Storage::disk($driver)->url($path) が使えない
+        foreach ($lists as $num => $filepath) {
+            $response[] = [
+                "filename" => $filepath,
+                "seq" => $num,
+                "tid" => $this->{$this->cKey("tid")},
+            ];
+        }
+        return $response;
     }
     /**
      * インストラクターが所属する店舗一覧取得

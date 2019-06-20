@@ -54,12 +54,18 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
-        /*
         // かごやサーバ（テスト用）
         'sftp' => [
-            'driver' => 'sftp',
-
-        ]*/
+            'driver'     => 'sftp',
+            'host'       => env('SFTP_SERVER','localhost'),
+            'port'       => env('SFTP_PORT',22),
+            'username'   => env('SFTP_USER','kagoya-user'),
+            'password'   => env('SFTP_PASS','kagoya-pass'),
+            'root'       => env('SFTP_DOCUMENTROOT','/'),
+            'privateKey' => env('SFTP_PRIVATE_KEY',''),
+            'timeout'    => env('SFTP_TIMEOUT',null),
+            'url'        => env('SFTP_SERVER','localhost'),
+        ],
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

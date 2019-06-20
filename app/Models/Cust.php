@@ -350,7 +350,6 @@ class Cust extends BaseFormModel implements Authenticatable
 		return TenpoMaster::whereIn((new TenpoMaster)->cKey("tid"),$ids)->get();
     }
     public function hasOneStoreTenpo() {
-		var_dump($this->joinAllStoreTenpo()); exit;
 		if (!$this->joinAllStoreTenpo()->count()) {
 			return null;
 		}
@@ -472,7 +471,8 @@ class Cust extends BaseFormModel implements Authenticatable
 				$okTenpoIds = $allTenpo->pluck($this->cKey("tid"))->unique();
 				// 店舗の変更履歴ではなく（所属店舗ID配列内に変更履歴の店舗IDがある）、会員種別変更時（現在の種別IDと違う）
 				if (
-					$schedule->{$schedule->cKey("sc_memtype")} != $memtype->{$schedule->cKey("mid")} && 
+					!is_null($memtype) &&
+					$schedule->{$schedule->cKey("sc_memtype")} != $memtype->{(new CustMemType)->cKey("mid")} && 
 					in_array($schedule->{$schedule->cKey("sc_tenpo")},$okTenpoIds->toArray())
 				) {
 					$append = "（変更登録あり）";
@@ -508,7 +508,8 @@ class Cust extends BaseFormModel implements Authenticatable
             foreach ($changeSchedule as $schedule) {
 				// 会員種別が現在と同一かつ、所属店舗ID配列内に変更履歴の店舗IDがない場合
 				if (
-					$schedule->{$schedule->cKey("sc_memtype")} == $memtype->{$schedule->cKey("mid")} && 
+					!is_null($memtype) &&
+					$schedule->{$schedule->cKey("sc_memtype")} == $memtype->{(new CustMemType)->cKey("mid")} && 
 					!in_array($schedule->{$schedule->cKey("sc_tenpo")},$okTenpoIds->toArray())
 				) {
 					$append = "（変更登録あり）";
