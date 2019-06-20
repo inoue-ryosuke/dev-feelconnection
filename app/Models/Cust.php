@@ -172,10 +172,10 @@ class Cust extends BaseFormModel implements Authenticatable
 
 	// モデル結合アクセサ（会員区分）
     public function joinAllMemType() {
-		$newMemType = new CustMemType();
-		$memtype_col     = $this->convertKey("memtype");
+		$newMemType  = new CustMemType();
+		$memtype_col = $this->cKey("memtype");
         //return $this->hasOne(CustMemType::Class,$memtype_primary,$memtype_col);
-        return CustMemType::where($newMemType->convertKey("mid"),$this->memtype)->get();
+        return CustMemType::where($newMemType->cKey("mid"),$this->memtype)->get();
 	}
 	/*
     public function hasOneMemType() {
@@ -206,10 +206,10 @@ class Cust extends BaseFormModel implements Authenticatable
 	// モデル結合アクセサ（ではなく単なるモデル抽出）（所属店舗：複数対応）
     public function joinAllStoreTenpo() {
 //		return $this->belongsToMany(TenpoMaster::Class,CustTenpo::class,$this->primaryKey,"tenpo_id");
-		$ids = CustTenpo::where((new CustTenpo)->convertKey("cid"),$this->cid)
-						->where((new CustTenpo)->convertKey("flg"),1)->get()
-						->pluck((new CustTenpo)->convertKey("tenpo_id"))->unique();
-		return TenpoMaster::whereIn((new TenpoMaster)->convertKey("tid"),$ids)->get();
+		$ids = CustTenpo::where((new CustTenpo)->cKey("cid"),$this->cid)
+						->where((new CustTenpo)->cKey("flg"),1)->get()
+						->pluck((new CustTenpo)->cKey("tenpo_id"))->unique();
+		return TenpoMaster::whereIn((new TenpoMaster)->cKey("tid"),$ids)->get();
     }
     public function hasOneStoreTenpo() {
 		var_dump($this->joinAllStoreTenpo()); exit;
@@ -228,8 +228,8 @@ class Cust extends BaseFormModel implements Authenticatable
 	}
 	// モデル結合アクセサ（ではなく単なるモデル抽出）（登録店舗）
     public function joinAllLastTenpo() {
-		//return $this->hasOne(TenpoMaster::Class,(new TenpoMaster)->convertKey("tid"),$this->convertKey("last_tenpo"));
-		return TenpoMaster::where((new TenpoMaster)->convertKey("tid"),$this->last_tenpo)->get();
+		//return $this->hasOne(TenpoMaster::Class,(new TenpoMaster)->cKey("tid"),$this->cKey("last_tenpo"));
+		return TenpoMaster::where((new TenpoMaster)->cKey("tid"),$this->last_tenpo)->get();
 	}
     public function hasOneLastTenpo() {
 		if (!$this->joinAllLastTenpo()->count()) {
@@ -250,8 +250,8 @@ class Cust extends BaseFormModel implements Authenticatable
 	// モデル結合アクセサ（ではなく単なるモデル抽出）
 	// 1.ログインユーザーの会員ID、契約変更履歴の会員IDからレコード抽出。
     public function joinSchedule() {
-//		return $this->hasMany(Schedule::Class,(new Schedule)->convertKey("sc_cid"),$this->convertKey("cid"));
-		return Schedule::where((new Schedule)->convertKey("sc_cid"),$this->cid)->get();
+//		return $this->hasMany(Schedule::Class,(new Schedule)->cKey("sc_cid"),$this->cKey("cid"));
+		return Schedule::where((new Schedule)->cKey("sc_cid"),$this->cid)->get();
 	}
     public function getChangeSchedule() {
 		if (!$this->joinSchedule()->count()) {
@@ -262,7 +262,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		$allTenpoId = $allTenpo->implode("tid",",");
 		// 
 //		return $this->joinSchedule->where("sc_flg",1); 
-		return $this->joinSchedule()->where((new Schedule)->convertKey("sc_flg"),1);
+		return $this->joinSchedule()->where((new Schedule)->cKey("sc_flg"),1);
 	}
 
 	/**
@@ -331,7 +331,7 @@ class Cust extends BaseFormModel implements Authenticatable
 		// 前提：変更scheduleデータがある場合
 	    if ($changeSchedule->count()) {
             foreach ($changeSchedule as $schedule) {
-				$okTenpoIds = $allTenpo->pluck($this->convertKey("tid"))->unique();
+				$okTenpoIds = $allTenpo->pluck($this->cKey("tid"))->unique();
 				// 店舗の変更履歴ではなく（所属店舗ID配列内に変更履歴の店舗IDがある）、会員種別変更時（現在の種別IDと違う）
 			    if ($schedule->sc_memtype != $memtype->mid && in_array($schedule->sc_tenpo,$okTenpoIds->toArray())) {
 					$append = "（変更登録あり）";
@@ -359,7 +359,7 @@ class Cust extends BaseFormModel implements Authenticatable
 			return "";
 		}
         $memtype = $this->hasOneMemType();		
-		$okTenpoIds = $all->pluck($this->convertKey("tid"))->unique();
+		$okTenpoIds = $all->pluck($this->cKey("tid"))->unique();
 
 		// 変更スケジュール情報を取得
 		$changeSchedule = $this->getChangeSchedule() ?? collect([]);

@@ -33,6 +33,16 @@ class BaseModel extends Model implements IEditable {
         }
         return null;
     }
+    /**
+     * SalesForceテーブル名になっていたら、カラム名も__c付き返却
+     */
+    public function cKey($key) {
+//        if (preg_match("#^(.+)__c$#",(new static)->getTable())) {
+        if (preg_match("#^(.+)__c$#",$this->table)) {
+            return $key."__c";
+        }
+        return $key;
+    }
 
     /**
      * ID情報取得
