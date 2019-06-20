@@ -176,4 +176,28 @@ class AuthController extends ApiController
 
     }
 
+    /**
+     * API-05: 会員情報登録
+     *
+     * @POST("api/auth/user/store", as="api.auth.user.store")
+     * @param $request
+     * @return Response
+     */
+    public function storeUser(Request $request) {
+
+        logger("storeUser() Start");
+
+        $payload = $this->getPayload();
+        logger('payload');
+        logger($payload);
+        // ペイロードバリデーション
+        $this->validateApiPayload('cust.store', $payload);
+
+        // TBD:認証情報からIDを特定する
+        $response = $this->getAuthStoreLogic()->createUser($payload);
+        logger("storeUser() End");
+        return response()->json($response);
+
+    }
+
 }
