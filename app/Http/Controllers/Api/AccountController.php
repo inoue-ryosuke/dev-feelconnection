@@ -68,8 +68,11 @@ class AccountController extends ApiController
         $this->validateApiPayload('cust.store', $payload);
         // 処理タイプを取得
         $type = data_get($payload, 'type', 1);
+        logger('type');
+        logger($type);
         // 処理タイプが更新の場合
         if ($this->isAuthUpdate($type)) {
+            logger('update user');
             $response = $this->getAuthUpdateLogic()->updateUser($payload);
             return response()->json($response);
         }
@@ -83,10 +86,12 @@ class AccountController extends ApiController
 
         // 入会可能な年齢の場合
         if (Cust::validateUserAge($age)) {
-            if ($type = Cust::PROCESS_VALIDATE) {
+            if ($type === Cust::PROCESS_VALIDATE) {
+                logger('validate user');
                 // 処理タイプが入力・確認
                 $response = ["result_code" => 0];
             } else {
+                logger('create user');
                 // 処理タイプが登録
                 $response = $this->getAuthStoreLogic()->createUser($payload);
             }

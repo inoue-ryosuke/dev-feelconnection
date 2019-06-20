@@ -176,14 +176,6 @@ $router->post('api/zip_code', [
 	'domain' => NULL,
 ]);
 
-$router->post('api/account', [
-	'uses' => 'App\Http\Controllers\Api\AccountController@validateAccount',
-	'as' => 'api.account.post',
-	'middleware' => ['api'],
-	'where' => [],
-	'domain' => NULL,
-]);
-
 $router->post('api/memtype_change/confirm', [
 	'uses' => 'App\Http\Controllers\Api\MemtypeChangeController@getMemtypeChangeConfirmPage',
 	'as' => 'api.memtype_change.confirm',
@@ -204,6 +196,14 @@ $router->post('api/studio', [
 	'uses' => 'App\Http\Controllers\Api\TenpoController@getTenpoInfo',
 	'as' => 'api.studio.get',
 	'middleware' => ['api', 'auth:customer'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/account', [
+	'uses' => 'App\Http\Controllers\Api\AccountController@validateAccount',
+	'as' => 'api.account.post',
+	'middleware' => ['api'],
 	'where' => [],
 	'domain' => NULL,
 ]);
