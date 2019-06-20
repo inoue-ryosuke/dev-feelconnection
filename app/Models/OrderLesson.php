@@ -18,10 +18,13 @@ class OrderLesson extends Model
     protected $primaryKey = 'oid';
 
     protected $guarded = [
+        'oid',
         'experience',
     ];
 
-    public $timestamps = false;
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
+    const DELETED_AT = null;
 
     /**
      * 体験レッスン(初回レッスン)受講状態、体験レッスン(初回レッスン)予約状態を取得

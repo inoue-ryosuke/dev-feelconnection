@@ -33,7 +33,9 @@ class LessonMaster extends BaseFormModel implements Authenticatable
         'lid',
     ];
 
-    public $timestamps = false;
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
+    const DELETED_AT = null;
 
     /**
      * レッスンの予約が可能か判定
