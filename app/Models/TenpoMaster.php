@@ -125,7 +125,34 @@ class TenpoMaster extends BaseFormModel implements Authenticatable
 //		return $this->joinAllTenpoKubun->get();
 		return $this->joinAllTenpoKubun();
     }
-    
+    /**
+     * 最寄り駅取得
+     */
+    public function getStationName() {
+        return $this->{$this->cKey("station")} ?? "";
+    }
+    /**
+     * 店舗画像一覧取得
+     */
+    public function getTenpoImageFileInfo() {
+        // TBD:Storage経由のファイル一覧取得と返却
+        return [
+            "filename" => "http://xxx.xxx.xxx.xxx/image/".$this->{$this->cKey("tid")}."/hogehoge.jpg",
+            "seq" => 1,
+            "tid" => $this->{$this->cKey("tid")},
+        ];
+    }
+    /**
+     * 店舗オプション画像一覧取得
+     */
+    public function getTenpoOptionImageFileInfo() {
+        // TBD:Storage経由のファイル一覧取得と返却
+        return [
+            "filename" => "http://xxx.xxx.xxx.xxx/image_option/".$this->{$this->cKey("tid")}."/testtest.jpg",
+            "seq" => 1,
+            "tid" => $this->{$this->cKey("tid")},
+        ];
+    }
     /**
      * インストラクターが所属する店舗一覧取得
      * @param $instructorIds

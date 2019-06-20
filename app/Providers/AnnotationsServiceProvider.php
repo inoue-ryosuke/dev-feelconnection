@@ -48,8 +48,9 @@ class AnnotationsServiceProvider extends ServiceProvider
             'App\Http\Controllers\Api\MailAuthController',
             'App\Http\Controllers\Auth\LoginController',
             'App\Http\Controllers\Api\ZipCodeController',
+            'App\Http\Controllers\Api\MemtypeChangeController',
+            'App\Http\Controllers\Api\TenpoController',
             'App\Http\Controllers\Api\AccountController',
-            'App\Http\Controllers\Api\MemtypeChangeController'
         ]);
 
         // WEB

@@ -29,7 +29,7 @@ class AuthController extends ApiController
     }
 
     /**
-     * API-01: 認証情報の取得
+     * API-001: 認証情報の取得
      * @OA\POST(
      *     path="/api/auth",
      *     description="認証されている会員情報を取得",
@@ -105,7 +105,7 @@ class AuthController extends ApiController
 
     }
     /**
-     * API-02: 個人情報表示
+     * API-002: 個人情報表示
      * 
      * @POST("api/auth/user", as="api.auth.user.get")
      * @param $request
@@ -128,7 +128,7 @@ class AuthController extends ApiController
         return response()->json($response);
     }
     /**
-     * API-03: 受け取りメール設定表示更新
+     * API-003: 受け取りメール設定表示更新
      * 
      * @POST("api/auth/user/dm_list/update", as="api.auth.user.dm_list.update")
      * @param $request
@@ -152,7 +152,7 @@ class AuthController extends ApiController
 
     }
     /**
-     * API-04: 認証会員情報更新
+     * API-004: 認証会員情報更新
      * 
      * @POST("api/auth/user/update", as="api.auth.user.update")
      * @param $request

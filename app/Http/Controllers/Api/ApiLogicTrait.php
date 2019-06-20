@@ -12,6 +12,7 @@ use App\Libraries\Logic\Authentication\UpdateLogic as AuthUpdateLogic;
 use App\Libraries\Logic\Authentication\StoreLogic as AuthStoreLogic;
 use App\Libraries\Logic\MailCheck\SelectLogic as MailCheckSelectLogic;
 use App\Libraries\Logic\ZipCode\SelectLogic as ZipCodeSelectLogic;
+use App\Libraries\Logic\Tenpo\SelectLogic as TenpoSelectLogic;
 
 /**
  * API用ロジックに関するトレイト
@@ -112,5 +113,12 @@ trait ApiLogicTrait {
      */
     public function getZipCodeSelectLogic() {
         return $this->getApiLogic(Loader::ZipCode, Loader::SELECT);
+    }
+    /**
+     * TenpoのSelectロジックを取得する
+     * @return TenpoSelectLogic
+     */
+    public function getTenpoSelectLogic() {
+        return $this->getApiLogic(Loader::Tenpo, Loader::SELECT);
     }
 }

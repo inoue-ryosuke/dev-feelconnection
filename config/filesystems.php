@@ -54,7 +54,12 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+        /*
+        // かごやサーバ（テスト用）
+        'sftp' => [
+            'driver' => 'sftp',
 
+        ]*/
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

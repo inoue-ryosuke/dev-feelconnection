@@ -3,80 +3,6 @@ info:
   title: 'FeelConnection API仕様書'
   version: '1.0'
 paths:
-  /api/account:
-    post:
-      tags:
-        - Account
-      summary: 'API-xx: 個人情報入力確認・更新・登録API'
-      description: "入力・確認時は、各データのバリデーションチェックを行う。\r\n    変更時は、各データのバリデーションチェックを行い、DBを更新する。\r\n    登録時は、各データのバリデーションチェックを行い、DBへ登録し、登録完了メールを送信する。"
-      operationId: 'App\Http\Controllers\Api\AccountController::getInstructors'
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              properties:
-                type:
-                  description: '1:入力・確認、２：変更、３：登録'
-                  type: integer
-                name:
-                  description: 名前（漢字）
-                  type: string
-                kana:
-                  description: 名前(カタカナ)
-                  type: string
-                b_year:
-                  description: 生年月日(年)
-                  type: integer
-                b_month:
-                  description: 生年月日(月)
-                  type: integer
-                b_day:
-                  description: 生年月日(日)
-                  type: integer
-                sex:
-                  description: '性別(1:男性、2:女性)'
-                  type: integer
-                h_zip:
-                  description: 郵便番号
-                  type: string
-                h_pref:
-                  description: 都道府県
-                  type: string
-                h_addr:
-                  description: 番地、建物名
-                  type: string
-                h_tel:
-                  description: 電話番号・市外局番
-                  type: string
-                dm:
-                  description: 'ご案内メール受信許可(0:可　1:不可)'
-                  type: integer
-                pc_conf:
-                  description: '事前予約案内メール受信許可(0:可　1:不可)'
-                  type: integer
-                login_pass:
-                  description: パスワード
-                  type: string
-                login_pass_confirmation:
-                  description: パスワード（確認）
-                  type: string
-                campaign_code:
-                  description: キャンペーンコード
-                  type: string
-                pc_mail:
-                  description: メールアドレス
-                  type: string
-              type: object
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                properties:
-                  result_code: { description: '結果コード(0:正常 1:エラー)', type: integer }
-                type: object
   /api/get_json_sample:
     post:
       tags:
@@ -118,7 +44,7 @@ paths:
     post:
       tags:
         - Auth
-      summary: 'API-01: 認証情報の取得'
+      summary: 'API-001: 認証情報の取得'
       description: 認証されている会員情報を取得
       operationId: 'App\Http\Controllers\Api\AuthController::getAuthInfo'
       responses:
@@ -173,7 +99,7 @@ paths:
   /api/instructors:
     post:
       tags:
-        - Instructor
+        - UserMaster
       summary: 'API-xx: インストラクター紹介一覧取得API'
       description: インストラクター紹介画面に表示するインストラクターの一覧を取得する
       operationId: 'App\Http\Controllers\Api\InstructorController::getInstructors'
@@ -252,7 +178,7 @@ paths:
               schema:
                 properties:
                   result_code: { description: '結果コード(0:正常 1:エラー)', type: integer }
-                  list: { description: 音楽プログラムリスト, type: array, items: { properties: { '{category_name}': { description: 'BBC HIT,BB1 COMP等カテゴリー毎にグルーピングされたリスト', type: array, items: { properties: { name: { description: "プレイリスト名(表示プレイリスト名　＝　プログラム名 ＋ 音楽ジャンル名 ＋ バージョン\r\n    ex) BB2 HIT 16  = BB2 + HIT + 16)", type: string }, path: { description: 'プレイリストパス(URL)(AppleMusicのプレイリスト詳細へのURL )', type: string }, image_path: { description: プレイリスト画像パス(URL)(AppleMusicのプレイリスト画像パス(URL), type: string } }, type: object } } }, type: object } }
+                  list: { description: 音楽プログラムリスト, type: array, items: { properties: { '{category_name}': { description: 'BBC HIT,BB1 COMP等カテゴリー毎にグルーピングされたリスト', type: array, items: { properties: { name: { description: "プレイリスト名(表示プレイリスト名　＝　プログラム名 ＋ 音楽ジャンル名 ＋ バージョン\n    ex) BB2 HIT 16  = BB2 + HIT + 16)", type: string }, path: { description: 'プレイリストパス(URL)(AppleMusicのプレイリスト詳細へのURL )', type: string }, image_path: { description: プレイリスト画像パス(URL)(AppleMusicのプレイリスト画像パス(URL), type: string } }, type: object } } }, type: object } }
                 type: object
   /api/zip_code:
     post:

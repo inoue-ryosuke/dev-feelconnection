@@ -7,6 +7,8 @@ namespace App\Models\Constant;
  */
 class NormalReservationTransitionType
 {
+    /** 予約確定(遷移は無し) */
+    const RESERVATION_CONFIRMATION = 1;
     /** 予約モーダルリロード説明モーダル */
     const EXPLANATION_MODAL = 3005;
     /** 他店舗チケット・1回券選択モーダル */
@@ -25,6 +27,7 @@ class NormalReservationTransitionType
     const BUY_ADDITIONAL_TICKET_MODAL = 1091;
 
     protected static $data = [
+        ['id' => self::RESERVATION_CONFIRMATION, 'name' => '予約確定(遷移は無し)'],
         ['id' => self::EXPLANATION_MODAL, 'name' => '予約モーダルリロード説明モーダル'],
         ['id' => self::OTHER_STORES_ONE_TIME_TICKET_SELECTION_MODAL, 'name' => '他店舗チケット・1回券選択モーダル'],
         ['id' => self::ONE_TIME_TICKET_SELECTION_MODAL, 'name' => 'マンスリー・リミテッド1回券選択モーダル'],
