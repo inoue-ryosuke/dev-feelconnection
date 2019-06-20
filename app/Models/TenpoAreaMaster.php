@@ -13,6 +13,8 @@ class TenpoAreaMaster extends BaseModel
      */
     protected $table = 'tenpo_area_master';
     protected $primaryKey = 'id';
+//    protected $table = 'tenpo_area_master__c';
+//    protected $primaryKey = 'id__c';
 
     // 有効/無効フラグ
     const VALID = 1;
@@ -26,7 +28,17 @@ class TenpoAreaMaster extends BaseModel
 		"itxtcol",
 		"ibgcol",
 		"description"
-	];
+    ];
+    /*
+    protected $fillable = [
+		"flg__c",
+		"name__c",
+		"seq__c",
+		"iname__c",
+		"itxtcol__c",
+		"ibgcol__c",
+		"description__c"
+	];*/
     const UPDATED_AT = null;
 	const DELETED_AT = null;
 }

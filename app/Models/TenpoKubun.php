@@ -13,6 +13,8 @@ class TenpoKubun extends BaseModel
      */
     protected $table = 'tenpo_kubun';
     protected $primaryKey = 'tkid';
+//    protected $table = 'tenpo_kubun__c';
+//    protected $primaryKey = 'tkid__c';
 
     // 有効/無効フラグ
     const VALID = 1;
@@ -20,7 +22,12 @@ class TenpoKubun extends BaseModel
 
     protected $fillable = [
 		"tk_name",
-	  ];
+    ];
+    /*
+    protected $fillable = [
+		"tk_name__c",
+    ];
+    */
     const CREATED_AT = null;
     const UPDATED_AT = null;
     const DELETED_AT = null;
