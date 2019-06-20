@@ -9,6 +9,7 @@ use App\Libraries\Logic\Invite\SelectLogic as InviteSelectLogic;
 use App\Libraries\Logic\Music\SelectLogic as MusicSelectLogic;
 use App\Libraries\Logic\Authentication\SelectLogic as AuthSelectLogic;
 use App\Libraries\Logic\Authentication\UpdateLogic as AuthUpdateLogic;
+use App\Libraries\Logic\Authentication\StoreLogic as AuthStoreLogic;
 use App\Libraries\Logic\MailCheck\SelectLogic as MailCheckSelectLogic;
 use App\Libraries\Logic\ZipCode\SelectLogic as ZipCodeSelectLogic;
 use App\Libraries\Logic\Tenpo\SelectLogic as TenpoSelectLogic;
@@ -72,6 +73,14 @@ trait ApiLogicTrait {
      */
     public function getAuthUpdateLogic() {
         return $this->getApiLogic(Loader::Auth, Loader::UPDATE);
+    }
+
+    /**
+     * AuthのStoreロジックを取得する
+     * @return AuthStoreLogic
+     */
+    public function getAuthStoreLogic() {
+        return $this->getApiLogic(Loader::Auth, Loader::STORE);
     }
 
     /**

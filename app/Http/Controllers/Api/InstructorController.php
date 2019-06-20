@@ -14,7 +14,7 @@ class InstructorController extends ApiController
      * @OA\POST(
      *     path="/api/instructors",
      *     description="インストラクター紹介画面に表示するインストラクターの一覧を取得する",
-     *     tags={"UserMaster"},
+     *     tags={"Instructor"},
      *     @OA\RequestBody(
      *         required=false,
      *         @OA\JsonContent(

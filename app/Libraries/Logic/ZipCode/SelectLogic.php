@@ -29,33 +29,41 @@ class SelectLogic extends BaseLogic
     {
         logger('ZipCode SelectLogic getAddressByZipCode start');
         // スタブレスポンス
-        $response = $this->getStub();
+//        $response = $this->getStub();
 //        // パラメーターを取得
-//        $zipCode = data_get($payload, 'zip_code', null);
-//
-//        if (ZipCode::isExistsZipCode($zipCode)) {
-//            $record = ZipCode::findByCode((integer)$zipCode);
-//        } else {
-//            throw new IllegalParameterException('存在しない郵便番号です');
-//        }
-//
-//
-//        // 住所を結合
-//        $address = null;
-//        if (!empty($record->address2) && !is_null($record->address2)) {
-//            $address = $record->address2;
-//        }
-//
-//        if (!empty($record->address3) && !is_null($record->address3)) {
-//            $address = $address.$record->address3;
-//        }
-//
-//        $response = [
-//            'result_code' => 0,
-//            "zip_code" => (string)$record->code,
-//            "prefecture" => $record->address1,
-//            "address" => $address,
-//        ];
+        $zipCode = data_get($payload, 'zip_code', null);
+
+        if (ZipCode::isExistsZipCode($zipCode)) {
+            $record = ZipCode::findByCode((integer)$zipCode);
+        } else {
+            throw new IllegalParameterException('存在しない郵便番号です');
+        }
+
+        // 住所を結合
+        $address = null;
+        if (!empty($record->address2) && !is_null($record->address2)) {
+            $address = $record->address2;
+        }
+
+        if (!empty($record->address3) && !is_null($record->address3)) {
+            // address3の中身が「以下に掲載がない場合」を削除
+            if (preg_match("/^以下に掲載がない場合$/",$record->address3)) {
+                $record->address3 = "";
+            }
+            // （次のビルを除く）（地階・階層不明）（３~６丁目）等を削除
+            if (preg_match("/（.*\）$/",$record->address3)) {
+                $match = preg_replace("/（.*\）$/","",$record->address3);
+                 $record->address3 = $match;
+            }
+            $address = $address.$record->address3;
+        }
+
+        $response = [
+            'result_code' => 0,
+            "zip_code" => (string)$record->code,
+            "prefecture" => $record->address1,
+            "address" => $address,
+        ];
 
         logger('ZipCode SelectLogic getAddressByZipCode end');
         return $response;

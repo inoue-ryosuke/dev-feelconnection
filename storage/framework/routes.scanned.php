@@ -48,6 +48,14 @@ $router->post('api/auth/user/update', [
 	'domain' => NULL,
 ]);
 
+$router->post('api/auth/user/store', [
+	'uses' => 'App\Http\Controllers\Api\AuthController@storeUser',
+	'as' => 'api.auth.user.store',
+	'middleware' => ['api', 'auth:customer'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
 $router->get('api/invite/{invite_code}', [
 	'uses' => 'App\Http\Controllers\Api\InviteController@validateInviteCode',
 	'as' => 'api.invite.get',
@@ -164,6 +172,14 @@ $router->post('api/zip_code', [
 	'uses' => 'App\Http\Controllers\Api\ZipCodeController@getAddressByZipCode',
 	'as' => 'api.zip_code.get',
 	'middleware' => ['api', 'guest'],
+	'where' => [],
+	'domain' => NULL,
+]);
+
+$router->post('api/account', [
+	'uses' => 'App\Http\Controllers\Api\AccountController@validateAccount',
+	'as' => 'api.account.post',
+	'middleware' => ['api'],
 	'where' => [],
 	'domain' => NULL,
 ]);

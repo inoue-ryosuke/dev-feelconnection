@@ -50,6 +50,7 @@ class AnnotationsServiceProvider extends ServiceProvider
             'App\Http\Controllers\Api\ZipCodeController',
             'App\Http\Controllers\Api\MemtypeChangeController',
             'App\Http\Controllers\Api\TenpoController',
+            'App\Http\Controllers\Api\AccountController',
         ]);
 
         // WEB

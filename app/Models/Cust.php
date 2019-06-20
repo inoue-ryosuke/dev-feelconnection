@@ -28,7 +28,12 @@ class Cust extends BaseFormModel implements Authenticatable
     const CREATED_AT = null;
     const UPDATED_AT = null;
     const DELETED_AT = null;
+    // 入会可能年齢
+    const MEMBER_POSSIBLE_AGE = 16;
 
+    const PROCESS_VALIDATE = 1; //1:入力・確認
+    const PROCESS_UPDATE = 2; // 2:変更
+    const PROCESS_STORE = 3; // 3:登録
     /**
      * The attributes that are mass assignable.
      *
@@ -555,5 +560,42 @@ class Cust extends BaseFormModel implements Authenticatable
 		];
         return $campaign;
 	}
+
+    /**
+     * ユーザーの年齢を取得する
+     * @param $year
+     * @param $month
+     * @param $day
+     * @return
+     */
+    public static function getUserAge($year,$month,$day) {
+        // どれか一つでも空の場合
+        if (empty($year) || empty($month) || empty($day)) {
+            return null;
+        }
+        if (is_null($year) || is_null($month) || is_null($day)) {
+            return null;
+        }
+        // パースして年齢を取得
+        $age = Carbon::parse($year.'/'.$month.'/'.$day)->age;
+        return $age;
+    }
+
+    /**
+     * ユーザーの年齢を判定する
+     * @param $age
+     * @return
+     */
+    public static function validateUserAge($age) {
+        // 空/nullの場合
+        if (empty($age) || is_null($age)) {
+            throw new IllegalParameterException();
+        }
+        // 16歳未満は例外
+        if ($age < self::MEMBER_POSSIBLE_AGE) {
+            throw new IllegalParameterException('16歳未満は登録できません。');
+        }
+        return true;
+    }
 
 }

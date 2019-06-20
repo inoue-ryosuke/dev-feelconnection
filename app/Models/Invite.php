@@ -14,11 +14,15 @@ class Invite extends BaseFormModel
      */
     protected $table = 'invite';
     protected $primaryKey = 'id';
+    protected $cidKey = 'cid';
 
     protected $fillable = [
         'cid',
         'lid'
     ];
+
+    const CID = 'cid';
+
     /**
      * 紹介コードがレコードに存在するか確認
      * @param $inviteCode
