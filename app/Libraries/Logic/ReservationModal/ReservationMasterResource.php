@@ -17,6 +17,7 @@ use App\Models\Constant\ReservationTablePrefix;
  * @var int taiken_mess 体験制限表示(0:非表示, 1:表示)
  * @var int taiken_les_flg 体験予約可(0:不可, 1:可)
  * @var int tlimit tlimit分前まで予約可能
+ * @var int tlimit_cancel tlimit分前まで取消可能
  * @var date shift_date レッスン開催日
  * @var time ls_st レッスン開始時間
  * @var int shift_capa 定員(人数)
@@ -228,6 +229,7 @@ abstract class ReservationMasterResource {
         $this->shiftMaster['taiken_mess'] = null;
         $this->shiftMaster['taiken_les_flg'] = null;
         $this->shiftMaster['tlimit'] = null;
+        $this->shiftMaster['tlimit_cancel'] = null;
         $this->shiftMaster['shift_date'] = null;
         $this->shiftMaster['ls_st'] = null;
         $this->shiftMaster['shift_capa'] = null;

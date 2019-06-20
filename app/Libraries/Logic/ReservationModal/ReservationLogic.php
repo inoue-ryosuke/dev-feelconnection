@@ -6,6 +6,7 @@ use App\Libraries\Logger;
 use App\Models\OrderLesson;
 use Illuminate\Support\Facades\DB;
 use App\Models\Constant\OrderLessonFlg;
+use App\Models\Constant\OrderLessonSbFlg;
 
 /**
  * 予約登録、バイク位置変更、予約キャンセル ロジック
@@ -28,6 +29,7 @@ class ReservationLogic
                 $model = OrderLesson::where('sid', '=', $shiftId)
                     ->where('customer_id', '=', $customerId)
                     ->where('flg', '=', OrderLessonFlg::RESERVED)
+                    ->where('sb_flg', '=', OrderLessonSbFlg::NORMAL)
                     ->lockForUpdate()
                     ->first();
 
@@ -41,6 +43,24 @@ class ReservationLogic
         }
 
         return true;
+    }
+
+    /**
+     * 予約済みレッスン情報取得
+     *
+     * @param int $shiftId レッスンスケジュールID
+     * @param int $customerId 会員ID
+     * @return array|null
+     */
+    public static function getReservedLesson(int $shiftId, int $customerId) {
+        $model = OrderLesson::getReservedOrderLesson($shiftId, $customerId);
+
+        if (is_null($model)) {
+            // 予約済みでない
+            return null;
+        }
+
+        return $model->toArray();
     }
 
 }
