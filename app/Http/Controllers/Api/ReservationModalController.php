@@ -12,7 +12,7 @@ use App\Libraries\Logic\ReservationModal\ShiftCustMasterResource;
 use App\Libraries\Logic\ReservationModal\ShiftTenpoCustMasterResource;
 use App\Libraries\Logic\ReservationModal\SheetManager;
 use App\Libraries\Logic\ReservationModal\ReservationLogic;
-use App\Models\Constant\NormalReservationTransitionType;
+use App\Models\Constant\ReservationTransitionType;
 
 /**
  * 予約モーダルコントローラー
@@ -66,6 +66,17 @@ class ReservationModalController extends Controller
                     '未公開のレッスンです。',
                     array_merge($params))
             );
+        }
+
+        // レッスン予約・キャンセル排他ロック(同時予約・キャンセルを防ぐ)
+        if (VaidationLogic::isReserveLock($custMaster['reserve_lock'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not reserve lesson',
+                    'レッスンを予約できません。',
+                    array_merge($params))
+                );
         }
 
         // 予約受付時間内かどうか
@@ -491,7 +502,7 @@ class ReservationModalController extends Controller
         if ($sheetManager->isSheetReserved($sheet_no)) {
             return response()->json([
                 'response_code' => Response::HTTP_RESET_CONTENT,
-                'modal_type' => NormalReservationTransitionType::EXPLANATION_MODAL,
+                'modal_type' => ReservationTransitionType::EXPLANATION_MODAL,
                 'modal_text' => '指定された座席は、他のユーザーによって、枠確保済みまたは予約済みです。'
             ])->setStatusCode(Response::HTTP_RESET_CONTENT);
         }
@@ -501,10 +512,14 @@ class ReservationModalController extends Controller
             // バイク枠確保失敗
             return response()->json([
                 'response_code' => Response::HTTP_RESET_CONTENT,
-                'modal_type' => NormalReservationTransitionType::EXPLANATION_MODAL,
+                'modal_type' => ReservationTransitionType::EXPLANATION_MODAL,
                 'modal_text' => 'バイク枠確保に失敗しました。'
             ])->setStatusCode(Response::HTTP_RESET_CONTENT);
         }
+
+        // 遷移先取得
+        $transitionType = ReservationLogic::getReservationTransitionType($shiftMaster, $custMaster, $tenpoMaster);
+
 
         return response()->json([
             'response_code' => Response::HTTP_CREATED,
@@ -661,45 +676,32 @@ class ReservationModalController extends Controller
                 );
         }
 
+        // レッスン予約・キャンセル排他ロック(同時予約・キャンセルを防ぐ)
+        if (VaidationLogic::isReserveLock($custMaster['reserve_lock'])) {
+            return CommonLogic::getErrorJsonResponse(
+                Response::HTTP_CONFLICT,
+                CommonLogic::getErrorArray(
+                    'Can not cancel lesson',
+                    'レッスンをキャンセルできません。',
+                    array_merge($params))
+                );
+        }
+
         // キャンセル受付時間内かどうか
         if (!VaidationLogic::validateTimeLimit($shiftMaster['shift_date'], $shiftMaster['ls_st'], $shiftMaster['tlimit_cancel'])) {
             // キャンセル受付時間外
             return CommonLogic::getErrorJsonResponse(
                 Response::HTTP_CONFLICT,
                 CommonLogic::getErrorArray(
-                    'Can not reserve sheet',
+                    'Can not cancel lesson',
                     '予約受付時間外です。',
                     array_merge($params,
                         [ 'shift_date' => $shiftMaster['shift_date'], 'start_time' => $shiftMaster['ls_st'], 'time_limit_cancel' => $shiftMaster['tlimit_cancel'] ]))
                 );
         }
 
-        // 予約済みレッスン情報取得
-        $orderLesson = ReservationLogic::getReservedLesson($shiftMaster['shiftid'], $custMaster['cid']);
-        if (is_null($orderLesson)) {
-            // 予約済みでない
-            return CommonLogic::getErrorJsonResponse(
-                Response::HTTP_BAD_REQUEST,
-                CommonLogic::getErrorArray(
-                    'Invalid lesson',
-                    '予約済みでないレッスンです。',
-                    array_merge($params))
-                );
-        }
-
-        // キャンセル可能なレッスン予約(order_lesson)かどうか
-        if (!VaidationLogic::isCancelProhibit($orderLesson['cancel_prohibit'])) {
-            return CommonLogic::getErrorJsonResponse(
-                Response::HTTP_BAD_REQUEST,
-                CommonLogic::getErrorArray(
-                    'Invalid lesson',
-                    'キャンセルできないレッスンです。',
-                    array_merge($params))
-                );
-        }
-
         // 予約キャンセル
-        if (!ReservationLogic::cancelLesson($orderLesson['oid'])) {
+        if (!ReservationLogic::cancelLesson($shiftMaster['shiftid'], $custMaster['cid'])) {
             // throw new InternalErrorException();
             return response()->json([
                 'response_code' => Response::HTTP_INTERNAL_SERVER_ERROR

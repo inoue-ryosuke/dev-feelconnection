@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Constant\OrderLessonFlg;
 use App\Models\Constant\OrderLessonSbFlg;
 use App\Models\Constant\TicketMasterFlg;
+use App\Models\Constant\ReserveLock;
 use App\Models\ClubFee;
+use App\Models\Cust;
 
 /**
  * 予約登録、バイク位置変更、予約キャンセル ロジック
@@ -70,16 +72,34 @@ class ReservationLogic
     /**
      * 予約キャンセル(通常予約)
      *
-     * @param int $orderId レッスン予約ID
+     * @param int $shiftId レッスンスケジュールID
+     * @param int $customerId 会員ID
      * @return bool
      */
-    public static function cancelLesson(int $orderId) {
+    public static function cancelLesson(int $shiftId, int $customerId) {
         try {
-            DB::transaction(function () use ($orderId) {
-                $orderLesson = OrderLesson::where('oid', '=', $orderId)->lockForUpdate()->first();
-                if ($orderLesson->flg !== OrderLessonFlg::RESERVED) {
-                    // 予約キャンセルエラー
-                    throw new \Exception('予約キャンセルエラー order_lessonのステータスが不正 order_lesson =>\n"' . var_export($orderLesson->toArray(), true));
+            DB::transaction(function () use ($shiftId, $customerId) {
+                // レッスン予約・キャンセル排他ロック、予約・キャンセルの同時実行を防ぐ
+                $custMaster = Cust::find($customerId);
+                $custMaster->fill([ 'reserve_lock' => ReserveLock::LOCK ]);
+                $custMaster->save();
+
+                // 予約済みレッスン取得
+                $orderLesson = OrderLesson::where('sid', '=', $shiftId)
+                    ->where('customer_id', '=', $customerId)
+                    ->where('flg', '=', OrderLessonFlg::RESERVED)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (is_null($orderLesson)) {
+                    // 予約済みレッスンでない
+                    throw new \Exception("予約キャンセルエラー 予約済みレッスンでない" );
+                }
+
+                if (!VaidationLogic::isCancelProhibit($orderLesson->cancel_prohibit)) {
+                    // キャンセル可のレッスンでない
+                    throw new \Exception(
+                        "予約キャンセルエラー キャンセル可のレッスンでない order_lesson => \n" . var_export($orderLesson->toArray(), true));
                 }
 
                 // レッスン予約更新カラム
@@ -153,6 +173,10 @@ class ReservationLogic
                     'lid' => $orderLesson->lid,
                     'reg_uid' => 0 // キャンセル実行スタッフID、0:ユーザーキャンセル
                 ]);
+
+                // レッスン予約・キャンセル排他ロック、予約・キャンセルの同時実行を防ぐ
+                $custMaster->fill([ 'reserve_lock' => ReserveLock::UNLOCK ]);
+                $custMaster->save();
             });
         } catch (\Exception $e) {
             Logger::writeErrorLog($e->getMessage());
@@ -161,6 +185,19 @@ class ReservationLogic
         }
 
         return true;
+    }
+
+    /**
+     * 予約確定フローで、遷移先画面・モーダルを決定するために使用
+     * 通常予約・キャンセル待ち予約で使用
+     *
+     * @param array& $shiftMaster shift_masterのリソース
+     * @param array& $custMaster cust_masterのリソース
+     * @param array& $tenpoMaster tenpo_masterのリソース
+     * @return array [ 'modal_type' => モーダル種別, 'modal_text' => モーダルテキスト ]
+     */
+    public static function getReservationTransitionType(array &$shiftMaster, array &$custMaster, array &$tenpoMaster) {
+
     }
 
 }

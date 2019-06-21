@@ -45,6 +45,7 @@ class ReservationModalMasterResource extends ReservationMasterResource {
         $user = auth('customer')->user();
         $this->custMaster['cid'] = $user->cid;
         $this->custMaster['memtype'] = $user->memtype;
+        $this->custMaster['reserve_lock'] = $user->reserve_lock;
 
         return true;
     }
@@ -71,6 +72,7 @@ class ReservationModalMasterResource extends ReservationMasterResource {
         $user = auth('customer')->user();
         $this->custMaster['cid'] = $user->cid;
         $this->custMaster['memtype'] = $user->memtype;
+        $this->custMaster['reserve_lock'] = $user->reserve_lock;
     }
 
 }

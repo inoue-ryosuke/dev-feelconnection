@@ -5,7 +5,7 @@ namespace App\Models\Constant;
 /**
  * 予約モーダルAPIで指定する、遷移先種別
  */
-class NormalReservationTransitionType
+class ReservationTransitionType
 {
     /** 予約確定(遷移は無し) */
     const RESERVATION_CONFIRMATION = 1;
