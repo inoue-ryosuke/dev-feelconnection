@@ -20,7 +20,7 @@ class UpdateLogic
         $result = DB::transaction(function() use($cid,$payload) {
              $cid = data_get($payload,(new Cust)->cKey("cid"));
              $custinfo = Cust::getUserInfoById($cid,true);
-             $custinfo->margeRequest($payload);
+             $custinfo->mergeRequest($payload);
              $custinfo->save();
              return ["result_code" => 0];
         });
